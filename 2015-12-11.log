@@ -1,0 +1,3 @@
+* camera calibration using the 3 point marker and the l-shaped calibrator
+* created a new rigid body out of 3 points
+* struggling running connecting the stream from motive tracker to ros

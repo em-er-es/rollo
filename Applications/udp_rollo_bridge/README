@@ -1,0 +1,4 @@
+To build:
+
+g++ server2.cpp -o rollo_bridge -L. -ludp
+

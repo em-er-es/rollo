@@ -1,0 +1,9 @@
+<launch> 
+  <node pkg="rollo"
+    type="rollo_node"
+    name="rollo_node"
+    respawn="false"
+    launch-prefix=""
+    required="true">
+  </node>
+</launch>

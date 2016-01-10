@@ -1,0 +1,4 @@
+* established connection between ros and motive on both laptops
+* the pose topic for Robot_1 for y and z seem to be swaped, so that the coordinates displayed in motive for y 
+correspond to the coordinates from z and vice versa
+ 

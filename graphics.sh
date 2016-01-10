@@ -1,0 +1,1 @@
+/home/emeres/.bin/latex-precompile--graphics

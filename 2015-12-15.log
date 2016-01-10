@@ -1,0 +1,11 @@
+* the humanot is connecting to the network again, ip address 130.251.13.142, port 900
+* attempts to connect to send raw udp messages to the Humanot
+
+* started working on the motive, translation of tracked coordinates into euler coordinates
+* Motive data on the host: position in millimeters X, Y, Z (Z calibrated to point towards us) 
+* Motive data on the host: orientation in degrees Pitch X, Yaw Y, Roll Z 
+* Motive data on the client: position in millimeters X, Y, Z (Z calibrated to point towards us)
+* Motive data on the clinet: orientation in degrees Pitch X, Yaw Y, Roll Z 
+* Rollo pose, ground_pose logging
+* used python to convert from quaternion coordinates to euler, input needs to be a matrix, output in radians
+* started writing subscriber/publisher for Rollo

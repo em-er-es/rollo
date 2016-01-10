@@ -1,0 +1,15 @@
+# 
+# Definition of all trackable objects
+# Identifier corresponds to Trackable ID set in Tracking Tools
+#
+rigid_bodies:
+    '1':
+        pose: Optitrack_Rollo/pose
+        pose2d: Optitrack_Rollo/ground_pose
+        child_frame_id: Optitrack_Rollo/base_link
+        parent_frame_id: world
+    '2':
+        pose: Object_1/pose
+        pose2d: Object_1/ground_pose
+        frame_id: Object_1/base_link
+        parent_frame_id: world

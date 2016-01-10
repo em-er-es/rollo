@@ -1,0 +1,3 @@
+//first byte: direction -> 0x7b = stop, 0x7c = pull, 0x7d = push, 0x7e = left, 0x7f = right)
+//second byte: velocity -> 0x50 = 0%, 0x55 = 12%, 0x56= 25%, 0x57 = 37%, 0x59 = 50%, 0x5F=62%, 0x60 = 75%, 0x61=87%, 0x62 = 100%;
+//third byte: irrelevant for now -> 0x31 // set to this value in source code
