@@ -1,0 +1,106 @@
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+#include "geometry_msgs/Pose.h"
+#include "geometry_msgs/Pose2D.h"
+#include <sstream>
+#include <iostream>
+// #include <boost/format.hpp>
+
+// ros::Publisher RolloPub;
+
+/*
+void subscriberCallback(const geometry_msgs::Pose::ConstPtr& PoseMsg)
+{
+	 geometry_msgs::Pose MsgSent;
+	 //turtlesim::Pose test= *PoseMsg;
+
+	 //std::cout << test.x << std::endl;
+	 if ((PoseMsg->x >= 1.0)&(PoseMsg->x<=9.5))
+		{
+		MsgSent.linear.y = 0.0;
+		MsgSent.linear.x = 1.0;
+		MsgSent.angular.z=0.0;
+		}
+
+		else if ((PoseMsg->x > 9.5)&(PoseMsg -> theta <3.135))
+		{
+		MsgSent.linear.y = 0.0;
+		MsgSent.linear.x = 0.1;
+		MsgSent.angular.z=0.3;
+		}
+
+	 else if ((PoseMsg->x <1.5)&(PoseMsg -> theta >0.005))
+		{
+		MsgSent.linear.y = 0.0;
+		MsgSent.linear.x = 0.1;
+		MsgSent.angular.z=-0.3;
+		}
+
+		else if ((PoseMsg->x > 9)&(PoseMsg -> theta >3.135))
+		{
+		MsgSent.linear.y = 0.0;
+		MsgSent.linear.x = 1.0;
+		MsgSent.angular.z=0.0;
+		}
+
+	 else if ((PoseMsg->x	< 1.5)&(PoseMsg -> theta <0.005))
+		{
+		MsgSent.linear.y = 0.0;
+		MsgSent.linear.x = 1.0;
+		MsgSent.angular.z=0.0;
+		}
+
+		RolloPub.publish(MsgSent);
+		
+		if ((PoseMsg->y >8.9))
+		{
+	ros::shutdown();
+		}
+}
+*/
+
+int main(int argc, char **argv)
+{
+	ros::start(); // Unncessary to be called manually
+	// Initialization
+	// ros::init(argc, argv, "rollo_node"); // name of the converter node
+	ros::init(argc, argv, "rollo_pubsub"); // name of the converter node
+	ros::Rate frequency(10); // 10 Hz
+
+	// Nodes
+	// ros::NodeHandle NodeSubscribe;
+	ros::NodeHandle NodePublish;
+
+// Subscriber
+	// ros::Subscriber PoseSub = NodeSubscribe.subscribe("/Optitrack_Rollo/pose", 1024, subscriberCallback);
+// Check if subscribed correctly otherwise exit
+	// ros::Publisher RolloPub = NodePublish.advertise<geometry_msgs::Pose>("/Rollo/pose", 1024);
+	ros::Publisher RolloPub = NodePublish.advertise<std_msgs::String>("/Rollo/pose", 1024);
+	// ros::Publisher RolloPub = NodePublish.advertise<geometry_msgs::Pose>("/rosout", 1024);
+
+// Publisher
+	int condition = 1;
+	int loopcounter = 0;
+	
+	std_msgs::String Message;
+	std::stringstream StringStream;
+	// fprintf(StringStream, "%d -- %d", loopcounter, condition);
+	// sprintf(StringStream, "%d -- %d", loopcounter, condition);
+	StringStream << loopcounter << " -- " << condition;
+	Message.data = StringStream.str();
+
+	do {
+	ROS_INFO("%s", Message.data.c_str());
+//	ros::spin();
+	RolloPub.publish(Message);
+	
+	ros::spinOnce();
+
+	if (! ros::ok()) condition = 0;
+	frequency.sleep();
+	loopcounter++;
+	} while (condition);
+//end while loop
+// ros::shutdown();
+return 0;
+}
