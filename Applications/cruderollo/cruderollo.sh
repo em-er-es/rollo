@@ -1,8 +1,10 @@
 #!/bin/bash
+## Arguments
 if [[ -z $1 ]]; then ROLLO_IP=192.168.0.120; else ROLLO_IP=$1; fi
 if [[ -z $2 ]]; then ROLLO_UDP_PORT=900; else ROLLO_UDP_PORT=$2; fi
 if [[ -z $3 ]]; then ROLLO_REPEAT_CMD=3; else ROLLO_REPEAT_CMD=$3; fi
 
+## Definitions
 connect_rollo(){
 echo "Connecting to $ROLLO_IP@$ROLLO_UDP_PORT";
 if [[ $VERBOSE ]]; then
@@ -25,45 +27,74 @@ exit 0;
 
 help_rollo(){
 echo -e "\nRollo crude control script\nCommands:\n";
-echo -e "MOV:[fF]orward\t[bB]ackward\t[lL]eft\t[rR]ight\n[sS]top\t\tre[C]onnect\t[Q]uit\n";
+echo -e "MOV:[fF]orward\t[bB]ackward\t[lL]eft\t[rR]ight\n[sS]top\t\tre[C]onnect\t[Q]uit";
+echo -e "[fblr] = Independent wheel speed\t[FBLR] = Same speed\n"
 echo -e "VEL:[0]* = 6%\t[1]* = 12%\t[2]* = 19%\t[3]* = 25%\n[4]* = 31%\t[5]* = 38%\t[6]* = 44%\t[7]* = 50%\n\t\t\t\t\t\t[8|9]* = 56%\n";
 #echo -e "\n";
 }
 
+## Initialization
 help_rollo;
-connect_rollo;
+#connect_rollo;
 #echo -e "Ready."
 echo -e "Input:"
 #MSG3=31;
 STOP=0;
 TMP=$ROLLO_REPEAT_CMD;
 COUNTER=1;
+## Main loop
 while :; do
+## Movement
 	echo -e "\nMOV:"
 	read -n1 CMD1
 	MOV=$CMD1;
 	case "$MOV" in
-		[fF]*)
+		[f]*)
 		MSG1=7c;
 		INFO1="FORWARD";
+		INDEPENDENT=1;
 		;;
-		[bB]*)
+		[b]*)
 		MSG1=7d;
 		INFO1="BACKWARD";
+		INDEPENDENT=1;
 		;;
-		[lL]*)
+		[l]*)
 		MSG1=7e;
 		INFO1="LEFT";
+		INDEPENDENT=1;
 		;;
-		[rR]*)
+		[r]*)
 		MSG1=7f;
 		INFO1="RIGHT";
+		INDEPENDENT=1;
+		;;
+		[F]*)
+		MSG1=7c;
+		INFO1="FORWARD";
+		INDEPENDENT=0;
+		;;
+		[B]*)
+		MSG1=7d;
+		INFO1="BACKWARD";
+		INDEPENDENT=0;
+		;;
+		[L]*)
+		MSG1=7e;
+		INFO1="LEFT";
+		INDEPENDENT=0;
+		;;
+		[R]*)
+		MSG1=7f;
+		INFO1="RIGHT";
+		INDEPENDENT=0;
 		;;
 		[sS]*)
 		MSG1=7b;
 		MSG2=50;
 		INFO1="STOP";
-		INFO2="0%";
+		INFO2="$MSG2%";
+		INFO3="$MSG3%";
 		STOP=1;
 		;;
 #		[qQeExX]*)
@@ -87,8 +118,9 @@ while :; do
 		continue;
 		;;
 	esac
+## Speed left wheel
 	if [[ $STOP == 0 ]]; then
-	WHEEL="LEFT";
+	if [[ $INDEPENDENT ]]; then WHEEL="LEFT"; else WHEEL="BOTH"; fi
 	echo -e "\n$WHEEL VEL:";
 	read -n1 VELL
 	case "$VELL" in
@@ -136,7 +168,8 @@ while :; do
 		[sS]*)
 		MSG1=7b;
 		INFO1="STOP";
-		INFO2="L $MSG2% R $MSG3%";
+		INFO2="$MSG2%";
+		INFO3="$MSG3%";
 		STOP=1;
 		;;
 		[Q]*)
@@ -159,55 +192,62 @@ while :; do
 		continue;
 		;;
 	esac
-	WHEEL="RIGHT";
-	echo -e "\n$WHEEL VEL:";
-	read -n1 VELR
+## Speed right wheel
+	if [[ $STOP == 0 ]]; then 
+	if [[ $INDEPENDENT == 0 ]]; then 
+		VELR=$VELL; 
+	else 
+		WHEEL="RIGHT";
+		echo -e "\n$WHEEL VEL:";
+		read -n1 VELR
+	fi
 	case "$VELR" in
 		0*)
 		MSG3=10;
-		INFO2="6%";
+		INFO3="6%";
 		;;
 		1*)
 		MSG3=11;
-		INFO2="12%";
+		INFO3="12%";
 		;;
 		2*)
 		MSG3=12;
-		INFO2="19%";
+		INFO3="19%";
 		;;
 		3*)
 		MSG3=13;
-		INFO2="25%";
+		INFO3="25%";
 		;;
 		4*)
 		MSG3=1A;
-		INFO2="31%";
+		INFO3="31%";
 		;;
 		5*)
 		MSG3=1B;
-		INFO2="38%";
+		INFO3="38%";
 		;;
 		6*)
 		MSG3=1C;
-		INFO2="44%";
+		INFO3="44%";
 		;;
 		7*)
 		MSG3=1D;
-		INFO2="50%";
+		INFO3="50%";
 		;;
 		[89]*)
 		MSG3=24;
-		INFO2="56%";
+		INFO3="56%";
 		;;
 #		10*)
 #		MSG3=62;
-#		INFO2="100%";
+#		INFO3="100%";
 #		;;
 #		[qQeExX]*)
 		[sS]*)
 		MSG1=7b;
 		INFO1="STOP";
-		INFO2="L $MSG2% R $MSG3%";
+		INFO2="$MSG2%";
+		INFO3="$MSG3%";
 		STOP=1;
 		;;
 		[Q]*)
@@ -231,7 +271,9 @@ while :; do
 		;;
 	esac
 	fi
-	echo -e "\nRollo: $INFO1 @ $INFO2 speed";
+	fi
+## Data transmission
+	echo -e "\nRollo: $INFO1 @ L $INFO2 R $INFO3 speed";
 	if [[ $STOP ]] && [[ $ROLLO_REPEAT_CMD < 6 ]]; then TMP=$ROLLO_REPEAT_CMD; ROLLO_REPEAT_CMD=6; fi
 	if [[ $VERBOSE ]]; then
 	for i in $(seq $ROLLO_REPEAT_CMD); do udp_rollo 0x$MSG1$MSG2$MSG3; done
