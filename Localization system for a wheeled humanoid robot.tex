@@ -456,18 +456,31 @@ Similar derivation of the robot can be derived for counterclockwise rotation, wh
 \subsection{Adaption of odometry model for rollo}\label{s:10-odometry--rollo}
 \indent\indent
 
+Currently, the encoders feedback is unavailable in the robot and true odometry model can not be implemented.
+However, an attempt has been made to implement its modified version.
+The distance covered by right and left wheels is instead estimated from the control command.
+
+\subsubsection{Straight line motion}\label{s:10-odometry--rollo--straight-line-motion}
+Because of the mechanical difference in the two legs, it is almost impossible for the two wheels to run at same speed . Moreover, the two motors/wheels are powered using 2 different LIPO packs and are run in open loop. The difference in voltage level further results in different speed of the motor at the same pwm. This is a major source for deviation in behavior of robot's adjusted odometry model.
+
+Rollo was run in a straight line at different commands and its location feedback from the motion capture system was logged. For a certain command, average speed of left and right wheel was determined from the logs.
+
+
+  
 \subsection{Odometry errors}\label{s:10-odometry--errors} %TODO refine the whole subsection, define systematic and random errors, shows the differences and the influence on the overall error
 \indent\indent
 This method is sensitive to errors  Rapid and accurate data collection, equipment calibration, and processing are required in most cases for odometry to be used effectively  straight forward to implement
 
-Odometry Error Sources
-Limited resolution during integration (time increments,
-measurement resolution).
-Unequal wheel diameter (deterministic)
-Variation in the contact point of the wheel
-(deterministic)
-Unequal floor contact and variable friction can lead to
-slipping (non deterministic)
+Odometry Error Sources:
+\begin{enumerate}
+	\item Limited resolution during integration (time increments, measurement resolution).
+	\item Unequal wheel diameter (deterministic)
+	\item Variation in the contact point of the wheel (deterministic)
+	\item Unequal floor contact and variable friction can lead to slipping (non deterministic)
+\end{enumerate}
+
+
+
 
 The errors can be divided into systematic and random. 
 Three main sources of systematic errors in odometry:
@@ -478,6 +491,247 @@ Three main sources of systematic errors in odometry:
 \end{itemize}
 
 Last two more significant with time.
+
+
+
+\section{System and Measurements Model}\label{s:20-Model}
+\indent\indent
+\subsection{System Model}\label{s:20-Model--SysModel}
+In order to implement Kalman Filter, the previously described model must be first represented in state space representation.
+
+We can define the location of the robot at instant $k$ using state variables. This will include position in x and y coordinates and orientation.
+\begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:xk localistion}
+	x_k & = & 
+	\begin{bmatrix}
+		x_{[x],k}\\
+		x_{[y],k}\\
+		x_{[\phi],k}\\
+	\end{bmatrix}
+\end{IEEEeqnarray}
+
+The control input provided to robot is the speed of right and left wheel. This defines the distance covered by both the wheels in unit time. The relative displacement of the robot at instant $k$ can be notated by $d_k$. Using equations \ref{e:P_fCCW},\ref{e:P_fCW} and \ref{e:P_fSt}, relative displacement can be expressed in terms of $r$ and $\theta$. Thus, control input $u_k$ can be expressed as a function of relative displacement.
+
+\begin{equation} \label{eq:uk displacmenet}
+	u_k  =  j(d_k)
+\end{equation}
+% 
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:uk displacement2}
+	u_k & = & 
+		\begin{bmatrix}
+			u_{[r],k}\\
+			u_{[ \phi],k}\\
+		\end{bmatrix}
+\end{IEEEeqnarray*} 
+ 
+Given $x_{k-1}$ and $u_{k-1}$, the next location of the robot, $x_k$ can be computed.  
+\begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:xk function}
+	x_k & = & f(x_{k-1}, u_{k-1}) & = & 
+	\begin{bmatrix}
+		f_x(x_{k-1}, u_{k-1})\\
+		f_y(x_{k-1}, u_{k-1})\\
+		f_\phi(x_{k-1}, u_{k-1})\\
+	\end{bmatrix}
+\end{IEEEeqnarray} 
+
+In the above derivation of the system model it was assumed that there are no noise sources. In the next section, we model the noise in the system.
+
+\subsection{System Model with noise}\label{s:20-Model--SysModeNoisel}
+We assume that the noise in the odometry can be modeled by a random noise vector $q_k$ such that the noise is Gaussian distribution with zero mean,$\hat{q_k}$ and covariance matrix,$U_k$ .
+
+\begin{equation} \label{eq: Noise Model}
+q_k \sim   N(\hat{q_k} , U_k) 
+\end{equation}
+
+where
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:qk mean}
+	\hat{q_k} & = & 
+	\begin{bmatrix}
+		0\\
+		0\\
+	\end{bmatrix}
+\end{IEEEeqnarray*} 
+
+and 
+
+\begin{equation*} \label{eq: Uk}
+	U_k = \mathrm{E}(q_k - \hat{q_k}) (q_k - \hat{q_k})^T  
+	\end{equation*}
+
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Uk covariance}
+	U_k & = &  
+	\begin{bmatrix}
+		{\sigma}^2_{q[r],k} & {\sigma}_{q[\phi],k} {\sigma}_{q[r],k}\\
+		{\sigma}_{q[\phi],k} {\sigma}_{q[r],k} & {\sigma}^2_{q[\phi],k}\\
+	\end{bmatrix}
+\end{IEEEeqnarray*} 
+
+With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix, $U_k$ are equal to zero.The computation of variances $ {\sigma}^2_{q[r],k}  $ and ${\sigma}^2_{q[\phi],k} $ for the model is discussed in section.
+ 
+ The control input, or relative displacement can be expressed now as shown below.
+\begin{equation} \label{eq: Uk + noise}
+u_k = j(d_k) + q_k  
+\end{equation}
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Uk + noise2}
+	u_k & = & 
+	\begin{bmatrix}
+			u_{[r],k}\\
+			u_{[ \phi],k}\\
+	\end{bmatrix}
+	& + &
+	\begin{bmatrix}
+			q_{[r],k}\\
+			q_{[ \phi],k}\\
+	\end{bmatrix}	
+\end{IEEEeqnarray*} 
+
+This makes $u_k$ a random vector. Assuming, that $u_{[r],k}$ and $u_{[ \phi],k}$ are deterministic, uncertainty in$ u_k $equals the uncertainty in the noise term $q_k$.
+
+The system noise can similarly be modeled by a random noise vector $w_k$ such that the noise is Gaussian distribution with zero mean , $\hat{w_k}$ and covariance matrix, $Q_k$
+\begin{equation} \label{eq: Noise Model w_k}
+w_k \sim   N(\hat{w_k} , Q_k) 
+\end{equation}
+
+where
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:wk mean}
+	\hat{w_k} & = & 
+	\begin{bmatrix}
+		0\\
+		0\\
+		0\\
+	\end{bmatrix}
+\end{IEEEeqnarray*} 
+
+and 
+
+\begin{equation*} \label{eq: Qk}
+Q_k = \mathrm{E}(w_k - \hat{w_k}) (w_k - \hat{w_k})^T  
+\end{equation*}
+
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Qk covariance}
+	Q_k & = &  
+	\begin{bmatrix}
+		{\sigma}^2_{w[x],k} & {\sigma}_{w[y],k} {\sigma}_{w[x],k} &  {\sigma}_{w[\phi],k} {\sigma}_{w[x],k}\\
+		{\sigma}_{w[x],k} {\sigma}_{w[y],k} & {\sigma}^2_{w[y],k} & {\sigma}_{w[\phi],k} {\sigma}_{w[y],k}\\
+		{\sigma}_{w[x],k} {\sigma}_{w[\phi],k} & {\sigma}_{w[\phi],k} {\sigma}_{w[x],k} & {\sigma}^2_{w[\phi],k}\\
+	\end{bmatrix}
+\end{IEEEeqnarray*} 
+
+With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix, $Q_k$ are equal to zero.The computation of variances $ {\sigma}^2_{w[x],k}  $ , $ {\sigma}^2_{w[y],k}  $ and ${\sigma}^2_{w[\phi],k} $ for the model is discussed in section.
+
+ The system can be expressed now as shown below.
+ \begin{equation} \label{eq: xk + wk}
+	x_k = f(x_{k-1}, u_{k-1}) + w_k 
+ \end{equation}
+ 
+\begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:xk + noise function}
+	x_k & = & 
+	\begin{bmatrix}
+		f_x(x_{k-1}, u_{k-1})\\
+		f_y(x_{k-1}, u_{k-1})\\
+		f_\phi(x_{k-1}, u_{k-1})\\
+	\end{bmatrix}
+	& + &
+	\begin{bmatrix}
+		w_{[x],k-1})\\
+		w_{[y],k-1})\\
+		w_{[\phi],k-1})\\
+	\end{bmatrix}	
+\end{IEEEeqnarray} 
+
+$w_k$ consists of noise sources that are not directly related to $u_k$.
+Now, $x_k$ is a random vector and with every time step the system noise increases the variance. Thus, the variance of the location grows with every time step. %assuming that $f_x$, $f_y$ and $f_\phi$ are deterministic, 
+ 
+We have proposed the System Model so that we can implement Kalman Filter on it. Now, we need to prepare the Measurement Model for it.
+
+
+\subsection{Measurement Model with noise}\label{s:20-Model--MeasurementModel}
+Starting with the assumption that there is no noise in the measurement, $z_k$, it is simply a vector containing for each state variable a variable that takes on the value of the corresponding state variable.
+The measurement vector, $z_k$ is 
+
+\begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:zk}
+	z_k & = & 
+	\begin{bmatrix}
+		z_{[x],k}\\
+		z_{[y],k}\\
+		z_{[\phi],k}\\ 	
+	\end{bmatrix}
+\end{IEEEeqnarray} 
+
+
+In our system, we use the motion capture system in the lab to localize the robot. The motion capture system acts as absolute sensor and provides us directly the position of the robot in x and y coordinates and its orientation. Thus, $z_k$ in this case is simply expressed as \ref{eq:zk 2}
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:zk 2}
+	z_k & = & 
+	\begin{bmatrix}
+		x_{[x],k}\\
+		x_{[y],k}\\
+		x_{[\phi],k}\\ 	
+	\end{bmatrix}
+\end{IEEEeqnarray*} 
+
+
+Now, we can add noise to the measurement model. We assume that the noise in the odometry can be modeled by a random noise vector $v_k$ such that the noise is Gaussian distribution with zero mean,$\hat{v_k}$ and covariance matrix,$R_k$ .
+
+\begin{equation} \label{eq: Noise Model vk}
+v_k \sim   N(\hat{v_k} , R_k) 
+\end{equation}
+
+where
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:vk mean}
+	\hat{v_k} & = & 
+	\begin{bmatrix}
+		0\\
+		0\\
+		0\\
+	\end{bmatrix}
+\end{IEEEeqnarray*} 
+
+and 
+
+\begin{equation*} \label{eq: Rk}
+R_k = \mathrm{E}(v_k - \hat{v_k}) (v_k - \hat{v_k})^T  
+\end{equation*}
+
+%
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Rk covariance}
+	R_k & = &  
+	\begin{bmatrix}
+		{\sigma}^2_{v[x],k} & {\sigma}_{v[y],k} {\sigma}_{v[x],k} &  {\sigma}_{v[\phi],k} {\sigma}_{v[x],k}\\
+		{\sigma}_{v[x],k} {\sigma}_{v[y],k} & {\sigma}^2_{v[y],k} & {\sigma}_{v[\phi],k} {\sigma}_{v[y],k}\\
+		{\sigma}_{v[x],k} {\sigma}_{v[\phi],k} & {\sigma}_{v[\phi],k} {\sigma}_{v[x],k} & {\sigma}^2_{v[\phi],k}\\
+	\end{bmatrix}
+\end{IEEEeqnarray*} 
+
+With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix, $R_k$ are equal to zero.
+
+The measurement model can be expressed now as shown below.
+\begin{equation} \label{eq: zk + noise}
+z_k = x_k + v_k  
+\end{equation}
+
+\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Uk + noise2}
+	z_k & = & 
+	\begin{bmatrix}
+		x_{[x],k}\\
+		x_{[y],k}\\
+		x_{[\phi],k}\\ 
+	\end{bmatrix}
+	& + &
+	\begin{bmatrix}
+		v_{[x],k-1})\\
+		v_{[y],k-1})\\
+		v_{[\phi],k-1})\\
+	\end{bmatrix}	
+\end{IEEEeqnarray*} 
+
+Since the measurement noise $v_k$ is a Gaussian vector, this makes $z_k$ a random vector.
+
 
 % % % % CODE REFERENCE
 %
