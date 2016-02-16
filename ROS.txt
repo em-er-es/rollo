@@ -6,4 +6,33 @@ Nodes:
 *Control
 *Odometry model
 *Kalman Filter
-*Communication
+*Communication (udp, system call udp py/c++)
+
+Taks:
+
+1. Odometry Model
+	a. mathematical equations/model
+	b. MATLAB/Python script + simulation
+	c. implement w/ Rollo
+	d. Square Test Odometry
+	e. Finalize Model
+	f. Documentation
+	g. ROS
+
+2. Localization (using OptiTrack Motion Capture)
+	a. verification/validation
+	b. ROS
+	c. Documentation
+
+3. Kalman Filter
+	a. State Space Model
+	b. KF equaions
+	c. MATLAB/Python script + simulation
+	d. ROS node
+
+4. Testing with Rollo
+
+5. Control Rollo using ROS node
+
+6. Documentation
+
