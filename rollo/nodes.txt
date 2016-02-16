@@ -1,0 +1,3 @@
+# ROS nodes for Rollo
+rollo_preprocessor - basic input gather and preprocess node [S+P]
+rollo_ekf - Extended Kalman filter computations [S+P]
