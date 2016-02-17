@@ -1,5 +1,5 @@
 % EKF   Extended Kalman Filter for nonlinear dynamic systems
-% [x, P] = ekf(f,x,P,h,z,Q,R) returns state estimate, x and state covariance, P 
+% [x, P] = ekf(f,x,P,h,z,Q,R) returns state estimate, x and state covariance, P
 % for nonlinear dynamic system:
 %           x_k+1 = f(x_k, u_k) + w_k
 %           z_k   = h(x_k) + v_k
@@ -54,7 +54,7 @@ zV = zeros(n,N);          % allocate memory for measurement
 for k=1:N
   z = [x_log(k+1);y_log(k+1);theta_log(k+1)];      % measurments from sensor
   zV(:,k)  = z;                             % save measurment
-  [x, E] = rollo_ekf(f,x,u,Jf,Jh,E,h,z,Q,R);    % EKF 
+  [x, E] = my_ekf(f,x,u,Jf,Jh,E,h,z,Q,R);    % EKF
   xV(:,k) = x;                            % save estimate
 end
 figure

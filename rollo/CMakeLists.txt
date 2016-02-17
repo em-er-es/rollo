@@ -129,14 +129,14 @@ include_directories(
 # add_dependencies(rollo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(rollo_node src/rollo_node.cpp)
+add_executable(rollo_preprocessor src/rollo_preprocessor.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(rollo_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(rollo_node
+target_link_libraries(rollo_preprocessor
   ${catkin_LIBRARIES}
 )
 
