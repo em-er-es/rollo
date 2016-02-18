@@ -6,4 +6,41 @@
     launch-prefix=""
     required="true">
   </node>
+  <node pkg="rollo"
+    type="rollo_control"
+    name="rollo_control"
+    respawn="false"
+    launch-prefix=""
+    required="true">
+  </node>
+<!--
+  <node pkg="rollo"
+    type="rollo_ekf"
+    name="rollo_ekf"
+    respawn="false"
+    launch-prefix=""
+    required="true">
+  </node>
+  <node pkg="rollo"
+    type="rollo_comm"
+    name="rollo_comm"
+    respawn="false"
+    launch-prefix=""
+    required="true">
+  </node>
+  <node pkg="rollo"
+    type="rollo_localization"
+    name="rollo_localization"
+    respawn="false"
+    launch-prefix=""
+    required="true">
+  </node>
+  <node pkg="rollo"
+    type="rollo_odometry"
+    name="rollo_odometry"
+    respawn="false"
+    launch-prefix=""
+    required="true">
+  </node>
+/-->
 </launch>
