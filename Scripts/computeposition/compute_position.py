@@ -29,22 +29,22 @@ if __name__ == '__main__':
     parser.add_argument('-Px', '--initial-position-x', dest='P_i_x', type=float, default=0.0, help='Initial position of the robot - X coordinate', metavar='P_I_X <!0>[m]')
     parser.add_argument('-Py', '--initial-position-y', dest='P_i_y', type=float, default=0.0, help='Initial position of the robot - Y coordinate', metavar='P_I_Y <!0>[m]')
     parser.add_argument('-Th', '--initial-orientation', dest='Theta_i', type=float, default=0.0, help='Initial orientation of the robot - Theta', metavar='THETA <!0>[rad]')
-    parser.add_argument('-t', '--time', dest='t', type=float, default=1.0, help='Time for the movement', metavar='t <!0>[s]')
+    parser.add_argument('-t', '--time', dest='t', type=float, default=10.0, help='Time for the movement', metavar='t <!10.0>[s]')
     parser.add_argument('-rL', '--radius-wheel-left', dest='r_L', type=float, default=0.1, help='Radius of the left wheel', metavar='R_L <!0.100>[m]')
     parser.add_argument('-rR', '--radius-wheel-right', dest='r_R', type=float, default=0.1, help='Radius of the right wheel', metavar='R_R <!0.100>[m]')
-    parser.add_argument('-al', '--axle-length', dest='axle_l', type=float, default=0.205, help='Distance between wheels - Length of the axle', metavar='AXLE_L <!0.30>[m]')
+    parser.add_argument('-al', '--axle-length', dest='axle_l', type=float, default=0.205, help='Distance between wheels - Length of the axle', metavar='AXLE_L <!0.205>[m]')
     #%% Additional script relevant arguments
 #    parser.add_argument('-1', '-p', '--pause', dest='pause', action='store_true', help='Pause between processed images')
 #    parser.add_argument('-cp', '--color-plot', dest='colorPlot', type=bool, help='Colorize generated plot')
-    parser.add_argument('-gp', '--generate-plot', dest='generatePlot', type=bool, help='Generate a plot of movement')
-    parser.add_argument('-d', '--degrees', dest='degrees', action='store_true', help='Output orientation in degrees instead of radians')
-#    parser.add_argument('-ia', '--invert-axes', dest='invertAxes', type=bool, help='Invert axes on distortion plots')
+    parser.add_argument('-gp', '--generate-plot', dest='generatePlot', action='store_true', default=0, help='Generate a plot of movement')
+    parser.add_argument('-d', '--degrees', dest='degrees', action='store_true', default=0, help='Output orientation in degrees instead of radians')
+#    parser.add_argument('-ia', '--invert-axes', dest='invertAxes', type=bool, default=0, help='Invert axes on distortion plots')
 #    parser.add_argument('-l', '--log', dest='logFile', type=str, help='Write a log file with results', metavar='LOGFILENAME')
-    parser.add_argument('-pd', '--predefined', dest='predefined', type=str, help='Use a predefined sets of parameters for movement simulation', metavar='PREDEFINED')
-#    parser.add_argument('-si', '--show-images', dest='showImages', action='store_true', help='Show images')
-#    parser.add_argument('-s', '--save-images', dest='saveImages', action='store_true', help='Save images')
-#    parser.add_argument('-sp', '--save-path', dest='savePath', type=str, default='/tmp', help='Defines path for generated images, implies save images option', metavar='<SAVEPATH><!/tmp>')
-    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='Produce more verbose output')
+    parser.add_argument('-pd', '--predefined', dest='predefined', action='store_true', default=0, help='Use a predefined sets of parameters for movement simulation')
+#    parser.add_argument('-si', '--show-images', dest='showImages', action='store_true', default=0, help='Show images')
+#    parser.add_argument('-s', '--save-images', dest='saveImages', action='store_true', default=0, help='Save images')
+#    parser.add_argument('-sp', '--save-path', dest='savePath', type=str, default='/tmp', default=0, help='Defines path for generated images, implies save images option', metavar='<SAVEPATH><!/tmp>')
+    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=0, help='Produce more verbose output')
     args = parser.parse_args() # Parse script call arguments
     #%% Assign arguments
     n_L = float(args.n_L)
@@ -104,8 +104,8 @@ if __name__ == '__main__':
             Theta_i = 45
         else:
             Theta_i = np.pi / 4.0
-        n_L = 6; n_R = 5; t = 10; 
-        r_L = 0.1; r_R = 0.1; axle_l = 0.3;
+        n_L = 6; n_R = 5; t = 1000;
+        r_L = 0.1; r_R = 0.1; axle_l = 0.205;
     if verbose:
         print('Time (t [s]): ', t)
         print('Initial position (X [m]; Y [m]): ', P_i_x, ';', P_i_y)
@@ -118,15 +118,12 @@ if __name__ == '__main__':
         print('Wheel speed - right (n_R [m/s]): ', n_R)
         print('Wheel radius - left (r_L [m]): ', r_L)
         print('Wheel radius - right (r_R [m]): ', r_R)
-    if predefined:
-        [P_f_x, P_f_y, Theta_f] = rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, verbose, 1)
-    else:
-        [P_f_x, P_f_y, Theta_f] = rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, verbose, degrees)
+    [P_f_x, P_f_y, Theta_f] = rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, verbose, degrees)
     print('Final position (X [m]; Y [m]): ', P_f_x, ';', P_f_y)
     if degrees:
-        print('Final orientation (Theta [°]): ', Theta_f)
+        print('Final orientation (Theta [°]): ', Theta_f % 360)
     else:
-        print('Final orientation (Theta [rad]): ', Theta_f)
+        print('Final orientation (Theta [rad]): ', Theta_f % (2 * np.pi))
         
     if generatePlot:
         axi = 2.0
@@ -134,7 +131,7 @@ if __name__ == '__main__':
         lineWidth = 1.6
         axx = np.max([np.ceil(np.abs(P_f_x - P_i_x) / axi) * axi, np.abs(P_f_x) + 1, np.abs(P_i_x) + 1])
         axy = np.max([np.ceil(np.abs(P_f_y - P_i_y) / axi) * axi, np.abs(P_f_y) + 1, np.abs(P_i_y) + 1])
-        plt.axis([-axx, axx, -axy, axy])
+        # plt.axis([-axx, axx, -axy, axy])
         if not degrees:
             oi = np.rad2deg(Theta_i)
             of = np.rad2deg(Theta_f)
@@ -146,20 +143,34 @@ if __name__ == '__main__':
         Theta_i_t = Theta_i
         P_i_x_t = P_i_x
         P_i_y_t = P_i_y
-        step = 100.0
-        for i in np.arange(0, t, t / step):
+
+        steps = 100.0
+        z = 0
+        dt = t / steps
+        if verbose:
+            print('Number of steps (n [1]): ', steps)
+            print('Time step (dt [s]): ', dt)
+        # for i in np.arange(0, t, t / step):
+        for i in np.arange(1, steps + 1, 1):
+            [P_f_x_t, P_f_y_t, Theta_f_t] = rollo_compute_position(P_i_x_t, P_i_y_t, Theta_i_t, n_L, n_R, dt, r_L, r_R, axle_l, 0, degrees)
+            print(i, P_f_x_t, P_f_y_t, Theta_f_t)
+            # print(i)
+
+            if not degrees:
+                of = np.rad2deg(Theta_f)
+            else:
+                of = Theta_f
+            plt.plot(P_f_x_t, P_f_y_t, 'b', marker=(3, 1, of), markersize = markerScale / 3)
+            # plt.plot(P_f_x_t, P_f_y_t, marker='x', markersize = markerScale / 3)
+            # plt.plot(np.linspace(P_i_x, P_f_x, 10), np.linspace(P_i_y, P_f_y, 10), 'b-', linewidth = lineWidth)
+
             Theta_i_t = Theta_f_t
             P_i_x_t = P_f_x_t
             P_i_y_t = P_f_y_t
 
-            [P_f_x_t, P_f_y_t, Theta_f_t] = rollo_compute_position(P_i_x_t, P_i_y_t, Theta_i_t, n_L, n_R, t, r_L, r_R, axle_l, 0, degrees)
-            # print(P_f_x_t, P_f_y_t, Theta_f_t)
+            z = z + dt
 
-        if not degrees:
-            of = np.rad2deg(Theta_f)
-        else:
-            of = Theta_f
-
-            plt.plot(P_f_x_t, P_f_y_t, marker=(3, 1, of), markersize = markerScale / 3)
-        # plt.plot(np.linspace(P_i_x, P_f_x, 10), np.linspace(P_i_y, P_f_y, 10), 'b-', linewidth = lineWidth)
         plt.grid(1)
+        # print(P_f_x_t, P_f_y_t, Theta_f_t, z)
+        print(t, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, 0, degrees))
+        print(z-dt, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, z-dt, r_L, r_R, axle_l, 0, degrees))
