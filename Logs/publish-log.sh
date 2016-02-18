@@ -9,7 +9,8 @@ if [[ $# -lt 1 ]]; then echo "Specify log file to publish"; exit 1; fi
 if [[ ! -f "$FILE" ]]; then echo -e "Error reading $FILE"; exit 1; fi
 
 if [[ $# -lt 2 ]]; then 
-	MESSAGE_DESTINATION="/Optitrack_Rollo/ground_pose"; MESSAGE_FORMAT="geometry_msgs/Pose2D"; LOOPS=0; FREQUENCY=25.0; PERIOD=0; PRESLEEP=0;
+#	MESSAGE_DESTINATION="/Optitrack_Rollo/ground_pose"; MESSAGE_FORMAT="geometry_msgs/Pose2D"; LOOPS=0; FREQUENCY=25.0; PERIOD=0; PRESLEEP=0;
+	MESSAGE_DESTINATION="/Optitrack_Rollo/ground_pose"; MESSAGE_FORMAT="geometry_msgs/Pose2D"; LOOPS=0; FREQUENCY=120.0; PERIOD=0; PRESLEEP=0;
 else
 	MESSAGE_DESTINATION=$2; MESSAGE_FORMAT=$3; LOOPS=$4; FREQUENCY=$5; PERIOD=$6; PRESLEEP=$7;
 fi
