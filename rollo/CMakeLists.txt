@@ -148,7 +148,7 @@ add_executable(rollo_control src/rollo_control.cpp)
 add_executable(rollo_preprocessor src/rollo_preprocessor.cpp)
 # add_executable(rollo_ekf src/rollo_ekf.cpp)
 # add_executable(rollo_localization src/rollo_localization.cpp)
-# add_executable(rollo_comm src/rollo_comm.cpp)
+add_executable(rollo_comm src/rollo_comm.cpp)
 # add_executable(rollo_odometry src/rollo_odometry.cpp)
 
 ## Add cmake target dependencies of the executable
@@ -168,9 +168,12 @@ target_link_libraries(rollo_control
   # ${catkin_LIBRARIES}
 # )
 
-# target_link_libraries(rollo_comm
-  # ${catkin_LIBRARIES}
-# )
+target_link_libraries(rollo_comm
+  ${catkin_LIBRARIES}
+#  $ROS_ROOT/rollo/
+#  $ROS_PACKAGE_PATH/src/rollo/src/libudp.so
+#  $ROS_PACKAGE_PATH/devel/lib/rollo/libudp.so
+)
 
 # target_link_libraries(rollo_localization
   # ${catkin_LIBRARIES}
