@@ -1,7 +1,7 @@
 <launch> 
   <node pkg="rollo"
-    type="rollo_node"
-    name="rollo_node"
+    type="rollo_preprocessor"
+    name="rollo_preprocessor"
     respawn="false"
     launch-prefix=""
     required="true">
