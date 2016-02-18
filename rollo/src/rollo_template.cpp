@@ -8,10 +8,26 @@
  * @see https://github.com/em-er-es/rollo/
  */
 
+// Naming conventions:
+// Global and important variables: CapitalLettersFullName
+// Local, temporary and irrelevant variables: shortlowercase
+// Functions priority: CapitalLettersFunctions
+// Functions conventional: firstLowerLetterFunction
+// Functions and variables special: _FullDescription
 
 #include "ros/ros.h"
 #include <sstream>
 #include <iostream>
+#include "rollo_nodes.h"
+
+
+/**
+ * @brief GLOBVAR
+ * 
+ */
+
+double x, y, theta;
+double x_mm, y_mm, theta_deg;
 
 
 /**
@@ -53,8 +69,8 @@ void fun()
 int main(int argc, char **argv)
 {
 //! Initialize node
-ros::init(argc, argv, "rollo_control_node"); // name of the converter node
-ros::start(); // Necessary to be called
+ros::init(argc, argv, "rollo_name"); // LOOKUP nodes.txt
+ros::start(); // ROS node initialization
 
 //! Initialize nodehandle
 ros::NodeHandle RolloControlNode;
