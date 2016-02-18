@@ -26,7 +26,7 @@
 
 
 /**
- * @brief Global variables updated in the SubscriberCallback function and later used in main to process and publish.
+ * @brief Global variables updated in the SubscriberCallback function, processed and published.
  * 
  */
 
@@ -61,7 +61,7 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
  *
  * Initializes variables, nodehandle, subscribes to Optitack Ground_pose and publishes position and orientation after processing.
  * It accepts 3 arguments from command line: rate, samplesize, sampling.
- * The position and orientation are published to topic /Rollo/pose in format geometry_msgs::Pose2D
+ * The position and orientation are published to topic /Rollo/pose in format geometry_msgs::Pose2D.
  * @return 0
  */
 int main(int argc, char **argv)
@@ -72,20 +72,20 @@ ros::init(argc, argv, "rollo_preprocessor"); // Name of the preprocessor node
 ros::start(); // ROS internal function, neccessary to be called
 
 //! Nodehandle for subscriber and publisher
-ros::NodeHandle RolloNode;
+ros::NodeHandle RolloPreprocessorNode;
 
 //! Subscriber
-ros::Subscriber PoseSub = RolloNode.subscribe("/Optitrack_Rollo/ground_pose", 1024, subscriberCallback);
+ros::Subscriber PoseSub = RolloPreprocessorNode.subscribe("/Optitrack_Rollo/ground_pose", 1024, subscriberCallback);
 
 //! Publisher initialization with topic, message format and queue size definition
-ros::Publisher RolloPub = RolloNode.advertise<geometry_msgs::Pose2D>("/Rollo/pose", 1024);
+ros::Publisher RolloPub = RolloPreprocessorNode.advertise<geometry_msgs::Pose2D>("/Rollo/pose", 1024);
 
 //! Node arguments using command line
 int rate_frequency;
 int samplesize;
 int sampling; // Sampling is either done using subsampling (0) or simple averaging (1) 
 
-// Command: rosrun rollo rollo_node _rate:=1 _samplesize:=5 _sampling:=0
+// Command: rosrun rollo rollo_preprocessor _rate:=1 _samplesize:=5 _sampling:=0
 //! Initialize node parameters from launch file or command line.
 //! Use a private node handle so that multiple instances of the node can be run simultaneously
 //! while using different parameters.
@@ -101,7 +101,7 @@ ros::Rate frequency(rate_frequency);
 std_msgs::String Message;
 std::stringstream StringStream;
 
-std_msgs::String PubRolloPosition; // Declaration of message typey
+std_msgs::String PubRolloPosition; // Declaration of message type
 
 //! Publisher variables for processing
 double sum_x_mm = 0;
@@ -164,7 +164,7 @@ do {
 	loopcounter++;
 
 } while (loopcondition);
-//! End while loop
+//! End loop
 
 // ros::shutdown();
 return 0;
