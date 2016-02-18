@@ -139,7 +139,7 @@ if __name__ == '__main__':
             oi = Theta_i
             of = Theta_f
         plt.plot(P_i_x, P_i_y, 'g', marker = (3, 0, -oi), markersize = markerScale, linewidth = lineWidth)
-        plt.plot(P_f_x, P_f_y, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
+        # plt.plot(P_f_x, P_f_y, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
         Theta_i_t = Theta_i
         P_i_x_t = P_i_x
         P_i_y_t = P_i_y
@@ -170,8 +170,10 @@ if __name__ == '__main__':
 
             z = z + dt
 
+        plt.plot(P_f_x_t, P_f_y_t, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
         plt.grid(1)
         plt.show()
         # print(P_f_x_t, P_f_y_t, Theta_f_t, z)
         print(t, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, 0, degrees))
         print(z-dt, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, z-dt, r_L, r_R, axle_l, 0, degrees))
+###TODO use only the loop for calculating the final position

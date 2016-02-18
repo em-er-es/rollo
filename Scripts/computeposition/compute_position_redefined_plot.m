@@ -64,18 +64,18 @@ axx = ceil((max(C_x) - min(C_x)) / 5) * 5;
 axy = ceil((max(C_y) - min(C_y)) / 5) * 5;
 % axis ([-axx axx -axy axy])
 grid on;
-steps * dt, t
-SL = t * (nL / 60) * 2 * pi * rL
-SR = t * (nR / 60) * 2 * pi * rR
-SL = dt * steps * (nL / 60) * 2 * pi * rL
-SR = dt * steps * (nR / 60) * 2 * pi * rR
-C_f_x_t = C_i_x + del_S* cos(-beta_rad/2 + theta_i)
-C_f_y_t = C_i_y + del_S* sin(-beta_rad/2 + theta_i)
-C_f_x_t = C_i_x_t + del_S* cos(-beta_rad/2 + theta_i)
-C_f_y_t = C_i_y_t + del_S* sin(-beta_rad/2 + theta_i)
-beta_rad, del_S
-beta_rad = (SL - SR) / 2;
-del_S = (SL + SR) / 2;
-beta_rad, del_S
-C_f_x_t = C_i_x_t + del_S* cos(-beta_rad/2 + theta_i)
-C_f_y_t = C_i_y_t + del_S* sin(-beta_rad/2 + theta_i)
+% steps * dt, t
+% SL = t * (nL / 60) * 2 * pi * rL
+% SR = t * (nR / 60) * 2 * pi * rR
+% SL = dt * steps * (nL / 60) * 2 * pi * rL
+% SR = dt * steps * (nR / 60) * 2 * pi * rR
+% C_f_x_t = C_i_x + del_S* cos(-beta_rad/2 + theta_i)
+% C_f_y_t = C_i_y + del_S* sin(-beta_rad/2 + theta_i)
+% C_f_x_t = C_i_x_t + del_S* cos(-beta_rad/2 + theta_i)
+% C_f_y_t = C_i_y_t + del_S* sin(-beta_rad/2 + theta_i)
+% beta_rad, del_S
+% beta_rad = (SL - SR) / 2;
+% del_S = (SL + SR) / 2;
+% beta_rad, del_S
+% C_f_x_t = C_i_x_t + del_S* cos(-beta_rad/2 + theta_i)
+% C_f_y_t = C_i_y_t + del_S* sin(-beta_rad/2 + theta_i)
