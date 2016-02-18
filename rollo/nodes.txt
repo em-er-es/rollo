@@ -1,7 +1,8 @@
 # ROS nodes for Rollo
-rollo_preprocessor - Basic input fetch and preprocess [S+P]
-rollo_ekf - Extended Kalman filter computations [S+P]
-rollo_localization - Localization [S+P]
-rollo_control - Direct control of Rollo [P]
-rollo_odometry - Odometry model [S+P]
-rollo_comm - Communication between protocols and nodes (udp, system call udp py/c++) [P]
+rollo_preprocessor - Basic input fetch and preprocess [S+P] [PREP]
+rollo_ekf - Extended Kalman filter computations [S+P] [EKF ]
+rollo_localization - Localization [S+P] [LOC ]
+rollo_control - Direct control of Rollo [P] [CTRL]
+rollo_odometry - Odometry model [S+P] [ODOM]
+rollo_comm - Communication between protocols and nodes (udp, system call udp py/c++) [P] [COMM]
+
