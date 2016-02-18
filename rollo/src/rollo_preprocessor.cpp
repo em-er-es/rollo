@@ -58,7 +58,7 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
 /**
  * @brief Main function
  *
- * Initializes variables, nodehandle, subsrcribes to Optitack Ground_pose and publishes position and orientation after processing.
+ * Initializes variables, nodehandle, subscribes to Optitack Ground_pose and publishes position and orientation after processing.
  * It accepts 3 arguments from command line: rate, samplesize, sampling.
  * The position and orientation are published to topic /Rollo/pose in format geometry_msgs::Pose2D
  * @return 0
@@ -66,43 +66,43 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
 int main(int argc, char **argv)
 {
 
-// Initialization 
+//! Initialization 
 ros::init(argc, argv, "rollo_preprocessor"); // Name of the preprocessor node
 ros::start(); // ROS internal function, neccessary to be called
 
-// Nodehandle for subscriber and publisher
+//! Nodehandle for subscriber and publisher
 ros::NodeHandle RolloNode;
 
-// Subscriber
+//! Subscriber
 ros::Subscriber PoseSub = RolloNode.subscribe("/Optitrack_Rollo/ground_pose", 1024, subscriberCallback);
 
-// Publisher
+//! Publisher initialization with topic, message format and queue size definition
 ros::Publisher RolloPub = RolloNode.advertise<geometry_msgs::Pose2D>("/Rollo/pose", 1024);
 
-// Publisher arguments using command line
+//! Node arguments using command line
 int rate_frequency;
 int samplesize;
 int sampling; // Sampling is either done using subsampling (0) or simple averaging (1) 
 
 // Command: rosrun rollo rollo_node _rate:=1 _samplesize:=5 _sampling:=0
-// Initialize node parameters from launch file or command line.
-// Use a private node handle so that multiple instances of the node can be run simultaneously
-// while using different parameters.
+//! Initialize node parameters from launch file or command line.
+//! Use a private node handle so that multiple instances of the node can be run simultaneously
+//! while using different parameters.
 ros::NodeHandle private_node_handle_("~");
 private_node_handle_.param("rate", rate_frequency, int(1));
 private_node_handle_.param("samplesize", samplesize, int(4));
 private_node_handle_.param("sampling", sampling, int(0));
 
-// Publishing rate [Hz]
+//! Publishing rate [Hz]
 ros::Rate frequency(rate_frequency); 
 
-// Publisher variables for conventional messages
+//! Publisher variables for conventional messages
 std_msgs::String Message;
 std::stringstream StringStream;
 
-std_msgs::String PubRolloPosition; // Declaration of message type 
+std_msgs::String PubRolloPosition; // Declaration of message typey
 
-// Publisher variables for processing
+//! Publisher variables for processing
 double sum_x_mm = 0;
 double sum_y_mm = 0;
 double sum_theta_deg = 0;
@@ -115,7 +115,7 @@ int loopcounter = 0;
 int loopcondition = 1; // For while(1) loop
 
 
-// Loop
+//! Loop
 do {
 	sum_x_mm += x_mm;
 	sum_y_mm += y_mm;
@@ -134,22 +134,22 @@ do {
 		//StringStream << "[Rollo][X, Y, Theta]: " << average_x_mm << ", " << average_y_mm << ", " << average_theta_deg << "\n";
 		//PubRolloPosition.data = StringStream.str();
 
-		// Prepare data for publishing
+		//! Prepare data for publishing
 		geometry_msgs::Pose2D PubRolloPositionPose2d;
 		PubRolloPositionPose2d.x = average_x_mm;
 		PubRolloPositionPose2d.y = average_y_mm;
 		PubRolloPositionPose2d.theta = average_theta_deg;
 
-		// Publish
+		//! Publish
 		RolloPub.publish(PubRolloPositionPose2d);
 
-		// Reset variables
+		//! Reset variables
 		loopcounter = 0;
 		sum_x_mm  = 0;
 		sum_y_mm  = 0;
 		sum_theta_deg = 0;
 
-		// For subsampling sleep for time defined by rate and then read the states from the subscriber callback() without sleep() delay 
+		//! For subsampling sleep for time defined by rate and then read the states from the subscriber callback() without sleep() delay 
 		if (sampling == 0) frequency.sleep();
 	}
 
@@ -158,12 +158,12 @@ do {
 	ros::spinOnce();
 	if (! ros::ok()) loopcondition = 0;
 
-	// For averaging sleep for time defined by rate before reading states from the subscriber callback()
+	//! For averaging sleep for time defined by rate before reading states from the subscriber callback()
 	if (sampling != 0) frequency.sleep();
 	loopcounter++;
 
 } while (loopcondition);
-// End while loop
+//! End while loop
 
 // ros::shutdown();
 return 0;
