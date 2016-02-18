@@ -160,7 +160,7 @@ if __name__ == '__main__':
                 of = np.rad2deg(Theta_f)
             else:
                 of = Theta_f
-            plt.plot(P_f_x_t, P_f_y_t, 'b', marker=(3, 1, of), markersize = markerScale / 3)
+            plt.plot(P_f_x_t, P_f_y_t, 'b', marker=(3, 0, -of), markersize = markerScale / 3)
             # plt.plot(P_f_x_t, P_f_y_t, marker='x', markersize = markerScale / 3)
             # plt.plot(np.linspace(P_i_x, P_f_x, 10), np.linspace(P_i_y, P_f_y, 10), 'b-', linewidth = lineWidth)
 
@@ -171,6 +171,7 @@ if __name__ == '__main__':
             z = z + dt
 
         plt.grid(1)
+        plt.show()
         # print(P_f_x_t, P_f_y_t, Theta_f_t, z)
         print(t, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, 0, degrees))
         print(z-dt, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, z-dt, r_L, r_R, axle_l, 0, degrees))

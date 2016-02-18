@@ -1,5 +1,5 @@
 function [C_f_x, C_f_y, theta_f] = compute_position (C_i_x, C_i_y, theta_i, nL, nR, t)
-%% Odometery model
+%% Odometry model
 %% Inputs: Initial coordinates of the robot (centre position), initial orientation of the robot in radians, nL and nR is rpm of the left and right wheel 
 %% Outputs: Final coordinates of the robot (centre position), Final orientation of the robot in radians
 %% Assumptions: 
@@ -14,21 +14,20 @@ rR = 0.1; % [m]
 t % [s]
 steps = 100;
 
-%compute distance traveled by wheel
-% SL = t * (nL / 60) * 2 * pi * rL; %linear distance traveled by left wheel in meters
-% SR = t * (nR / 60) * 2 * pi * rR; %linear distance traveled by right wheel in meters
-td = t / steps
-SL = td * (nL / 60) * 2 * pi * rL; %linear distance traveled by left wheel in meters
-SR = td * (nR / 60) * 2 * pi * rR; %linear distance traveled by right wheel in meters
+% Compute distance traveled by wheel
+% SL = t * (nL / 60) * 2 * pi * rL; % Linear distance traveled by left wheel in meters
+% SR = t * (nR / 60) * 2 * pi * rR; % Linear distance traveled by right wheel in meters
+dt = t / steps
+SL = dt * (nL / 60) * 2 * pi * rL; % Linear distance traveled by left wheel in meters
+SR = dt * (nR / 60) * 2 * pi * rR; % Linear distance traveled by right wheel in meters
 
 C_i_x, C_i_y, SL, SR, theta_i
-
+C_i_x_t = C_i_x, C_i_y_t = C_i_y
 
 hold off;
 plot(C_i_x, C_i_y, 'o');
 hold on;
 
-%now repeating so we have the same equation for all three conditions
 for i = 1:steps
 
 	beta_rad = (SL - SR) / 2;
@@ -65,3 +64,18 @@ axx = ceil((max(C_x) - min(C_x)) / 5) * 5;
 axy = ceil((max(C_y) - min(C_y)) / 5) * 5;
 % axis ([-axx axx -axy axy])
 grid on;
+steps * dt, t
+SL = t * (nL / 60) * 2 * pi * rL
+SR = t * (nR / 60) * 2 * pi * rR
+SL = dt * steps * (nL / 60) * 2 * pi * rL
+SR = dt * steps * (nR / 60) * 2 * pi * rR
+C_f_x_t = C_i_x + del_S* cos(-beta_rad/2 + theta_i)
+C_f_y_t = C_i_y + del_S* sin(-beta_rad/2 + theta_i)
+C_f_x_t = C_i_x_t + del_S* cos(-beta_rad/2 + theta_i)
+C_f_y_t = C_i_y_t + del_S* sin(-beta_rad/2 + theta_i)
+beta_rad, del_S
+beta_rad = (SL - SR) / 2;
+del_S = (SL + SR) / 2;
+beta_rad, del_S
+C_f_x_t = C_i_x_t + del_S* cos(-beta_rad/2 + theta_i)
+C_f_y_t = C_i_y_t + del_S* sin(-beta_rad/2 + theta_i)
