@@ -1,8 +1,8 @@
 /**
  * @file rollo_node.cpp
- * @author Ernest Damian Skrzypczyk, Rabbia Asghar
+ * @author Rabbia Asghar, Ernest Skrzypczyk
  * @date 9 16/2/16
- * @brief Preprocessor Mocap OptiTrack GroundTrack
+ * @brief Preprocessor for Rollo measurement using Mocap OptiTrack motion capture data
  *
  * Filter the raw data from optitrack motion capture system and 
  * publish it for modeling of odometry and the measurement in Kalman Filter
@@ -22,6 +22,7 @@
 #include "tf/tf.h"
 #include <sstream>
 #include <iostream>
+#include "rollo_nodes.h"
 
 
 /**
