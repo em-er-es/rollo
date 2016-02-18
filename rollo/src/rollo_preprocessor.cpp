@@ -29,7 +29,9 @@
  * @brief Global variables updated in the SubscriberCallback function and later used in main to process and publish.
  * 
  */
- 
+
+char NodeName[20] = C1 PP CR; // The size is necessary for the GNU/Linux console codes //~COLOR
+// char NodeName[20] = PP; // The size is necessary for the GNU/Linux console codes //~COLOR
 double x, y, theta;
 double x_mm, y_mm, theta_deg;
 
@@ -50,9 +52,7 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
 	y_mm = 1000 * y;
 	theta = msg->theta; // Raw theta [rad]
 	theta_deg = theta / 3.14159265359 * 180 + 180; // Conversion into degrees in the range 0 to 360 degress
-	// ROS_INFO("[Rollo][Sub][X, Y, Theta]: %f, %f, %f", msg->x, msg->y, msg->theta);
-	// ROS_INFO("[Rollo][Sub][X, Y, Theta]: %f, %f, %f, %f", msg->x, msg->y, msg->theta, theta_deg);
-	ROS_INFO("[Rollo][Sub][X, Y, Theta]: %f, %f, %f", x_mm, y_mm, theta_deg);
+	ROS_INFO("[Rollo][%s][Sub][X, Y, Theta]: %f, %f, %f", NodeName, x_mm, y_mm, theta_deg);
 }
 
 
@@ -129,10 +129,10 @@ do {
 		average_y_mm = sum_y_mm / samplesize;
 		average_theta_deg = sum_theta_deg / samplesize;
 
-		//StringStream << "[Rollo][X, Y, Theta]: " << x_mm << ", " << y_mm << ", " << theta_deg << "\n";
-		//StringStream << "[Rollo][X, Y, Theta]: " << sum_x_mm << ", " << sum_y_mm << ", " << sum_theta_deg << "\n";
-		//StringStream << "[Rollo]["<<samplesize<<"][X, Y, Theta]: " << average_x_mm << ", " << average_y_mm << ", " << average_theta_deg << "\n";
-		//StringStream << "[Rollo][X, Y, Theta]: " << average_x_mm << ", " << average_y_mm << ", " << average_theta_deg << "\n";
+		//StringStream << "[Rollo][" << NodeName << "][X, Y, Theta]: " << x_mm << ", " << y_mm << ", " << theta_deg << "\n";
+		//StringStream << "[Rollo][" << NodeName << "][X, Y, Theta]: " << sum_x_mm << ", " << sum_y_mm << ", " << sum_theta_deg << "\n";
+		//StringStream << "[Rollo][" << NodeName << "]["<<samplesize<<"][X, Y, Theta]: " << average_x_mm << ", " << average_y_mm << ", " << average_theta_deg << "\n";
+		//StringStream << "[Rollo][" << NodeName << "][X, Y, Theta]: " << average_x_mm << ", " << average_y_mm << ", " << average_theta_deg << "\n";
 		//PubRolloPosition.data = StringStream.str();
 
 		//! Prepare data for publishing
@@ -155,7 +155,7 @@ do {
 	}
 
 
-	// ROS_INFO("[Rollo][Debug][Counter]: %d", loopcounter); //DB
+	// ROS_INFO("[Rollo][%s][Debug][Counter]: %d", NodeName, loopcounter); //DB
 	ros::spinOnce();
 	if (! ros::ok()) loopcondition = 0;
 
