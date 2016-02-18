@@ -128,8 +128,28 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(rollo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+###
+# If necessary, use the RELATIVE flag, otherwise each source file may be listed 
+# with full pathname. RELATIVE may makes it easier to extract an executable name
+# automatically.
+# file( GLOB APP_SOURCES RELATIVE app/*.cxx )
+#file( GLOB APP_SOURCES app/*.cxx )
+#foreach( testsourcefile ${APP_SOURCES} )
+#    # I used a simple string replace, to cut off .cpp.
+#    string( REPLACE ".cpp" "" testname ${testsourcefile} )
+#    add_executable( ${testname} ${testsourcefile} )
+#    # Make sure YourLib is linked to each app
+#    target_link_libraries( ${testname} YourLib )
+#endforeach( testsourcefile ${APP_SOURCES} )
+###
+
 ## Declare a C++ executable
+add_executable(rollo_control src/rollo_control.cpp)
 add_executable(rollo_preprocessor src/rollo_preprocessor.cpp)
+# add_executable(rollo_ekf src/rollo_ekf.cpp)
+# add_executable(rollo_localization src/rollo_localization.cpp)
+# add_executable(rollo_comm src/rollo_comm.cpp)
+# add_executable(rollo_odometry src/rollo_odometry.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -139,6 +159,26 @@ add_executable(rollo_preprocessor src/rollo_preprocessor.cpp)
 target_link_libraries(rollo_preprocessor
   ${catkin_LIBRARIES}
 )
+
+target_link_libraries(rollo_control
+  ${catkin_LIBRARIES}
+)
+
+# target_link_libraries(rollo_ekf
+  # ${catkin_LIBRARIES}
+# )
+
+# target_link_libraries(rollo_comm
+  # ${catkin_LIBRARIES}
+# )
+
+# target_link_libraries(rollo_localization
+  # ${catkin_LIBRARIES}
+# )
+
+# target_link_libraries(rollo_odometry
+  # ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
