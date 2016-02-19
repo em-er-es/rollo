@@ -30,6 +30,7 @@ if __name__ == '__main__':
     parser.add_argument('-Py', '--initial-position-y', dest='P_i_y', type=float, default=0.0, help='Initial position of the robot - Y coordinate', metavar='P_I_Y <!0>[m]')
     parser.add_argument('-Th', '--initial-orientation', dest='Theta_i', type=float, default=0.0, help='Initial orientation of the robot - Theta', metavar='THETA <!0>[rad]')
     parser.add_argument('-t', '--time', dest='t', type=float, default=10.0, help='Time for the movement', metavar='t <!10.0>[s]')
+    parser.add_argument('-dt', '--step-time', dest='dt', type=float, default=-100.0, help='Time step for approximation for positive values and number of steps for negative', metavar='t <-100.0>[{s, 1}]')
     parser.add_argument('-rL', '--radius-wheel-left', dest='r_L', type=float, default=0.1, help='Radius of the left wheel', metavar='R_L <!0.100>[m]')
     parser.add_argument('-rR', '--radius-wheel-right', dest='r_R', type=float, default=0.1, help='Radius of the right wheel', metavar='R_R <!0.100>[m]')
     parser.add_argument('-al', '--axle-length', dest='axle_l', type=float, default=0.205, help='Distance between wheels - Length of the axle', metavar='AXLE_L <!0.205>[m]')
@@ -52,6 +53,7 @@ if __name__ == '__main__':
     P_i_x = float(args.P_i_x)
     P_i_y = float(args.P_i_y)
     t = float(args.t)
+    dt = float(args.dt)
     Theta_i = float(args.Theta_i)
     r_L = float(args.r_L)
     r_R = float(args.r_R)
@@ -78,26 +80,26 @@ def rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l,
         print('Linear distance traveled by left wheel (S_L [m]): ', S_L)
         print('Linear distance traveled by right wheel (S_R [m]): ', S_R)
 
-    Beta = (S_L - S_R) / 2.0 # travel_angle
-    r  = (S_L + S_R) / 2.0 # travel_radius
-    # print("SL:", S_L, " Beta: ", Beta, "Theta_i: ", Theta_i)
-    # print(Theta_i - (Beta / 2.0))
+    Beta = (S_L - S_R) / 2.0 # Travel angle
+    r  = (S_L + S_R) / 2.0 # Travel radius
     P_f_x = P_i_x + r * np.cos(Theta_i - (Beta / 2.0))
     P_f_y = P_i_y + r * np.sin(Theta_i - (Beta / 2.0))
     Theta_f = Theta_i - Beta
 
     if degrees:
         Theta_f = Theta_f * 180 / np.pi
-    if verbose:
+    if verbose and t_s + dt == t_f:
         print('Travel radius [m]: ', r)
-        if degrees:
-            print('Travel angle [°]:', Beta)
-        else:
-            print('Travel angle [rad]:', Beta)
+        print('Travel angle [', ThetaFormat, ']:', Beta)
     return [P_f_x, P_f_y, Theta_f]
 
 #%% Main script
 if __name__ == '__main__':
+    if degrees:
+        # ThetaFormat = '°'
+        ThetaFormat = 'deg'
+    else:
+        ThetaFormat = 'rad'
     if predefined:
         P_i_x = -2; P_i_y = -2; 
         if degrees:
@@ -109,71 +111,88 @@ if __name__ == '__main__':
     if verbose:
         print('Time (t [s]): ', t)
         print('Initial position (X [m]; Y [m]): ', P_i_x, ';', P_i_y)
-        if degrees:
-            print('Initial orientation (Theta [°]): ', Theta_i)
-        else:
-            print('Initial orientation (Theta [rad]): ', Theta_i)
+        print('Initial orientation (Theta [', ThetaFormat, ']): ', Theta_i)
         print('Axle length (axle_l [m]): ', axle_l)
         print('Wheel speed - left (n_L [m/s]): ', n_L)
         print('Wheel speed - right (n_R [m/s]): ', n_R)
         print('Wheel radius - left (r_L [m]): ', r_L)
         print('Wheel radius - right (r_R [m]): ', r_R)
-    [P_f_x, P_f_y, Theta_f] = rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, verbose, degrees)
-    print('Final position (X [m]; Y [m]): ', P_f_x, ';', P_f_y)
-    if degrees:
-        print('Final orientation (Theta [°]): ', Theta_f % 360)
-    else:
-        print('Final orientation (Theta [rad]): ', Theta_f % (2 * np.pi))
-        
+
     if generatePlot:
-        axi = 2.0
+        axi = 8.0
+        axd = 1
         markerScale = 20
         lineWidth = 1.6
-        axx = np.max([np.ceil(np.abs(P_f_x - P_i_x) / axi) * axi, np.abs(P_f_x) + 1, np.abs(P_i_x) + 1])
-        axy = np.max([np.ceil(np.abs(P_f_y - P_i_y) / axi) * axi, np.abs(P_f_y) + 1, np.abs(P_i_y) + 1])
-        # plt.axis([-axx, axx, -axy, axy])
-        if not degrees:
-            oi = np.rad2deg(Theta_i)
-            of = np.rad2deg(Theta_f)
-        else:
-            oi = Theta_i
-            of = Theta_f
-        plt.plot(P_i_x, P_i_y, 'g', marker = (3, 0, -oi), markersize = markerScale, linewidth = lineWidth)
-        # plt.plot(P_f_x, P_f_y, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
-        Theta_i_t = Theta_i
-        P_i_x_t = P_i_x
-        P_i_y_t = P_i_y
 
-        steps = 100.0
-        z = 0
+###TODO use array instead of scalar values
+    Theta_i_t = Theta_i
+    P_i_x_t = P_i_x
+    P_i_y_t = P_i_y
+
+    if dt < 0:
+        steps = - float(dt)
         dt = t / steps
-        if verbose:
-            print('Number of steps (n [1]): ', steps)
-            print('Time step (dt [s]): ', dt)
-        # for i in np.arange(0, t, t / step):
-        for i in np.arange(1, steps + 1, 1):
-            [P_f_x_t, P_f_y_t, Theta_f_t] = rollo_compute_position(P_i_x_t, P_i_y_t, Theta_i_t, n_L, n_R, dt, r_L, r_R, axle_l, 0, degrees)
-            print(i, P_f_x_t, P_f_y_t, Theta_f_t)
-            # print(i)
+    else:
+        steps = np.ceil(t / float(dt))
+    t_s = 0
+    t_f = t
+    if verbose:
+        print('Time step (dt [s]): ', dt)
+        print('Number of steps (n [1]): ', steps)
 
+    # for i in np.arange(0, t, t / step):
+    for i in np.arange(1, steps + 1, 1):
+        # [P_f_x_t, P_f_y_t, Theta_f_t] = rollo_compute_position(P_i_x_t, P_i_y_t, Theta_i_t, n_L, n_R, dt, r_L, r_R, axle_l, 0, degrees)
+        [P_f_x_t, P_f_y_t, Theta_f_t] = rollo_compute_position(P_i_x_t, P_i_y_t, Theta_i_t, n_L, n_R, dt, r_L, r_R, axle_l, verbose, degrees)
+        print('Loop:', int(i), 'Calculated position (x [m], y [m], Theta [', ThetaFormat, ']):', P_f_x_t, P_f_y_t, Theta_f_t)
+        # print(int(i))
+
+###TODO calculate lowest and highest points for axes
+        if generatePlot:
             if not degrees:
-                of = np.rad2deg(Theta_f)
+                of = np.rad2deg(Theta_i_t) - 90
             else:
-                of = Theta_f
-            plt.plot(P_f_x_t, P_f_y_t, 'b', marker=(3, 0, -of), markersize = markerScale / 3)
-            # plt.plot(P_f_x_t, P_f_y_t, marker='x', markersize = markerScale / 3)
-            # plt.plot(np.linspace(P_i_x, P_f_x, 10), np.linspace(P_i_y, P_f_y, 10), 'b-', linewidth = lineWidth)
+                of = Theta_i_t - 90
+            plt.plot(P_f_x_t, P_f_y_t, 'b', marker=(3, 0, of), markersize = markerScale / 3)
 
-            Theta_i_t = Theta_f_t
-            P_i_x_t = P_f_x_t
-            P_i_y_t = P_f_y_t
+        Theta_i_t = Theta_f_t
+        P_i_x_t = P_f_x_t
+        P_i_y_t = P_f_y_t
 
-            z = z + dt
+        t_s = t_s + dt
 
-        plt.plot(P_f_x_t, P_f_y_t, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
+    P_f_x = P_f_x_t
+    P_f_y = P_f_y_t
+    Theta_f = Theta_f_t
+
+    if verbose:
+        print('Simulation duration (t_s [s]): ', t_s)
+    # [P_f_x, P_f_y, Theta_f] = rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, verbose, degrees)
+    print('Final position (x [m], y [m]): ', P_f_x, ',', P_f_y)
+    if degrees:
+        # print('Final orientation (Theta [°]): ', Theta_f % 360)
+        print('Final orientation (Theta [deg]): ', Theta_f % 360)
+    else:
+        print('Final orientation (Theta [rad]): ', Theta_f % (2 * np.pi))
+
+    if generatePlot:
+        ###TODO take the highest or lowest values from simulation and add a margin to the plot
+        axx = np.max([np.ceil(np.abs(P_f_x - P_i_x) / axi) * axi, np.abs(P_f_x) + axd, np.abs(P_i_x) + axd])
+        axy = np.max([np.ceil(np.abs(P_f_y - P_i_y) / axi) * axi, np.abs(P_f_y) + axd, np.abs(P_i_y) + axd])
+        # plt.axis([-axx, axx, -axy, axy])
+        plt.axis('equal')
+        if not degrees:
+            oi = np.rad2deg(Theta_i) - 90
+            of = np.rad2deg(Theta_f) - 90
+        else:
+            oi = Theta_i - 90
+            of = Theta_f - 90
+        plt.plot(P_i_x, P_i_y, 'g', marker = (3, 0, oi), markersize = markerScale, linewidth = lineWidth)
+        # plt.plot(P_f_x_t, P_f_y_t, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
+        plt.plot(P_f_x, P_f_y, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
         plt.grid(1)
+        plt.tight_layout()
         plt.show()
         # print(P_f_x_t, P_f_y_t, Theta_f_t, z)
-        print(t, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, 0, degrees))
-        print(z-dt, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, z-dt, r_L, r_R, axle_l, 0, degrees))
-###TODO use only the loop for calculating the final position
+        # print(t, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, 0, degrees))
+        # print(t_s, rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, z-dt, r_L, r_R, axle_l, 0, degrees))
