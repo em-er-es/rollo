@@ -19,22 +19,20 @@
 #include <sstream>
 #include <iostream>
 #include "rollo_nodes.h"
-
-// /*
 #include "udp.h"
-#include <iostream>
-#include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
 
-
-
+// /*
 void Callback(const geometry_msgs::Twist::ConstPtr& msg)
 {
-udp_client_server::udp_client udp_c("130.251.13.185",5900);
-char buff_to_send[3]={0x7d,0x59,0x31}; 
-udp_c.send(buff_to_send,3);
-printf("udp_packet_Sent!! \n");
-sleep(1);
+	ip = 130.251.13.185;
+	port = 5900;
+	// udpClientlient_server::udpClientlient udpClient("130.251.13.185", port);
+	udpClientlient_server::udpClientlient udpClient(ip, port);
+	char udpBuffer[3]={0x7d,0x59,0x31};
+	udpClient.send(udpBuffer, 3);
+	printf("udp_packet_Sent!! \n");
+	sleep(1);
 }
 
 
