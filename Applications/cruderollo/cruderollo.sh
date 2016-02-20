@@ -211,7 +211,8 @@ while :; do
 		INFO3="12%";
 		;;
 		2*)
-		MSG3=12;
+		# MSG3=12; # Causes erratic behaviour
+		MSG3=25; # Works as a workaround
 		INFO3="19%";
 		;;
 		3*)
