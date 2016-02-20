@@ -22,19 +22,28 @@
 #include "udp.h"
 #include "geometry_msgs/Twist.h"
 
+/* TODO
+ * Define a function that will send UDP packets with ip adress, udp port and message as parameters
+ * Subscribe to the control node messages for input
+ * Define all possible messages by contructing them out of three bytes
+ * * 1: Movement/operation byte, 2: Left wheel speed, 3: Right wheel speed
+ * Run the node either at a given frequency or if there are problems with too much data for Rollo, at a rate of 60 or 30 Hz
+ * Make the node accepts parameters for ip address, udp port and node frequency
+ * TODO LATER
+ * Priorotize safety over control
+ * Define a function that will receice UDP packets
+// */
+
 // /*
 void Callback(const geometry_msgs::Twist::ConstPtr& msg)
 {
-	ip = 130.251.13.185;
-	port = 5900;
 	// udpClientlient_server::udpClientlient udpClient("130.251.13.185", port);
 	udpClientlient_server::udpClientlient udpClient(ip, port);
-	char udpBuffer[3]={0x7d,0x59,0x31};
+	char udpBuffer[3]={0x7d, 0x59, 0x31};
 	udpClient.send(udpBuffer, 3);
-	printf("udp_packet_Sent!! \n");
+	printf("udp_packet_Sent \n");
 	sleep(1);
 }
-
 
 
 int main(int argc, char **argv)
@@ -51,8 +60,10 @@ int main(int argc, char **argv)
  * 
  */
 
-double x, y, theta;
-double x_mm, y_mm, theta_deg;
+int ip = 130.251.13.185;
+int port = 5900;
+double x, z; // Linear and angular velocities from the control node
+double x_mm, y_mm, theta_deg; // 
 
 
 /**
