@@ -2,6 +2,8 @@
 #define ROLLO_AXLE_L 20.5;
 #define ROLLO_WHEEL_R 0.020;
 #define ROLLO_WHEEL_N 4;
+#define ROLLO_SPEED_MAX 56;
+#define ROLLO_SPEED_MIN 6;
 
 //! Node names
 #define PP "PREP"
