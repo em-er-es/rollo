@@ -1,4 +1,9 @@
-// Node names
+//! Rollo
+#define ROLLO_AXLE_L 20.5;
+#define ROLLO_WHEEL_R 0.020;
+#define ROLLO_WHEEL_N 4;
+
+//! Node names
 #define PP "PREP"
 #define LC "LOC "
 #define KF "EKF "
@@ -6,7 +11,7 @@
 #define OD "ODOM"
 #define CM "COMM"
 
-// GNU/Linux terminal color codes
+//! GNU/Linux terminal color codes
 #define CR "\033[0m"
 
 #define C1 "\033[38;5;63m"
