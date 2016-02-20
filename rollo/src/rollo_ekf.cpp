@@ -17,7 +17,7 @@
  *  _sampling selects if the raw data should be subsampled after a certain delay or averaged over a certain period
  *  _sampling 0 represents subsampling and any number other than 0 represents averaging, default is set to subsampling
  */
- 
+
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -31,7 +31,6 @@
 #include <eigen3/Eigen/Dense>
 
 
-#define PI 3.1415926535
 #define LeftWheelRadius 0.02
 #define RightWheelRadius 0.02
 
@@ -88,7 +87,7 @@ return h_x;
 Eigen::Matrix3d JacobianFSTATE(Eigen::Vector3d x_cp, Eigen::Vector2d u) {
 	Eigen::Matrix3d Jf_xu = Eigen::Matrix3d::Identity(); 
 	Jf_xu(0,2) = - u(0)*sin(x_cp(2) - (u(1)/2));
-	Jf_xu(1,2) = u(0)*cos(x_cp(2) - (u(1)/2));
+	Jf_xu(1, 2) = u(0) * cos(x_cp(2) - (u(1) / 2));
 return Jf_xu;
 }
 
@@ -132,7 +131,7 @@ private_node_handle_.param("rate", rate_frequency, int(1));
 //! publishing rate in units of Hz
 ros::Rate frequency(rate_frequency); 
 
-int loopcondition = 1;	
+int loopcondition = 1;
 
 //! Initializing variables involved in computation of EKF
 //! Define number of states
