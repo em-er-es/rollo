@@ -29,6 +29,7 @@
  * * 1: Movement/operation byte, 2: Left wheel speed, 3: Right wheel speed
  * Run the node either at a given frequency or if there are problems with too much data for Rollo, at a rate of 60 or 30 Hz
  * Make the node accepts parameters for ip address, udp port and node frequency
+ * Add publisher for custom message oncluding timestamped velocities [rpm] of Rollo for EKF node
  * TODO LATER
  * Priorotize safety over control
  * Define a function that will receice UDP packets
@@ -51,11 +52,13 @@ struct IPv4 {
 
 //! Rollo IP: 192.168.0.120
 // Local IP address range: 130.251.13.90-99
-IPv4 b1 = 192;
-IPv4 b2 = 168;
-IPv4 b3 = 0;
-IPv4 b4 = 120;
+IPv4 unsigned char b1 = 192;
+IPv4 unsigned char b2 = 168;
+IPv4 unsigned char b3 = 0;
+IPv4 unsigned char b4 = 120;
 
+// unsigned char ip[4] = {b1, b2, b3, b4}; //! Ip address
+unsigned char ip[16]; //! Ip address
 unsigned int port = 900; //! UDP port
 
 double x, z; //! Linear and angular velocities from the control node
@@ -63,58 +66,15 @@ int v_l, v_r; //! Velocities for both wheels
 
 unsigned int nb = 3; //! Number of bytes in the message
 char MessageB1, MessageB2, MessageB3; //! Message bytes
-char Message[nb]; //! Message combined
+char Message[nb] = {0x7b, 0x50, 0x10}; //! Message combined, complete stop default
 
 char Mode; //! Message mode description
 int VelocityL, VelocityR; //! Message velocities description
 
 unsigned int RolloMax = ROLLO_SPEED_MAX; //! Maximum speed of the Rollo
 unsigned int RolloMin = ROLLO_SPEED_MIN; //! Minimum speed of the Rollo
-unsigned int RolloRange = ROLLO_SPEED_MAX - ROLLO_SPEED_MIN; //! Range of speed of the Rollo
+unsigned int RolloRange = RolloMax - RolloMin; //! Range of speed of the Rollo
 
-//! Callback function for subscriber
-void SubscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
-{
-	x = msg.x;
-	z = msg.z;
-	decodeVelocities(x, z, &MessageB1, &MessageB2, &MessageB3);
-	Message = {MessageB1, MessageB2, MessageB3}; //! Update the UDP message
-}
-
-/**
- * @brief Send UDP packets
- *
- * Ip address, UDP port and message are passed as arguments
- * Parameters declared by reference: @p &ip, @p &port, @p &message.
- * @return Bytes sent
- * @see DOCURL
- */
-
-int udpSend(IPv4 ip, unsigned int &port, char udpBuffer[3]) // Could read the velocities and transform them later on
-{
-	udpClientlient_server::udpClientlient udpClient(ip, port); //! Client initialization
-
-	// char udpBuffer[3] = {0x7d, 0x59, 0x31};
-	// char udpBuffer[3] = Message;
-	int bs = udpClient.send(udpBuffer, sizeof(udpBuffer));
-	if (bs == sizeof(udpBuffer))
-		ROS_INFO("[Rollo][%s][UDP] UDP packets sent successfully", NodeName); //DB
-		ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %f, %f, %f", NodeName, Mode, v_l, v_r);
-	else
-		ROS_INFO("[Rollo][%s][ERR] UDP packets transmission failed", NodeName); //DB
-	if (bs < 0)
-		ROS_ERROR("select()");
-
-	return (bs);
-}
-
-/*
-	udpClientlient_server::udpClientlient udpClient(ip, port);
-	char udpBuffer[3]={0x7d, 0x59, 0x31};
-	udpClient.send(udpBuffer, 3);
-	printf("udp_packet_Sent \n");
-	sleep(1);
-// */
 
 /**
  * @brief Decode linear and angular velocities
@@ -151,10 +111,9 @@ int decodeVelocities(double x, double z, char &MessageB1, char &MessageB2, char 
 		MessageB2 = 0x50; MessageB3 = 0x10; //! Lowest speeds for previous modes
 
 	} else if (x != 0) { //! Determine speeds
-		// Based on the relation of the "dial" z
-		// |---|---|-------|
+		// Based on the position of the "dial" z
+		// |-a-|---*-b-----|
 		//-1   z   0       1
-		//   a        b     
 
 		float tx = x * RolloRange;
 		float a = (z + 1.001); //! Eliminate problems with diving through zero
@@ -198,6 +157,58 @@ int decodeVelocities(double x, double z, char &MessageB1, char &MessageB2, char 
 	ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%d][%d][%d]]", NodeName, x, z, MessageB1, MessageB2, MessageB3); //DB
 }
 
+/**
+ * @brief Subscriber callback
+ *
+ * Reads newest velocities from control node and decodes them into UDP message
+ * @return 0
+ * @see DOCURL
+ */
+
+//! Callback function for subscriber
+void SubscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
+{
+	x = msg->x;
+	z = msg->z;
+	decodeVelocities(x, z, &MessageB1, &MessageB2, &MessageB3);
+	Message = {MessageB1, MessageB2, MessageB3}; //! Update the UDP message
+}
+
+/**
+ * @brief Send UDP packets
+ *
+ * Ip address, UDP port and message are passed as arguments
+ * Parameters declared by reference: @p &ip, @p &port, @p &message.
+ * @return Bytes sent
+ * @see DOCURL
+ */
+
+int udpSend(IPv4 ip, unsigned int &port, char udpBuffer[3]) // Could read the velocities and transform them later on
+{
+	udpClientlient_server::udpClientlient udpClient(ip, port); //! Client initialization
+
+	// char udpBuffer[3] = {0x7d, 0x59, 0x31};
+	// char udpBuffer[3] = Message;
+	int bs = udpClient.send(udpBuffer, nb);
+	if (bs == nb) {
+		ROS_INFO("[Rollo][%s][UDP] UDP packets sent successfully", NodeName); //DB
+		ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %f, %f, %f", NodeName, Mode, v_l, v_r);
+	} else if (bs < 0) {
+		ROS_INFO("[Rollo][%s][ERR] UDP packets transmission failed", NodeName); //DB
+		ROS_ERROR("sendto()");
+	}
+
+	return (bs);
+}
+
+/*
+	udpClientlient_server::udpClientlient udpClient(ip, port);
+	char udpBuffer[3]={0x7d, 0x59, 0x31};
+	udpClient.send(udpBuffer, 3);
+	printf("udp_packet_Sent \n");
+	sleep(1);
+// */
+
 
 /**
  * @brief Main function
@@ -215,8 +226,8 @@ ros::start(); // ROS node initialization
 ros::NodeHandle RolloCommunicationNode;
 
 //! Initialie subscriber and define topic and message queue size
-ros::Subscriber TwistSub = RolloCommunicationNode.subscribe("/Rollo/cmd_vel", 1024, subscriberCallback);
-ros::Publisher TwistPub = RolloControlNode.advertise<geometry_msgs::Twist>("/Rollo/encoders", 1024); //! Publish velocities as [rpm]
+ros::Subscriber SubRollo = RolloCommunicationNode.subscribe("/Rollo/cmd_vel", 1024, subscriberCallback);
+ros::Publisher PubRollo = RolloCommunicationNode.advertise<geometry_msgs::Twist>("/Rollo/encoders", 1024); //! Publish velocities as [rpm]
 
 //! Initialize node arguments using command line
 int rate_frequency;
@@ -229,6 +240,7 @@ ros::NodeHandle private_node_handle_("~");
 private_node_handle_.param("rate", rate_frequency, int(10));
 private_node_handle_.param("port", port, unsigned int(10));
 // private_node_handle_.param("ip", ip, IPv4(12));
+// private_node_handle_.param("ip", ip, int(10));
 private_node_handle_.param("ip", ip, int(10));
 
 //! Sending rate in units of Hz
@@ -248,14 +260,15 @@ while (ros::ok())
 	{
 
 		//! Send control command to Rollo
-		rv = udpSend(ip, port, Message);
+		// rv = udpSend(ip, port, Message);
+		rv = udpSend("192.168.0.120", port, Message);
 		if (rv)
 			ROS_INFO("[Rollo][%s] Command executed", NodeName); //DB
 
 		//! Publish encoder readings
 		VelocityL = v_l;
 		VelocityR = v_r;
-		RolloTwist.publish(PubRolloTwist);
+		PubRollo.publish(PubRolloTwist);
 		ROS_INFO("[Rollo][%s][Pub] L[%d] R[%d]", NodeName, VelocityL, VelocityR); //DB
 
 		//! ROS spinOnce
