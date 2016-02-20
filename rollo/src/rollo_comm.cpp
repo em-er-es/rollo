@@ -19,8 +19,8 @@
 #include <sstream>
 #include <iostream>
 #include "rollo_nodes.h"
-#include "udp.h"
 #include "geometry_msgs/Twist.h"
+#include "udp.h"
 
 /* TODO
  * Define a function that will send UDP packets with ip adress, udp port and message as parameters
@@ -32,133 +32,236 @@
  * TODO LATER
  * Priorotize safety over control
  * Define a function that will receice UDP packets
+ * Define function to parse the ip address properly
 // */
 
-// /*
-void Callback(const geometry_msgs::Twist::ConstPtr& msg)
+
+/**
+ * @brief Global variables updated in the SubscriberCallback function, processed and used to send commands to the specified Ip adress at the UDP port.
+ *
+ */
+
+char NodeName[20] = C3 CM CR; // The size is necessary for the GNU/Linux console codes //~COLOR
+// char NodeName[20] = CM; // The size is necessary for the GNU/Linux console codes //~COLOR
+
+//! Internet protocol version 4 representations
+struct IPv4 {
+	unsigned char b1, b2, b3, b4;
+}
+
+//! Rollo IP: 192.168.0.120
+// Local IP address range: 130.251.13.90-99
+IPv4 b1 = 192;
+IPv4 b2 = 168;
+IPv4 b3 = 0;
+IPv4 b4 = 120;
+
+unsigned int port = 900; //! UDP port
+
+double x, z; //! Linear and angular velocities from the control node
+int v_l, v_r; //! Velocities for both wheels
+
+unsigned int nb = 3; //! Number of bytes in the message
+char MessageB1, MessageB2, MessageB3; //! Message bytes
+char Message[nb]; //! Message combined
+
+char Mode; //! Message mode description
+int VelocityL, VelocityR; //! Message velocities description
+
+unsigned int RolloMax = ROLLO_SPEED_MAX; //! Maximum speed of the Rollo
+unsigned int RolloMin = ROLLO_SPEED_MIN; //! Minimum speed of the Rollo
+unsigned int RolloRange = ROLLO_SPEED_MAX - ROLLO_SPEED_MIN; //! Range of speed of the Rollo
+
+//! Callback function for subscriber
+void SubscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
-	// udpClientlient_server::udpClientlient udpClient("130.251.13.185", port);
+	x = msg.x;
+	z = msg.z;
+	decodeVelocities(x, z, &MessageB1, &MessageB2, &MessageB3);
+	Message = {MessageB1, MessageB2, MessageB3}; //! Update the UDP message
+}
+
+/**
+ * @brief Send UDP packets
+ *
+ * Ip address, UDP port and message are passed as arguments
+ * Parameters declared by reference: @p &ip, @p &port, @p &message.
+ * @return Bytes sent
+ * @see DOCURL
+ */
+
+int udpSend(IPv4 ip, unsigned int &port, char udpBuffer[3]) // Could read the velocities and transform them later on
+{
+	udpClientlient_server::udpClientlient udpClient(ip, port); //! Client initialization
+
+	// char udpBuffer[3] = {0x7d, 0x59, 0x31};
+	// char udpBuffer[3] = Message;
+	int bs = udpClient.send(udpBuffer, sizeof(udpBuffer));
+	if (bs == sizeof(udpBuffer))
+		ROS_INFO("[Rollo][%s][UDP] UDP packets sent successfully", NodeName); //DB
+		ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %f, %f, %f", NodeName, Mode, v_l, v_r);
+	else
+		ROS_INFO("[Rollo][%s][ERR] UDP packets transmission failed", NodeName); //DB
+	if (bs < 0)
+		ROS_ERROR("select()");
+
+	return (bs);
+}
+
+/*
 	udpClientlient_server::udpClientlient udpClient(ip, port);
 	char udpBuffer[3]={0x7d, 0x59, 0x31};
 	udpClient.send(udpBuffer, 3);
 	printf("udp_packet_Sent \n");
 	sleep(1);
-}
-
-
-int main(int argc, char **argv)
-{
-  ros::init(argc, argv, "subscriber");
-  ros::NodeHandle nh;
-  ros::Subscriber sub = nh.subscribe("test", 1, Callback);
-  ros::spin();
-}
 // */
 
 /**
- * @brief GLOBVAR
- * 
- */
-
-int ip = 130.251.13.185;
-int port = 5900;
-double x, z; // Linear and angular velocities from the control node
-double x_mm, y_mm, theta_deg; // 
-
-
-/**
- * @brief FUNDES
+ * @brief Decode linear and angular velocities
  *
- * FUNDES
- * @return VALUEDES
+ * Velocities are decoded and stored as partial bytes of the UDP packet
+ * Parameters declared: @p x, @p z, @p &MessageB1, @p &MessageB2, @p &MessageB3.
+ * @return 0
  * @see DOCURL
  */
- 
-void fun()
-{
-	int a = 0;
 
-	if(rv == -1)
-		ROS_ERROR("select");
-	else if(rv == 0)
-		ROS_INFO("[Rollo][getch] no_key_pressed");
-	else
-		{
-		read(filedesc, &buff, len );
-		ROS_INFO("[Rollo][Main] Key pressed %c \n", buff);
+int decodeVelocities(double x, double z, char &MessageB1, char &MessageB2, char &MessageB3) // Could read the velocities and transform them later on
+{
+//! Determine corresponding operation mode based on velocities
+
+/* Possible values for the wheel velocities
+		INFO="6%";
+		INFO="12%";
+		INFO="19%";
+		INFO="25%";
+		INFO="31%";
+		INFO="38%";
+		INFO="44%";
+		INFO="50%";
+		INFO="56%";
+#		INFO="100%"; // Not used
+// */
+
+	if (x == 0) {
+
+		if (z == 0) MessageB1 = 0x7b; //! Complete stop
+		else if (z > 0) MessageB1 = 0x7f; //! Right rotation
+		else if (z < 0) MessageB1 = 0x7e; //! Left rotation
+
+		MessageB2 = 0x50; MessageB3 = 0x10; //! Lowest speeds for previous modes
+
+	} else if (x != 0) { //! Determine speeds
+		// Based on the relation of the "dial" z
+		// |---|---|-------|
+		//-1   z   0       1
+		//   a        b     
+
+		float tx = x * RolloRange;
+		float a = (z + 1.001); //! Eliminate problems with diving through zero
+		float b = 2 - (z + 1.001);
+		v_l = (b / a * tx) / RolloMin;
+		v_r = (a / b * tx) / RolloMin;
+
+		switch (v_l){
+			case 0:		MessageB2 = 0x50; break;
+			case 1:		MessageB2 = 0x55; break;
+			case 2:		MessageB2 = 0x56; break;
+			case 3:		MessageB2 = 0x57; break;
+			case 4:		MessageB2 = 0x59; break;
+			case 5:		MessageB2 = 0x5F; break;
+			case 6:		MessageB2 = 0x60; break;
+			case 7:		MessageB2 = 0x61; break;
+			case 8:		MessageB2 = 0x62; break;
+			case 9:		MessageB2 = 0x62; break;
+			default:	MessageB2 = 0x50; break;
 		}
 
-	old.c_lflag |= ICANON;
-	old.c_lflag |= ECHO;
-	if (tcsetattr(filedesc, TCSADRAIN, &old) < 0)
-		ROS_ERROR ("tcsetattr ~ICANON");
-	return (buff);
+		switch (v_r){
+			case 0:		MessageB3 = 0x10; break;
+			case 1:		MessageB3 = 0x11; break;
+			case 2:		MessageB3 = 0x25; break; //! Temporary fix for errartic behaviour of Rollo
+			case 3:		MessageB3 = 0x13; break;
+			case 4:		MessageB3 = 0x1A; break;
+			case 5:		MessageB3 = 0x1B; break;
+			case 6:		MessageB3 = 0x1C; break;
+			case 7:		MessageB3 = 0x1D; break;
+			case 8:		MessageB3 = 0x24; break;
+			case 9:		MessageB3 = 0x24; break;
+			default:	MessageB3 = 0x10; break;
+		}
+
+		if (x > 0) MessageB1 = 0x7c; //! Determine forward or backward movement
+		else if (x < 0) MessageB1 = 0x7d;
+
+	}
+
+	ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%d][%d][%d]]", NodeName, x, z, MessageB1, MessageB2, MessageB3); //DB
 }
 
 
 /**
  * @brief Main function
  *
- * 
+ *
  * @return 0
  */
 int main(int argc, char **argv)
 {
 //! Initialize node
-ros::init(argc, argv, "rollo_name"); // LOOKUP nodes.txt
+ros::init(argc, argv, "rollo_comm"); // Communication node
 ros::start(); // ROS node initialization
 
 //! Initialize nodehandle
-ros::NodeHandle RolloControlNode;
+ros::NodeHandle RolloCommunicationNode;
 
-//! Initialie publisher and define topic and message queue size for the publisher
-ros::Publisher RolloTwist = RolloControlNode.advertise<geometry_msgs::Twist>("/Rollo/cmd_vel", 1024);
+//! Initialie subscriber and define topic and message queue size
+ros::Subscriber TwistSub = RolloCommunicationNode.subscribe("/Rollo/cmd_vel", 1024, subscriberCallback);
+ros::Publisher TwistPub = RolloControlNode.advertise<geometry_msgs::Twist>("/Rollo/encoders", 1024); //! Publish velocities as [rpm]
 
 //! Initialize node arguments using command line
 int rate_frequency;
 
-// Sample command: rosrun rollo rollo_control_node _rate:=1 
+// Sample command: rosrun rollo rollo_communication _rate:=1
 //! Initialize node parameters from launch file or command line.
-//! Use a private node handle so that multiple instances of the node can be run simultaneously
-//! while using different parameters.
+//! Use a private node handle so that multiple instances of the node
+//! can be run simultaneously while using different parameters.
 ros::NodeHandle private_node_handle_("~");
 private_node_handle_.param("rate", rate_frequency, int(10));
+private_node_handle_.param("port", port, unsigned int(10));
+// private_node_handle_.param("ip", ip, IPv4(12));
+private_node_handle_.param("ip", ip, int(10));
 
-//! publishing rate in units of Hz
-ros::Rate frequency(rate_frequency); 
+//! Sending rate in units of Hz
+ros::Rate frequency(rate_frequency);
+
+//! Initialize subscriber message type
+geometry_msgs::Twist SubRolloTwist;
 
 //! Initialize publisher message type
 geometry_msgs::Twist PubRolloTwist;
 
 //! Initialize variables for computing linear and angular velocity of the robot
-double x = 0;
-double th = 0;
-double speed = 0.5;
-double turn = 1;
-
+int rv = 0;
 
 //! Run loop
 while (ros::ok())
 	{
-		//! read if any keyboard key is pressed
-		int c = 0;
-		c=getch();
 
-		//! decode key pressed 
-		if (c != 0) decode_key(c, x, th, speed, turn);
+		//! Send control command to Rollo
+		rv = udpSend(ip, port, Message);
+		if (rv)
+			ROS_INFO("[Rollo][%s] Command executed", NodeName); //DB
 
-		//! compute linear and angular velocity
-		PubRolloTwist.linear.x = x*speed; 
-		PubRolloTwist.angular.z = th*turn;
-
-		//! publish Rollo Twist according to the velocities defined
-		ROS_INFO("[Rollo][Pub] Linear Speed %f Angular Speed %f \n", PubRolloTwist.linear.x, PubRolloTwist.angular.z);
+		//! Publish encoder readings
+		VelocityL = v_l;
+		VelocityR = v_r;
 		RolloTwist.publish(PubRolloTwist);
+		ROS_INFO("[Rollo][%s][Pub] L[%d] R[%d]", NodeName, VelocityL, VelocityR); //DB
 
-		//! ros spinOnce
+		//! ROS spinOnce
 		ros::spinOnce();
 
-		//!sleep before running loop again 
+		//! Sleep before running loop again
 		frequency.sleep();
 
 	}
