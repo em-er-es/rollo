@@ -51,7 +51,7 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
 	y = msg->y; // Raw y coordinate [m]
 	y_mm = 1000 * y;
 	theta = msg->theta; // Raw theta [rad]
-	theta_deg = theta / 3.14159265359 * 180 + 180; // Conversion into degrees in the range 0 to 360 degress
+	theta_deg = theta / PI * 180 + 180; // Conversion into degrees in the range 0 to 360 degress
 	ROS_INFO("[Rollo][%s][Sub][X, Y, Theta]: %f, %f, %f", NodeName, x_mm, y_mm, theta_deg);
 }
 
