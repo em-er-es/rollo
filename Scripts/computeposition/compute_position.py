@@ -76,9 +76,6 @@ def rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l,
         Theta_i = Theta_i / 180.0 * np.pi
     S_L = t * (n_L / 60.0) * 2 * np.pi * r_L # Linear distance traveled by left wheel in meters
     S_R = t * (n_R / 60.0) * 2 * np.pi * r_R # Linear distance traveled by right wheel in meters
-    if verbose:
-        print('Linear distance traveled by left wheel (S_L [m]): ', S_L)
-        print('Linear distance traveled by right wheel (S_R [m]): ', S_R)
 
     Beta = (S_L - S_R) / 2.0 # Travel angle
     r  = (S_L + S_R) / 2.0 # Travel radius
@@ -89,6 +86,8 @@ def rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l,
     if degrees:
         Theta_f = Theta_f * 180 / np.pi
     if verbose and t_s + dt == t_f:
+        print('Linear distance traveled by left wheel (S_L [m]): ', S_L)
+        print('Linear distance traveled by right wheel (S_R [m]): ', S_R)
         print('Travel radius [m]: ', r)
         print('Travel angle [', ThetaFormat, ']:', Beta)
     return [P_f_x, P_f_y, Theta_f]
