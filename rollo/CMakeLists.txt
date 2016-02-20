@@ -77,7 +77,6 @@ generate_messages(
    DEPENDENCIES
    std_msgs 
    geometry_msgs 
-#   geometry_msgs   std_msgs
 )
 
 ################################################
