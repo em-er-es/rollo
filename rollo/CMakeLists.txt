@@ -9,7 +9,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  message_generation
 )
+
+
+#find_package(catkin REQUIRED cmake_modules)
+#find_package(Eigen REQUIRED)
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -45,11 +51,12 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
+ add_message_files(
+   FILES
+   Pose2DStamped.msg
 #   Message1.msg
 #   Message2.msg
-# )
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -66,10 +73,12 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-#generate_messages(
-#   DEPENDENCIES
+generate_messages(
+   DEPENDENCIES
+   std_msgs 
+   geometry_msgs 
 #   geometry_msgs   std_msgs
-#)
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -105,6 +114,7 @@ catkin_package(
 #  LIBRARIES rollo
 #  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs
 #  DEPENDS system_lib
+  DEPENDS Eigen
 )
 
 ###########
@@ -116,6 +126,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -146,7 +157,7 @@ include_directories(
 ## Declare a C++ executable
 add_executable(rollo_control src/rollo_control.cpp)
 add_executable(rollo_preprocessor src/rollo_preprocessor.cpp)
-# add_executable(rollo_ekf src/rollo_ekf.cpp)
+add_executable(rollo_ekf src/rollo_ekf.cpp)
 # add_executable(rollo_localization src/rollo_localization.cpp)
 add_executable(rollo_comm src/rollo_comm.cpp)
 # add_executable(rollo_odometry src/rollo_odometry.cpp)
@@ -164,9 +175,10 @@ target_link_libraries(rollo_control
   ${catkin_LIBRARIES}
 )
 
-# target_link_libraries(rollo_ekf
-  # ${catkin_LIBRARIES}
-# )
+target_link_libraries(rollo_ekf
+  ${catkin_LIBRARIES}
+  ${Eigen_LIBRARIES}
+)
 
 target_link_libraries(rollo_comm
   ${catkin_LIBRARIES}
