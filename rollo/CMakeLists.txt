@@ -184,6 +184,7 @@ target_link_libraries(rollo_comm
 #  $ROS_ROOT/rollo/
 #  $ROS_PACKAGE_PATH/src/rollo/src/libudp.so
 #  $ROS_PACKAGE_PATH/devel/lib/rollo/libudp.so
+  $HOME/.ros/workspace/devel/lib/libudp.so
 )
 
 # target_link_libraries(rollo_localization
