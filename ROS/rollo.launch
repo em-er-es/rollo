@@ -13,7 +13,6 @@
     launch-prefix=""
     required="true">
   </node>
-<!--
   <node pkg="rollo"
     type="rollo_ekf"
     name="rollo_ekf"
@@ -28,9 +27,10 @@
     launch-prefix=""
     required="true">
   </node>
+<!--
   <node pkg="rollo"
-    type="rollo_localization"
-    name="rollo_localization"
+    type="rollo_visualization"
+    name="rollo_visualization"
     respawn="false"
     launch-prefix=""
     required="true">
