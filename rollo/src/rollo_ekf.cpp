@@ -29,6 +29,7 @@
 #include <sstream>
 #include <iostream>
 #include <eigen3/Eigen/Dense>
+#include "rollo_nodes.h"
 
 
 #define LeftWheelRadius 0.02
