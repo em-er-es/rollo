@@ -45,6 +45,7 @@
 char NodeName[20] = C3 CM CR; // The size is necessary for the GNU/Linux console codes //~COLOR
 // char NodeName[20] = CM; // The size is necessary for the GNU/Linux console codes //~COLOR
 
+/*
 //! Internet protocol version 4 representations
 struct IPv4 {
 	unsigned char b1, b2, b3, b4;
@@ -56,15 +57,20 @@ IPv4 unsigned char b1 = 192;
 IPv4 unsigned char b2 = 168;
 IPv4 unsigned char b3 = 0;
 IPv4 unsigned char b4 = 120;
+// */
 
 // unsigned char ip[4] = {b1, b2, b3, b4}; //! Ip address
-unsigned char ip[16]; //! Ip address
-unsigned int port = 900; //! UDP port
+// unsigned char ip[16]; //! Ip address
+// unsigned char ip[16] = "192.168.0.120"; //! Ip address
+char ip[16] = "192.168.0.120"; //! Ip address
+// unsigned int port = 900; //! UDP port
+int port = 900; //! UDP port
 
 double x, z; //! Linear and angular velocities from the control node
 int v_l, v_r; //! Velocities for both wheels
 
-unsigned int nb = 3; //! Number of bytes in the message
+// unsigned int nb = 3; //! Number of bytes in the message
+unsigned const int nb = 3; //! Number of bytes in the message
 char MessageB1, MessageB2, MessageB3; //! Message bytes
 char Message[nb] = {0x7b, 0x50, 0x10}; //! Message combined, complete stop default
 
@@ -166,12 +172,15 @@ int decodeVelocities(double x, double z, char &MessageB1, char &MessageB2, char 
  */
 
 //! Callback function for subscriber
-void SubscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
+void subscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
-	x = msg->x;
-	z = msg->z;
-	decodeVelocities(x, z, &MessageB1, &MessageB2, &MessageB3);
-	Message = {MessageB1, MessageB2, MessageB3}; //! Update the UDP message
+	x = msg->linear.x;
+	z = msg->angular.z;
+	decodeVelocities(x, z, MessageB1, MessageB2, MessageB3);
+	// Message = {MessageB1, MessageB2, MessageB3}; //! Update the UDP message
+	Message[0] = MessageB1; //! Update the UDP message
+	Message[1] = MessageB2; //! Update the UDP message
+	Message[2] = MessageB3; //! Update the UDP message
 }
 
 /**
@@ -183,9 +192,10 @@ void SubscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
  * @see DOCURL
  */
 
-int udpSend(IPv4 ip, unsigned int &port, char udpBuffer[3]) // Could read the velocities and transform them later on
+// int udpSend(IPv4 ip, unsigned int &port, char udpBuffer[3]) // Could read the velocities and transform them later on
+int udpSend(char ip[16], int &port, char udpBuffer[3]) // Could read the velocities and transform them later on
 {
-	udpClientlient_server::udpClientlient udpClient(ip, port); //! Client initialization
+	udp_client_server::udp_client udpClient(ip, port); //! Client initialization
 
 	// char udpBuffer[3] = {0x7d, 0x59, 0x31};
 	// char udpBuffer[3] = Message;
@@ -238,10 +248,14 @@ int rate_frequency;
 //! can be run simultaneously while using different parameters.
 ros::NodeHandle private_node_handle_("~");
 private_node_handle_.param("rate", rate_frequency, int(10));
-private_node_handle_.param("port", port, unsigned int(10));
+// private_node_handle_.param("port", port, unsigned int(10));
+private_node_handle_.param("port", port, int(10));
 // private_node_handle_.param("ip", ip, IPv4(12));
 // private_node_handle_.param("ip", ip, int(10));
-private_node_handle_.param("ip", ip, int(10));
+// private_node_handle_.param("ip", ip, int(10));
+// private_node_handle_.param("ip", ip, char(16));
+// private_node_handle_.param("ip", ip, "192.168.0.120");
+// private_node_handle_.param("ip", ip);
 
 //! Sending rate in units of Hz
 ros::Rate frequency(rate_frequency);
