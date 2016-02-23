@@ -2,6 +2,7 @@
  * @file rollo_ekf.cpp
  * @author Rabbia Asghar, Ernest Skrzypczyk
  * @date 20/2/16
+ *
  * @brief EKF implementation for localisation of the robot
  *
  * Takes control input from communication node and measurement from preprocessor node,
@@ -98,13 +99,18 @@ double OdometryTimeSecs = 0;
 char NodeName[20] = C1 KF CR; // The size is necessary for the GNU/Linux console codes //COLOR
 // char NodeName[20] = KF; // The size is necessary for the GNU/Linux console codes //COLOR
 
+//! Topics
+char TopicEKF[64] = TOPIC_EKF;
+char TopicWheelSpeed[64] = TOPIC_COMM_WS;
+char TopicPose2DStamped[64] = TOPIC_PREP_P2DT;
+
 
 /**
  * @brief SubscriberCallbackMeasurement
  *
  * Subscribe to the topic '/Rollo/preprocessor/pose2dstamped' of the preprocessor node.
  * Read filtered position and orientation of the robot and timestamp.
- * Update global variables @var zPose2DStamped and @var zTimeSecs for use in EKF update.  
+ * Update global variables @p zPose2DStamped and @p zTimeSecs for use in EKF update.  
  * @param msg - custom defined message (preprocessor node). 
  * @return NULL
  */
@@ -130,9 +136,9 @@ void subscriberCallbackMeasurement(const rollo::Pose2DStamped msg) {
 /**
  * @brief SubscriberCallbackControlInput
  *
- * Subscribe to the topic '/Rollo/communication/wheelspeed' of the communication node.
+ * Subscribe to the topic @var TopicWheelSpeed of the communication node.
  * Read wheel speed for both left and right in radians and timestamp.
- * Update global variables @var Odometry and @var OdometryTimeSecs for use in EKF update.
+ * Update global variables Odometry and OdometryTimeSecs for use in EKF update.
  * @param msg - custom defined message (communication node).
  * @return NULL
  */
@@ -158,11 +164,11 @@ void subscriberCallbackControlInput(const rollo::WheelSpeed msg) {
  * @brief Linear interpolation of values from odometry
  *
  * This function performs linear interpolation of right and left wheel speed for a given time instant.
- * The time for which the odometry values are computed is defined by @var EKFfilterTimeSecs. 
+ * The time for which the odometry values are computed is defined by @p EKFfilterTimeSecs. 
  * @param Odometryold contains left and right wheel speed and timestamp read at previous instant when EKF was updated.
  * @param Odometrynew contains left and right wheel speed and timestamp read currently.
  * @param EKFfilterTimeSecs is the time instant for which the EKF update need to be performed and odometry values need to be computed.
- * @return rollo::WheelSpeed, contains left and right wheel speed [rad/s] computed for time instant given by @var EKFfilterTimeSecs using linear interpolation.
+ * @return rollo::WheelSpeed, contains left and right wheel speed [rad/s] computed for time instant given by @p EKFfilterTimeSecs using linear interpolation.
  */
 
 //CRF
@@ -179,9 +185,9 @@ rollo::WheelSpeed interpolateOdometry( rollo::WheelSpeed Odometryold, rollo::Whe
 	interpolated.wheelspeedright = Odometryold.wheelspeedright + ((Odometrynew.wheelspeedright - Odometryold.wheelspeedright) * (EKFfilterTimeSecs - OdometryOldTimeSecs)) / (OdometryNewTimeSecs - OdometryOldTimeSecs);
 	interpolated.wheelspeedleft = Odometryold.wheelspeedleft + ((Odometrynew.wheelspeedleft - Odometryold.wheelspeedleft) * (EKFfilterTimeSecs - OdometryOldTimeSecs)) / (OdometryNewTimeSecs - OdometryOldTimeSecs);
 
-	std::cout << "Odometry old: Wheelspeed Left " << Odometryold.wheelspeedleft << " Wheelspeed Right " << Odometryold.wheelspeedright << "\n" << std::endl;//DB
-	std::cout << "Odometry new: Wheelspeed Left " << Odometrynew.wheelspeedleft << " Wheelspeed Right " << Odometrynew.wheelspeedright << "\n" << std::endl;//DB
-	std::cout << "Odometry intrepolated: Wheelspeed Left " << interpolated.wheelspeedleft << " Wheelspeed Right " << interpolated.wheelspeedright << "\n" << std::endl;//DB
+	std::cout << "Odometry old: Wheelspeed Left " << Odometryold.wheelspeedleft << " Wheelspeed Right " << Odometryold.wheelspeedright << "\n" << std::endl; //DB
+	std::cout << "Odometry new: Wheelspeed Left " << Odometrynew.wheelspeedleft << " Wheelspeed Right " << Odometrynew.wheelspeedright << "\n" << std::endl; //DB
+	std::cout << "Odometry intrepolated: Wheelspeed Left " << interpolated.wheelspeedleft << " Wheelspeed Right " << interpolated.wheelspeedright << "\n" << std::endl; //DB
 
 	return interpolated;
 }
@@ -239,16 +245,16 @@ Eigen::Vector3d FSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
  * @brief JacobianFSTATE
  *
  * This computes Jacobian matrix by taking the partial derivatives of f(x_k-1,u_k-1) w.r.t x
- * @param x_pp  contains  "a priori" state estimate, x_k-1|k-1.
+ * @param x_pp contains "a priori" state estimate, x_k-1|k-1.
  * @param u is control input vector, calculated from odometry. It consists of 2 elements, delta S and delta theta.
  * @return Eigen::Matrix3d is the Jacobian matrix 
  */
  
-Eigen::Matrix3d JacobianFSTATE(Eigen::Vector3d x_cp, Eigen::Vector2d u) {
+Eigen::Matrix3d JacobianFSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 
 	Eigen::Matrix3d Jf_xu = Eigen::Matrix3d::Identity(); 
-	Jf_xu(0, 2) = - u(0) * sin(x_cp(2) - (u(1) / 2));
-	Jf_xu(1, 2) = u(0) * cos(x_cp(2) - (u(1) / 2));
+	Jf_xu(0, 2) = - u(0) * sin(x_pp(2) - (u(1) / 2));
+	Jf_xu(1, 2) = u(0) * cos(x_pp(2) - (u(1) / 2));
 
 	return Jf_xu;
 }
@@ -258,7 +264,7 @@ Eigen::Matrix3d JacobianFSTATE(Eigen::Vector3d x_cp, Eigen::Vector2d u) {
  * 
  * This computes estimated measurement vector based on the latest state estimate.
  *
- * @param x_pp contains state prediction x_k|k-1 computed in time update of EKF
+ * @param x_cp contains state prediction x_k|k-1 computed in time update of EKF
  * @return Eigen::Vector3d, contains estimated measurement vector.
  */
 
@@ -279,7 +285,7 @@ Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
  * Initializes Extended Kalman Filter revelant variables.
  * As a part of initializing, function waits for one message from each subscriber and save timestamps for the first iteration of EKF.
  * State estimate, x_(0|-1) is initialized as the first measurement read from the preprocessor node.
- * Covariance of state estimate, E(0,-1) is initialized as identity matrix.
+ * Covariance of state estimate, E(0, -1) is initialized as identity matrix.
  * 
  * Run EKF in loop, update estimates.
  * Await new sensor data, determine time step for EKF update and perform necessary interpolation.
@@ -298,12 +304,12 @@ ros::start(); // Necessary to be called
 //! Initialize nodehandle for subscribers and publisher
 ros::NodeHandle RolloEKF;
 
-//! Initialize Subscribers
-//ros::Subscriber MeasSub = RolloEKF.subscribe("/Rollo/preprocessor/pose2dstamped", 1024, subscriberCallbackMeasurement);
-//ros::Subscriber ContSub = RolloEKF.subscribe("/Rollo/communication/wheelspeed", 1024, subscriberCallbackControlInput);
+//! Initialize subscribers
+ros::Subscriber MeasSub = RolloEKF.subscribe(TopicPose2DStamped, 1024, subscriberCallbackMeasurement);
+ros::Subscriber ContSub = RolloEKF.subscribe(TopicWheelSpeed, 1024, subscriberCallbackControlInput);
 
 //! Initialize publisher and define topic and message queue size for the publisher
-ros::Publisher RolloPub = RolloEKF.advertise<rollo::EKF>("/Rollo/ekf", 1024);
+ros::Publisher RolloPub = RolloEKF.advertise<rollo::EKF>(TopicEKF, 1024);
 
 //! Initialize node arguments using command line
 int rate_frequency;
@@ -443,7 +449,7 @@ do {
 	std::cout << "Wait for new data from all sensors (motion captutre and odometry) for next EKF iteration. \n" << std::endl; //DB
 
 	//! Check if new data is available from measurement (motion capture) and odometry (control input)
-	if (OdometryTimeSecs > prevOdometrySecs &&  zTimeSecs > prevMeasurementSecs ) {
+	if (OdometryTimeSecs > prevOdometrySecs &&  zTimeSecs > prevMeasurementSecs) {
 		all_sensors_data_available = 1;
 		prevOdometrySecs = OdometryTimeSecs;
 		prevMeasurementSecs = zTimeSecs;
@@ -472,7 +478,7 @@ do {
 			EKFfilterTimeSecs = zTimeSecs;
 
 			//! Interpolate for measurement
-			InterpolatedOdometry = interpolateOdometry( prevOdometry, Odometry, EKFfilterTimeSecs );
+			InterpolatedOdometry = interpolateOdometry(prevOdometry, Odometry, EKFfilterTimeSecs);
 
 			//! Update variables involved in EKF update
 			z_EKF(0) = zPose2DStamped.pose.x;
@@ -488,7 +494,7 @@ do {
 
 		}
 
-	//! Update @var prevOdometry and @var prevzPose2DStamped for next loop
+	//! Update @p prevOdometry and @p prevzPose2DStamped for next loop
 	prevOdometry = Odometry;
 	prevzPose2DStamped = zPose2DStamped;
 
@@ -561,7 +567,7 @@ do {
 		//! Prepare data for publishing
 		rollo::EKF result;
 		result.header.stamp.sec = (int) EKFfilterTimeSecs;
-		result.header.stamp.nsec = (int)((EKFfilterTimeSecs - result.header.stamp.sec ) * 1000000000); // 1.000.000.000 //Q what is the limit of int here? it is possible to overflow? If so, when? Does that make sense?
+		result.header.stamp.nsec = (int)((EKFfilterTimeSecs - result.header.stamp.sec) * 1000000000); // 1.000.000.000 //Q what is the limit of int here? it is possible to overflow? If so, when? Does that make sense?
 
 		//! Pose2D
 		result.pose2d.x = x_cc(0);
