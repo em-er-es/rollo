@@ -18,7 +18,7 @@
     name="rollo_ekf"
     respawn="false"
     launch-prefix=""
-    required="true">
+    required="false">
   </node>
   <node pkg="rollo"
     type="rollo_comm"
