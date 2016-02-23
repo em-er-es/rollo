@@ -39,8 +39,8 @@
  * 
  */
  
-char NodeName[20] = C2 CT CR; // The size is necessary for the GNU/Linux console codes //~COLOR
-// char NodeName[20] = CT; // The size is necessary for the GNU/Linux console codes //~COLOR
+char NodeName[20] = C2 CT CR; // The size is necessary for the GNU/Linux console codes //COLOR
+// char NodeName[20] = CT; // The size is necessary for the GNU/Linux console codes //COLOR
 
 
 /**
@@ -79,14 +79,13 @@ char getCharacter()
 		ROS_ERROR("tcsetattr ICANON");
 
 	if (rv == -1)
-		ROS_ERROR("select"); // select or select()? //~Q
+		ROS_ERROR("select()");
 	else if (rv == 0)
 		// ROS_INFO("[Rollo][%s][getCharacter] Key pressed: NONE", NodeName);
 		ROS_INFO("[Rollo][%s][getCharacter] No key pressed", NodeName);
 	else {
 		read(filedesc, &buffer, length);
-		// ROS_INFO("[Rollo][%s][main] Key pressed %c\n", NodeName, buffer); // How is this main()? //~Q
-		ROS_INFO("[Rollo][%s][main] Key pressed: %c", NodeName, buffer); // How is this main()? //~Q
+		ROS_INFO("[Rollo][%s][getCharacter] Key pressed: %c", NodeName, buffer);
 	}
 
 	previous.c_lflag |= ICANON;
@@ -187,7 +186,7 @@ private_node_handle_.param("rate", rate_frequency, int(10));
 ros::Rate frequency(rate_frequency); 
 
 //! Publisher variables for conventional messages
-geometry_msgs::Twist PubRolloTwist; // Or PubRolloCmd? //~Q
+geometry_msgs::Twist PubRolloTwist; // Or PubRolloCmd? //Q
 
 //! Initialize variables for computing linear and angular velocity of the robot
 double x = 0;
@@ -196,10 +195,10 @@ double speed = 0.5;
 double turn = 1;
 
 
-//! Loop
+//! Main loop
 while (ros::ok()) {
 	//! Read if any keyboard key is pressed
-	int c = 0; // Initialize each loop? //~Q
+	int c = 0; // Initialize each loop? //Q
 	c = getCharacter();
 
 	//! Decode key pressed
@@ -223,7 +222,7 @@ while (ros::ok()) {
 	frequency.sleep();
 
 }
-//! End loop
+//! Main loop end
 
 return 0;
 }
