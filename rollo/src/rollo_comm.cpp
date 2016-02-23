@@ -13,7 +13,7 @@
 #include <sstream>
 #include <iostream>
 #include "string.h"
-#include "rollo_nodes.h"
+#include "rollo.hpp"
 #include "geometry_msgs/Twist.h"
 #include "rollo/WheelSpeed.h"
 #include "udp.h"

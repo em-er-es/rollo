@@ -36,7 +36,7 @@
 #include <sstream>
 #include <iostream>
 #include <eigen3/Eigen/Dense>
-#include "rollo_nodes.h"
+#include "rollo.hpp"
 
 // Naming conventions:
 // Global and important variables: CapitalLettersFullName

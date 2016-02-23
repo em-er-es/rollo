@@ -23,7 +23,7 @@
 #include "tf/tf.h"
 #include <sstream>
 #include <iostream>
-#include "rollo_nodes.h"
+#include "rollo.hpp"
 
 
 /**
