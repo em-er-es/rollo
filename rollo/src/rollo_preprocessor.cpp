@@ -122,7 +122,7 @@ int loopcounter = 0;
 int loopcondition = 1; // For while(1) loop
 
 
-//! Loop
+//! Main loop
 do {
 	sum_x += x;
 	sum_y += y;
@@ -170,7 +170,7 @@ do {
 	loopcounter++;
 
 } while (loopcondition);
-//! End loop
+//! Main loop end
 
 // ros::shutdown();
 return 0;
