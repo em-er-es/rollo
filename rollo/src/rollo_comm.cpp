@@ -18,8 +18,10 @@
 #include "ros/ros.h"
 #include <sstream>
 #include <iostream>
+#include "string.h"
 #include "rollo_nodes.h"
 #include "geometry_msgs/Twist.h"
+#include "rollo/WheelSpeed.h"
 #include "udp.h"
 
 /* TODO
@@ -237,7 +239,7 @@ ros::NodeHandle RolloCommunicationNode;
 
 //! Initialie subscriber and define topic and message queue size
 ros::Subscriber SubRollo = RolloCommunicationNode.subscribe("/Rollo/cmd_vel", 1024, subscriberCallback);
-ros::Publisher PubRollo = RolloCommunicationNode.advertise<geometry_msgs::Twist>("/Rollo/encoders", 1024); //! Publish velocities as [rpm]
+ros::Publisher PubRollo = RolloCommunicationNode.advertise<rollo::WheelSpeed>("/Rollo/communication/wheelspeed", 1024); //! Publish velocities as [rpm]
 
 //! Initialize node arguments using command line
 int rate_frequency;
@@ -256,6 +258,7 @@ private_node_handle_.param("port", port, int(10));
 // private_node_handle_.param("ip", ip, char(16));
 // private_node_handle_.param("ip", ip, "192.168.0.120");
 // private_node_handle_.param("ip", ip);
+private_node_handle_.param("ip", ip, cha(16));
 
 //! Sending rate in units of Hz
 ros::Rate frequency(rate_frequency);
@@ -264,7 +267,7 @@ ros::Rate frequency(rate_frequency);
 geometry_msgs::Twist SubRolloTwist;
 
 //! Initialize publisher message type
-geometry_msgs::Twist PubRolloTwist;
+rollo::WheelSpeed PubRolloWheelSpeed;
 
 //! Initialize variables for computing linear and angular velocity of the robot
 int rv = 0;
@@ -275,6 +278,7 @@ while (ros::ok())
 
 		//! Send control command to Rollo
 		// rv = udpSend(ip, port, Message);
+		// rv = udpSend('192.168.0.120', port, Message);
 		rv = udpSend("192.168.0.120", port, Message);
 		if (rv)
 			ROS_INFO("[Rollo][%s] Command executed", NodeName); //DB
@@ -282,7 +286,7 @@ while (ros::ok())
 		//! Publish encoder readings
 		VelocityL = v_l;
 		VelocityR = v_r;
-		PubRollo.publish(PubRolloTwist);
+		PubRollo.publish(PubRolloWheelSpeed);
 		ROS_INFO("[Rollo][%s][Pub] L[%d] R[%d]", NodeName, VelocityL, VelocityR); //DB
 
 		//! ROS spinOnce

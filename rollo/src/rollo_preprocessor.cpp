@@ -1,11 +1,11 @@
 /**
  * @file rollo_node.cpp
  * @author Rabbia Asghar, Ernest Skrzypczyk
- * @date 9 16/2/16
+ * @date 16/2/16
  * @brief Preprocessor for Rollo measurement using Mocap OptiTrack motion capture data
  *
  * Filter the raw data from optitrack motion capture system and 
- * publish it for modeling of odometry and the measurement in Kalman Filter
+ * publish it along with time stamp for modeling of odometry and the measurement in Kalman Filter
  * 
  * Command: rosrun rollo rollo_node _rate:=1 _samplesize:=5 _sampling:=0
  *  _rate: Sampling frquency of the node, default value is 1
@@ -19,6 +19,7 @@
 #include "std_msgs/String.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/Pose2D.h"
+#include "rollo/Pose2DStamped.h"
 #include "tf/tf.h"
 #include <sstream>
 #include <iostream>
@@ -52,7 +53,7 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
 	y_mm = 1000 * y;
 	theta = msg->theta; // Raw theta [rad]
 	theta_deg = theta / PI * 180 + 180; // Conversion into degrees in the range 0 to 360 degress
-	ROS_INFO("[Rollo][%s][Sub][X, Y, Theta]: %f, %f, %f", NodeName, x_mm, y_mm, theta_deg);
+	ROS_INFO("[Rollo][%s][Sub][X(mm), Y(mm), Theta(deg)]: %f, %f, %f", NodeName, x_mm, y_mm, theta_deg);
 }
 
 
@@ -61,7 +62,7 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
  *
  * Initializes variables, nodehandle, subscribes to Optitack Ground_pose and publishes position and orientation after processing.
  * It accepts 3 arguments from command line: rate, samplesize, sampling.
- * The position and orientation are published to topic /Rollo/pose in format geometry_msgs::Pose2D.
+ * The position and orientation are published along with timestamp to topic /Rollo/preprocessor/pose2dstamped in format custom defined message, rollo::Pose2DStamped .
  * @return 0
  */
 int main(int argc, char **argv)
@@ -78,7 +79,7 @@ ros::NodeHandle RolloPreprocessorNode;
 ros::Subscriber PoseSub = RolloPreprocessorNode.subscribe("/Optitrack_Rollo/ground_pose", 1024, subscriberCallback);
 
 //! Publisher initialization with topic, message format and queue size definition
-ros::Publisher RolloPub = RolloPreprocessorNode.advertise<geometry_msgs::Pose2D>("/Rollo/pose", 1024);
+ros::Publisher RolloPub = RolloPreprocessorNode.advertise<rollo::Pose2DStamped>("/Rollo/preprocessor/pose2dstamped", 1024);
 
 //! Node arguments using command line
 int rate_frequency;
@@ -104,13 +105,18 @@ std::stringstream StringStream;
 std_msgs::String PubRolloPosition; // Declaration of message type
 
 //! Publisher variables for processing
-double sum_x_mm = 0;
-double sum_y_mm = 0;
-double sum_theta_deg = 0;
+double sum_x = 0;
+double sum_y = 0;
+double sum_theta = 0;
 
-double average_x_mm = 0;
-double average_y_mm = 0;
-double average_theta_deg = 0;
+double average_x = 0;
+double average_y = 0;
+double average_theta = 0;
+
+//! Initialize variable to publish message
+rollo::Pose2DStamped PubRolloPositionPose2dStamped;
+PubRolloPositionPose2dStamped.header.frame_id = '1'; // Global frame
+
 
 int loopcounter = 0;
 int loopcondition = 1; // For while(1) loop
@@ -118,16 +124,16 @@ int loopcondition = 1; // For while(1) loop
 
 //! Loop
 do {
-	sum_x_mm += x_mm;
-	sum_y_mm += y_mm;
-	sum_theta_deg += theta_deg;
+	sum_x += x;
+	sum_y += y;
+	sum_theta += theta;
 
 
 	if (loopcounter >= samplesize)
 	{
-		average_x_mm = sum_x_mm / samplesize;
-		average_y_mm = sum_y_mm / samplesize;
-		average_theta_deg = sum_theta_deg / samplesize;
+		average_x = sum_x / samplesize;
+		average_y = sum_y / samplesize;
+		average_theta = sum_theta / samplesize;
 
 		//StringStream << "[Rollo][" << NodeName << "][X, Y, Theta]: " << x_mm << ", " << y_mm << ", " << theta_deg << "\n";
 		//StringStream << "[Rollo][" << NodeName << "][X, Y, Theta]: " << sum_x_mm << ", " << sum_y_mm << ", " << sum_theta_deg << "\n";
@@ -136,19 +142,19 @@ do {
 		//PubRolloPosition.data = StringStream.str();
 
 		//! Prepare data for publishing
-		geometry_msgs::Pose2D PubRolloPositionPose2d;
-		PubRolloPositionPose2d.x = average_x_mm;
-		PubRolloPositionPose2d.y = average_y_mm;
-		PubRolloPositionPose2d.theta = average_theta_deg;
+		PubRolloPositionPose2dStamped.pose.x  = average_x;
+		PubRolloPositionPose2dStamped.pose.y  = average_y;
+		PubRolloPositionPose2dStamped.pose.theta  = average_theta;
+		PubRolloPositionPose2dStamped.header.stamp = ros::Time::now();
 
-		//! Publish
-		RolloPub.publish(PubRolloPositionPose2d);
+		//! publish
+		RolloPub.publish(PubRolloPositionPose2dStamped);
 
 		//! Reset variables
 		loopcounter = 0;
-		sum_x_mm  = 0;
-		sum_y_mm  = 0;
-		sum_theta_deg = 0;
+		sum_x  = 0;
+		sum_y  = 0;
+		sum_theta = 0;
 
 		//! For subsampling sleep for time defined by rate and then read the states from the subscriber callback() without sleep() delay 
 		if (sampling == 0) frequency.sleep();
