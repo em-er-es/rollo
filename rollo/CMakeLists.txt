@@ -51,12 +51,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
+add_message_files(
    FILES
    EKF.msg
    Pose2DStamped.msg
    WheelSpeed.msg
-#   Message2.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -77,7 +76,8 @@ find_package(catkin REQUIRED COMPONENTS
 generate_messages(
    DEPENDENCIES
    std_msgs 
-   geometry_msgs 
+   geometry_msgs
+   rollo
 )
 
 ################################################
@@ -112,7 +112,8 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rollo
-#  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs
+#  CATKIN_DEPENDS message_runtime geometry_msgs roscpp rospy std_msgs
+#  CATKIN_DEPENDS message_runtime geometry_msgs std_msgs
 #  DEPENDS system_lib
   DEPENDS Eigen
 )
@@ -182,8 +183,6 @@ target_link_libraries(rollo_ekf
 
 target_link_libraries(rollo_comm
   ${catkin_LIBRARIES}
-#  $ROS_ROOT/rollo/
-#  $ROS_PACKAGE_PATH/src/rollo/src/libudp.so
 #  $ROS_PACKAGE_PATH/devel/lib/rollo/libudp.so
 #  ${HOME}/.ros/workspace/devel/lib/libudp.so
   ~/.ros/workspace/devel/lib/libudp.so
