@@ -24,6 +24,7 @@
 #define TOPIC_COMM_WS "/Rollo/communication/wheelspeed"
 #define TOPIC_CTRL_CMD_VEL "/Rollo/control/cmd_vel"
 #define TOPIC_EKF "/Rollo/ekf/ekf"
+#define TOPIC_PREP_MC "/Optitrack_Rollo/ground_pose"
 #define TOPIC_PREP_P2DT "/Rollo/preprocessor/pose2dstamped"
 
 //! GNU/Linux terminal color codes
