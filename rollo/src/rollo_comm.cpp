@@ -32,6 +32,7 @@
 // Comment tags: Tasks needed to be fixed //FIX
 // Comment tags: Tasks left to do //TODO
 // Comment tags: Question //Q
+// Comment tags: Suggestion //S
 // Comment tags: Correct comment //CRC
 // Comment tags: Correct variable //CRV
 
@@ -59,6 +60,10 @@
 char NodeName[20] = C3 CM CR; // The size is necessary for the GNU/Linux console codes //COLOR
 // char NodeName[20] = CM; // The size is necessary for the GNU/Linux console codes //COLOR
 
+//! Topics
+char TopicWheelSpeed[64] = TOPIC_COMM_WS;
+char TopicCmdVel[64] = TOPIC_CTRL_CMD_VEL;
+
 /*
 //! Internet protocol version 4 representations
 struct IPv4 {
@@ -85,8 +90,8 @@ int v_l, v_r; //! Velocities for both wheels
 
 // unsigned int nb = 3; //! Number of bytes in the message
 unsigned const int nb = 3; //! Number of bytes in the message
-char MessageB1, MessageB2, MessageB3; //! Message bytes
 char Message[nb] = {0x7b, 0x50, 0x10}; //! Message combined, complete stop default
+char MessageEmergencyStop[nb] = {0x7b, 0x50, 0x10}; //! Emergency message - complete stop
 
 char Mode; //! Message mode description
 int VelocityL, VelocityR; //! Message velocities description
@@ -100,12 +105,13 @@ unsigned int RolloRange = RolloMax - RolloMin; //! Range of speed of the Rollo
  * @brief Decode linear and angular velocities
  *
  * Velocities are decoded and stored as partial bytes of the UDP packet
+ * Parameters declared: @p x, @p z, @p &Message.
  * Parameters declared: @p x, @p z, @p &MessageB1, @p &MessageB2, @p &MessageB3.
  * @return 0
  * @see DOCURL
  */
 
-int decodeVelocities(double x, double z, char &MessageB1, char &MessageB2, char &MessageB3) // Could read the velocities and transform them later on
+int decodeVelocities(double x, double z, char *Message) //S Could read the velocities and transform them later on
 {
 //! Determine corresponding operation mode based on velocities
 
@@ -124,16 +130,16 @@ int decodeVelocities(double x, double z, char &MessageB1, char &MessageB2, char 
 
 	if (x == 0) {
 
-		if (z == 0) MessageB1 = 0x7b; //! Complete stop
-		else if (z > 0) MessageB1 = 0x7f; //! Right rotation
-		else if (z < 0) MessageB1 = 0x7e; //! Left rotation
+		if (z == 0) Message[0] = 0x7b; //! Complete stop
+		else if (z > 0) Message[0] = 0x7f; //! Right rotation
+		else if (z < 0) Message[0] = 0x7e; //! Left rotation
 
-		MessageB2 = 0x50; MessageB3 = 0x10; //! Lowest speeds for previous modes
+		Message[1] = 0x50; Message[2] = 0x10; //! Lowest speeds for previous modes
 
 	} else if (x != 0) { //! Determine speeds
-		// Based on the position of the "dial" z
-		// |-a-|---*-b-----|
-		//-1   z   0       1
+		//! Based on the position of the "dial" z
+		//!    |-a-|---*-b-----|
+		//!   -1   z   0       1
 
 		float tx = x * RolloRange;
 		float a = (z + 1.001); //! Eliminate problems with diving through zero
@@ -142,39 +148,39 @@ int decodeVelocities(double x, double z, char &MessageB1, char &MessageB2, char 
 		v_r = (a / b * tx) / RolloMin;
 
 		switch (v_l){
-			case 0:		MessageB2 = 0x50; break;
-			case 1:		MessageB2 = 0x55; break;
-			case 2:		MessageB2 = 0x56; break;
-			case 3:		MessageB2 = 0x57; break;
-			case 4:		MessageB2 = 0x59; break;
-			case 5:		MessageB2 = 0x5F; break;
-			case 6:		MessageB2 = 0x60; break;
-			case 7:		MessageB2 = 0x61; break;
-			case 8:		MessageB2 = 0x62; break;
-			case 9:		MessageB2 = 0x62; break;
-			default:	MessageB2 = 0x50; break;
+			case 0:		Message[1] = 0x50; break;
+			case 1:		Message[1] = 0x55; break;
+			case 2:		Message[1] = 0x56; break;
+			case 3:		Message[1] = 0x57; break;
+			case 4:		Message[1] = 0x59; break;
+			case 5:		Message[1] = 0x5F; break;
+			case 6:		Message[1] = 0x60; break;
+			case 7:		Message[1] = 0x61; break;
+			case 8:		Message[1] = 0x62; break;
+			case 9:		Message[1] = 0x62; break;
+			default:	Message[1] = 0x50; break;
 		}
 
 		switch (v_r){
-			case 0:		MessageB3 = 0x10; break;
-			case 1:		MessageB3 = 0x11; break;
-			case 2:		MessageB3 = 0x25; break; //! Temporary fix for errartic behaviour of Rollo
-			case 3:		MessageB3 = 0x13; break;
-			case 4:		MessageB3 = 0x1A; break;
-			case 5:		MessageB3 = 0x1B; break;
-			case 6:		MessageB3 = 0x1C; break;
-			case 7:		MessageB3 = 0x1D; break;
-			case 8:		MessageB3 = 0x24; break;
-			case 9:		MessageB3 = 0x24; break;
-			default:	MessageB3 = 0x10; break;
+			case 0:		Message[2] = 0x10; break;
+			case 1:		Message[2] = 0x11; break;
+			case 2:		Message[2] = 0x25; break; //! Temporary fix for errartic behaviour of Rollo
+			case 3:		Message[2] = 0x13; break;
+			case 4:		Message[2] = 0x1A; break;
+			case 5:		Message[2] = 0x1B; break;
+			case 6:		Message[2] = 0x1C; break;
+			case 7:		Message[2] = 0x1D; break;
+			case 8:		Message[2] = 0x24; break;
+			case 9:		Message[2] = 0x24; break;
+			default:	Message[2] = 0x10; break;
 		}
 
-		if (x > 0) MessageB1 = 0x7c; //! Determine forward or backward movement
-		else if (x < 0) MessageB1 = 0x7d;
+		if (x > 0) Message[0] = 0x7c; //! Determine forward or backward movement
+		else if (x < 0) Message[0] = 0x7d;
 
 	}
 
-	ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%d][%d][%d]]", NodeName, x, z, MessageB1, MessageB2, MessageB3); //DB
+	ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%c][%c][%c]]", NodeName, x, z, Message[0], Message[1], Message[2]); //DB
 }
 
 /**
@@ -190,11 +196,8 @@ void subscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
 	x = msg->linear.x;
 	z = msg->angular.z;
-	decodeVelocities(x, z, MessageB1, MessageB2, MessageB3);
-	// Message = {MessageB1, MessageB2, MessageB3}; //! Update the UDP message
-	Message[0] = MessageB1; //! Update the UDP message
-	Message[1] = MessageB2; //! Update the UDP message
-	Message[2] = MessageB3; //! Update the UDP message
+	decodeVelocities(x, z, Message); //! Update the UDP message
+	// Message[2] = MessageB3; //! Update the UDP message
 }
 
 /**
@@ -249,13 +252,15 @@ ros::start(); // ROS node initialization
 ros::NodeHandle RolloCommunicationNode;
 
 //! Initialie subscriber and define topic and message queue size
-ros::Subscriber SubRollo = RolloCommunicationNode.subscribe("/Rollo/cmd_vel", 1024, subscriberCallback);
-ros::Publisher PubRollo = RolloCommunicationNode.advertise<rollo::WheelSpeed>("/Rollo/communication/wheelspeed", 1024); //! Publish velocities as [rpm]
+// ros::Subscriber SubRollo = RolloCommunicationNode.subscribe("/Rollo/control/cmd_vel", 1024, subscriberCallback);
+// ros::Publisher PubRollo = RolloCommunicationNode.advertise<rollo::WheelSpeed>("/Rollo/communication/wheelspeed", 1024); //! Publish velocities as [rpm]
+ros::Subscriber SubRollo = RolloCommunicationNode.subscribe(TopicCmdVel, 1024, subscriberCallback);
+ros::Publisher PubRollo = RolloCommunicationNode.advertise<rollo::WheelSpeed>(TopicWheelSpeed, 1024); //! Publish velocities as [rpm]
 
 //! Initialize node arguments using command line
 int rate_frequency;
 
-// Sample command: rosrun rollo rollo_communication _rate:=1
+// Command: rosrun rollo rollo_communication _rate:=1
 //! Initialize node parameters from launch file or command line.
 //! Use a private node handle so that multiple instances of the node
 //! can be run simultaneously while using different parameters.
@@ -271,7 +276,7 @@ private_node_handle_.param("port", port, int(10));
 // private_node_handle_.param("ip", ip);
 // private_node_handle_.param("ip", ip, cha(16));
 
-//! Sending rate in units of Hz
+//! Node frequency rate [Hz]
 ros::Rate frequency(rate_frequency);
 
 //! Initialize subscriber message type
