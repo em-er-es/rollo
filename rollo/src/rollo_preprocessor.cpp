@@ -37,6 +37,10 @@ double x, y, theta;
 double x_mm, y_mm, theta_deg;
 
 
+//! Topics
+char TopicMotionCapture[64] = TOPIC_PREP_MC;
+char TopicPose2DStamped[64] = TOPIC_PREP_P2DT;
+
 /**
  * @brief SubscriberCallback function
  *
@@ -76,10 +80,10 @@ ros::start(); // ROS internal function, neccessary to be called
 ros::NodeHandle RolloPreprocessorNode;
 
 //! Subscriber
-ros::Subscriber PoseSub = RolloPreprocessorNode.subscribe("/Optitrack_Rollo/ground_pose", 1024, subscriberCallback);
+ros::Subscriber PoseSub = RolloPreprocessorNode.subscribe(TopicMotionCapture, 1024, subscriberCallback);
 
 //! Publisher initialization with topic, message format and queue size definition
-ros::Publisher RolloPub = RolloPreprocessorNode.advertise<rollo::Pose2DStamped>("/Rollo/preprocessor/pose2dstamped", 1024);
+ros::Publisher RolloPub = RolloPreprocessorNode.advertise<rollo::Pose2DStamped>(TopicPose2DStamped, 1024);
 
 //! Node arguments using command line
 int rate_frequency;
@@ -118,7 +122,7 @@ rollo::Pose2DStamped PubRolloPositionPose2dStamped;
 PubRolloPositionPose2dStamped.header.frame_id = '1'; // Global frame
 
 
-int loopcounter = 0;
+unsigned int loopcounter = 0;
 int loopcondition = 1; // For while(1) loop
 
 
@@ -127,7 +131,6 @@ do {
 	sum_x += x;
 	sum_y += y;
 	sum_theta += theta;
-
 
 	if (loopcounter >= samplesize)
 	{
