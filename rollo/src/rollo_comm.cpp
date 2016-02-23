@@ -8,12 +8,6 @@
  * @see https://github.com/em-er-es/rollo/
  */
 
-// Naming conventions:
-// Global and important variables: CapitalLettersFullName
-// Local, temporary and irrelevant variables: shortlowercase
-// Functions priority: CapitalLettersFunctions
-// Functions conventional: firstLowerLetterFunction
-// Functions and variables special: _FullDescription
 
 #include "ros/ros.h"
 #include <sstream>
@@ -23,6 +17,24 @@
 #include "geometry_msgs/Twist.h"
 #include "rollo/WheelSpeed.h"
 #include "udp.h"
+
+
+// Naming conventions:
+// Global and important variables: CapitalLettersFullName
+// Local, temporary and irrelevant variables: shortlowercase
+// Functions priority: CapitalLettersFunctions
+// Functions conventional: firstLowerLetterFunction
+// Functions and variables special: _FullDescription
+// Comment switches: Debug //DB
+// Comment switches: Verbose //VB
+// Comment switches: Color //COLOR
+// Comment switches: Any other switch //RelevantCapitalLettersAbbreviation
+// Comment tags: Tasks needed to be fixed //FIX
+// Comment tags: Tasks left to do //TODO
+// Comment tags: Question //Q
+// Comment tags: Correct comment //CRC
+// Comment tags: Correct variable //CRV
+
 
 /* TODO
  * Define a function that will send UDP packets with ip adress, udp port and message as parameters
@@ -44,8 +56,8 @@
  *
  */
 
-char NodeName[20] = C3 CM CR; // The size is necessary for the GNU/Linux console codes //~COLOR
-// char NodeName[20] = CM; // The size is necessary for the GNU/Linux console codes //~COLOR
+char NodeName[20] = C3 CM CR; // The size is necessary for the GNU/Linux console codes //COLOR
+// char NodeName[20] = CM; // The size is necessary for the GNU/Linux console codes //COLOR
 
 /*
 //! Internet protocol version 4 representations
@@ -188,7 +200,6 @@ void subscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
 /**
  * @brief Send UDP packets
  *
- * Ip address, UDP port and message are passed as arguments
  * Parameters declared by reference: @p &ip, @p &port, @p &message.
  * @return Bytes sent
  * @see DOCURL
@@ -258,7 +269,7 @@ private_node_handle_.param("port", port, int(10));
 // private_node_handle_.param("ip", ip, char(16));
 // private_node_handle_.param("ip", ip, "192.168.0.120");
 // private_node_handle_.param("ip", ip);
-private_node_handle_.param("ip", ip, cha(16));
+// private_node_handle_.param("ip", ip, cha(16));
 
 //! Sending rate in units of Hz
 ros::Rate frequency(rate_frequency);
@@ -273,29 +284,29 @@ rollo::WheelSpeed PubRolloWheelSpeed;
 int rv = 0;
 
 //! Run loop
-while (ros::ok())
-	{
+while (ros::ok()) {
 
-		//! Send control command to Rollo
-		// rv = udpSend(ip, port, Message);
-		// rv = udpSend('192.168.0.120', port, Message);
-		rv = udpSend("192.168.0.120", port, Message);
-		if (rv)
-			ROS_INFO("[Rollo][%s] Command executed", NodeName); //DB
+	//! Send control command to Rollo
+	// rv = udpSend(ip, port, Message);
+	// rv = udpSend('192.168.0.120', port, Message);
+	rv = udpSend("192.168.0.120", port, Message);
+	if (rv)
+		ROS_INFO("[Rollo][%s] Command executed", NodeName); //DB
 
-		//! Publish encoder readings
-		VelocityL = v_l;
-		VelocityR = v_r;
-		PubRollo.publish(PubRolloWheelSpeed);
-		ROS_INFO("[Rollo][%s][Pub] L[%d] R[%d]", NodeName, VelocityL, VelocityR); //DB
+	//! Publish encoder readings
+	VelocityL = v_l;
+	VelocityR = v_r;
+	PubRollo.publish(PubRolloWheelSpeed);
+	ROS_INFO("[Rollo][%s][Pub] L[%d] R[%d]", NodeName, VelocityL, VelocityR); //DB
 
-		//! ROS spinOnce
-		ros::spinOnce();
+	//! ROS spinOnce
+	ros::spinOnce();
 
-		//! Sleep before running loop again
-		frequency.sleep();
+	//! Sleep before running loop again
+	frequency.sleep();
 
-	}
+}
 
 return 0;
+
 }
