@@ -42,6 +42,9 @@
 char NodeName[20] = C2 CT CR; // The size is necessary for the GNU/Linux console codes //COLOR
 // char NodeName[20] = CT; // The size is necessary for the GNU/Linux console codes //COLOR
 
+char TopicWheelSpeed[64] = TOPIC_COMM_WS;
+char TopicCmdVel[64] = TOPIC_CTRL_CMD_VEL;
+
 
 /**
  * @brief getCharacter function
@@ -68,14 +71,14 @@ char getCharacter()
 
 	rv = select(filedesc + 1, &set, NULL, NULL, &timeout);
 
-	struct termios previous = {0};
-	if (tcgetattr(filedesc, &previous) < 0)
+	struct termios settings = {0};
+	if (tcgetattr(filedesc, &settings) < 0)
 		ROS_ERROR("tcsetattr()");
-	previous.c_lflag &= ~ICANON;
-	previous.c_lflag &= ~ECHO;
-	previous.c_cc[VMIN] = 1;
-	previous.c_cc[VTIME] = 0;
-	if (tcsetattr(filedesc, TCSANOW, &previous) < 0)
+	settings.c_lflag &= ~ICANON;
+	settings.c_lflag &= ~ECHO;
+	settings.c_cc[VMIN] = 1;
+	settings.c_cc[VTIME] = 0;
+	if (tcsetattr(filedesc, TCSANOW, &settings) < 0)
 		ROS_ERROR("tcsetattr ICANON");
 
 	if (rv == -1)
@@ -88,9 +91,9 @@ char getCharacter()
 		ROS_INFO("[Rollo][%s][getCharacter] Key pressed: %c", NodeName, buffer);
 	}
 
-	previous.c_lflag |= ICANON;
-	previous.c_lflag |= ECHO;
-	if (tcsetattr(filedesc, TCSADRAIN, &previous) < 0)
+	settings.c_lflag |= ICANON;
+	settings.c_lflag |= ECHO;
+	if (tcsetattr(filedesc, TCSADRAIN, &settings) < 0)
 		ROS_ERROR ("tcsetattr ~ICANON");
 	return (buffer);
 }
@@ -170,7 +173,7 @@ ros::start();
 ros::NodeHandle RolloControlNode;
 
 //! Publisher initialization with topic, message format and queue size definition
-ros::Publisher RolloTwist = RolloControlNode.advertise<geometry_msgs::Twist>("/Rollo/cmd_vel", 1024);
+ros::Publisher RolloTwist = RolloControlNode.advertise<geometry_msgs::Twist>(TopicCmdVel, 1024);
 
 //! Node arguments using command line
 int rate_frequency;
