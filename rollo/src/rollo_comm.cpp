@@ -30,7 +30,7 @@
  *  - emergency procedure
  *
  * @see https://github.com/em-er-es/rollo/
- * 
+ *
  */
 
 
@@ -134,11 +134,11 @@ double RolloRange = RolloMax - RolloMin; //! Range of speed of the Rollo
  * Velocities are decoded and stored as partial bytes of the UDP packet
  *
  * \param x Linear velocity
- * \param z Angular veolocity 
+ * \param z Angular veolocity
  * \param &Message UDP message to be send to target robot
  * \param VelocityL Decoded velocity [%]
  * \param VelocityR Decoded velocity [%]
- * 
+ *
  * @return 0
  */
 
@@ -180,7 +180,7 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 		}
 		else if (z > tol) {
 			//! - Left rotation
-			Message[0] = 0x7e; 
+			Message[0] = 0x7e;
 			Mode[0] = 'L';
 		}
 
@@ -251,6 +251,66 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 	}
 // */
 
+}
+
+
+
+/**
+ * @brief Assign left and right wheel velocity estimates for a given velocity command
+ *
+ * System odometry simulation in absence of encoder feedback using estimates from processed and analyzed data
+ *
+ * \param LeftVelocityEstimate Estimated velocity for left wheel determined from logs [rad/s]
+ * \param RightVelocityEstimate Estimated velocity for right wheel determined from logs [rad/s]
+ * \param VelocityL Velocity command decoded from control node [%]
+ * \param VelocityR Velocity command decoded from control node [%]
+ *
+ * @warning Only velocities processed using logs are estimated
+ * 
+ * @return 0
+ */
+
+int EstimateFeedbackVelocities(int VelocityL, int VelocityR, double &LeftVelocityEstimate, double &RightVelocityEstimate)
+{
+	//! - No movement
+	if (VelocityL == 0 && VelocityR == 0) {
+		LeftVelocityEstimate = 0;
+		RightVelocityEstimate = 0;
+	//! - Slowest movement speed -- 6%
+	} else if (VelocityL == 6 && VelocityR == 6) {
+		LeftVelocityEstimate = 1.380944;
+		RightVelocityEstimate = 1.382213;
+	//! - Slow movement speed -- 12%
+	} else if (VelocityL == 12 && VelocityR == 12) {
+		LeftVelocityEstimate = 9.530818;
+		RightVelocityEstimate = 9.530586;
+	//! - Lower medium movement speed -- 19%
+	} else if (VelocityL == 19 && VelocityR == 19) {
+		LeftVelocityEstimate = 16.72931;
+		RightVelocityEstimate = 16.7356;
+	//! - Fastest movement speed in current configuration -- 56%
+	} else if (VelocityL == 56 && VelocityR == 56) {
+		LeftVelocityEstimate = 32.03983;
+		RightVelocityEstimate = 31.24964;
+	//! - Combination of different movement speeds -- L12% & R19%
+	} else if (VelocityL == 12 && VelocityR == 19) {
+		LeftVelocityEstimate = 11.99827796;
+		RightVelocityEstimate = 11.77803783;
+	//! - Combination of different movement speeds -- L19% & R12%
+	} else if (VelocityL == 19 && VelocityR == 12) {
+		LeftVelocityEstimate = 11.7195477;
+		RightVelocityEstimate = 11.97782072;
+	//! - Combination of different movement speeds -- L31% & R38%
+	} else if (VelocityL == 31 && VelocityR == 38) {
+		LeftVelocityEstimate = 28.11346659;
+		RightVelocityEstimate = 27.97425271;
+	//! - Combination of different movement speeds -- L38% & R31%
+	} else if (VelocityL == 38 && VelocityR == 31) {
+		LeftVelocityEstimate = 23.6848081;
+		RightVelocityEstimate = 23.79264803;
+	}
+
+	return 0;
 }
 
 /**
@@ -359,6 +419,11 @@ int square = 0;
 double squarespeed = 0.4;
 double turntime = 6;
 double forwardtime = 25;
+
+//! Feedback velocities in rad/s to publish
+double LFeedbackVelocity = 0;
+double RFeedbackVelocity = 0;
+
 // The code below also specifies default values, however for debugging it can be disabled with comments more easily
 private_node_handle_.param("square", square, int(0));
 private_node_handle_.param("forwardtime", forwardtime, double(25));
@@ -510,14 +575,19 @@ while (ros::ok()) {
 	// //! Publish encoder readings
 	// VelocityL = v_l;
 	// VelocityR = v_r;
-	//! Callback function for subscriber
+	// //! Callback function for subscriber
+	//! - Estimate feedback velocities
+	EstimateFeedbackVelocities(VelocityL, VelocityR, LFeedbackVelocity, RFeedbackVelocity);
 
-	//! - Compose message
+	//! - Compose message to be published
+	//!   - Assign timestamp
+	//!   - Assign estimated feedback velocities
 	PubRolloWheelSpeed.header.stamp = ros::Time::now();
+
 	// PubRolloWheelSpeed.wheelspeedleft = v_l;
 	// PubRolloWheelSpeed.wheelspeedright = v_r;
-	PubRolloWheelSpeed.wheelspeedleft = VelocityL;
-	PubRolloWheelSpeed.wheelspeedright = VelocityR;
+	PubRolloWheelSpeed.wheelspeedleft = LFeedbackVelocity;
+	PubRolloWheelSpeed.wheelspeedright = RFeedbackVelocity;
 
 	//! - Publish message
 	PubRollo.publish(PubRolloWheelSpeed);
