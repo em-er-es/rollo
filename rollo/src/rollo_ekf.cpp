@@ -1,25 +1,31 @@
 /**
  * @file rollo_ekf.cpp
- * @author Rabbia Asghar, Ernest Skrzypczyk
+ * @author Rabbia Asghar
+ * @author Ernest Skrzypczyk
+ * 
  * @date 20/2/16
  *
  * @brief EKF implementation for localisation of the robot
  *
- * Takes control input from communication node and measurement from preprocessor node,
- * implements Extended Kalman Filter for the estimation of states and publishes estimated state.
- * For localisation of the robot there are 3 states: position (x, y), orientation (Theta).
+ * Command prototype: <b>rosrun rollo rollo_ekf _rate:=1:</b>
+ *  - rate: Sampling frequency of the node <!1 [Hz]>
  * 
- * Timing for EKF update is inspired from Robot Pose EKF (robot/pose/ekf) package available for ROS:
+ * Based on input from communication node in form of control commands and measurement from preprocessor node,
+ * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance.
+ * 
+ * Localisation of the robot consists of 3 states: 
+ *  - Position (x, y)
+ *  - Orientation (Theta)
+ * 
+ * Timing for EKF update is inspired from @ref Robot Pose EKF (robot/pose/ekf) package available for ROS:\n
  * Timings and data at those specific time instants are synchronized in such a manner, that the latest
- * measurements with newer timestamps are interpolated to one and the same timestamp, where all necessary
+ * measurements with newer timestamps are interpolated to one and the same timestamp, when all necessary
  * data is available. This allows for a relative comparison of available data, even though an additional
  * error is introduced through interpolating.
  * @see http://wiki.ros.org/robot_pose_ekf
  *  
- * Kalman filter equations were first simulated in MATLAB and then written in C++ and compared and verified by results in MATLAB.
+ * Kalman filter equations were first simulated in MATLAB, then translated into C++, compared and verified with previous results.
  * 
- * Command: rosrun rollo rollo_ekf _rate:=1 
- *  * rate is the sampling frequency of the node (default: 1)
  * @see https://github.com/em-er-es/rollo/
  * 
  */
@@ -38,6 +44,7 @@
 #include <iostream>
 #include <eigen3/Eigen/Dense>
 #include "rollo.hpp"
+
 
 // Naming conventions:
 // Global and important variables: CapitalLettersFullName
@@ -60,6 +67,9 @@
 
 
 /* TODO
+ * Should the frequency be increased to 4 Hz or more?
+ * FIX DOXYGEN formatting
+ * Add more doxygen comments and appropriate description
  * Double check if std:cout and ROS_INFO do not collide or produce unnecessary output, std::cout is fine for debug, just update comment switches for those lines
  * Topics should be held in one place at the beginning of the code or maybe even better in the header file TOPIC_nodename#number, so TOPIC_COMM1 or TOPIC_COMM_WS for wheel speed
  * I suggest using descriptive names for node references, so communication node instead of rollo_comm, because that might change, the main name less likely
@@ -96,12 +106,16 @@ double zTimeSecs = 0;
 rollo::WheelSpeed Odometry;
 double OdometryTimeSecs = 0;
 
+//! Node name using console codes
 char NodeName[20] = C1 KF CR; // The size is necessary for the GNU/Linux console codes //COLOR
 // char NodeName[20] = KF; // The size is necessary for the GNU/Linux console codes //COLOR
 
-//! Topics
+// Topics
+//! Topic for extended Kalman filter results with all three estimated states and covariance matrix, stamped
 char TopicEKF[64] = TOPIC_EKF;
+//! Topic for wheel speed containing the actual speed of wheel, preferably extracted from encoders or if not available by using a lookup table
 char TopicWheelSpeed[64] = TOPIC_COMM_WS;
+//! Topic for position and orientation stamped from preprocessor node
 char TopicPose2DStamped[64] = TOPIC_PREP_P2DT;
 
 
@@ -277,7 +291,7 @@ Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
 
 
 /**
- * @brief Main function
+ * @brief Node main
  *
  * Initialize node, nodehandle, subsrcribe to messages from preprocessor and communication nodes and publish estimated state of the robot.
  * Arguments from command line: rate.
