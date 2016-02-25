@@ -224,10 +224,11 @@ void decodeKey (char character, double &Speed, double &Turn)
  * 
  * \param rate Running frequency of the node <!10 [Hz]>
  * 
- * Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @p geometry_msgs::Twist
+ * Publish to command velocity topic as specified in configuration header file according to format @p geometry_msgs::Twist
  * 
  * @return 0
  */
+//* Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @p geometry_msgs::Twist
 
 int main(int argc, char **argv)
 {
