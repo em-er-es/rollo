@@ -17,6 +17,9 @@
  * Filter the raw data from optitrack motion capture system and
  * publish it along with time stamp for modeling of odometry and
  * the measurement in Kalman filter
+ * 
+ * @see https://github.com/em-er-es/rollo/
+ * 
  */
 
 

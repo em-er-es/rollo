@@ -50,6 +50,9 @@
  * 
  * Python script available online used as reference.
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
+ * 
+ * @see https://github.com/em-er-es/rollo/
+ * 
  */
 
 /* TODO
@@ -133,7 +136,7 @@ int kbhit(void)
 
 		return 1;
 		}
-// Command: rosrun rollo rollo_control _rate:=1
+
 	return 0;
 }
 

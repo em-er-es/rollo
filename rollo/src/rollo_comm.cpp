@@ -7,7 +7,7 @@
  *
  * @brief Communication between ROS and Rollo
  *
- * Command prototype: <b>rosrun rollo rollo_control _rate:=10 _ip:=192.168.0.120 _port:=900 _em:=3 _square:=0 _forwardtime:=25 _turntime:=6 _squarespeed:=0.4</b>
+ * Command prototype: <b>rosrun rollo rollo_comm _rate:=10 _ip:=192.168.0.120 _port:=900 _em:=3 _square:=0 _forwardtime:=25 _turntime:=6 _squarespeed:=0.4</b>
  * \param rate: Command sending frequency of the node <!10 [Hz]>
  * \param ip: Internet protocl address of target robot <!192.168.0.120 [1]>
  * \param port: User datagram protocol taget connection port <!900 [1]>
@@ -30,6 +30,7 @@
  *  - emergency procedure
  *
  * @see https://github.com/em-er-es/rollo/
+ * 
  */
 
 
@@ -336,7 +337,6 @@ ros::Publisher PubRollo = RolloCommunicationNode.advertise<rollo::WheelSpeed>(To
 //! Initialize node arguments using command line
 int rate_frequency = 0.1;
 
-// Command: rosrun rollo rollo_communication _rate:=1
 //! Initialize node parameters from launch file or command line.
 //! Use a private node handle so that multiple instances of the node
 //! can be run simultaneously while using different parameters.
