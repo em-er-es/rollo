@@ -32,8 +32,8 @@
 
 
 /* TODO
- * Instead of using two parameters for samplesize and sampling/averaging, use one, where negative values are used for the least common operation and positive for the most common
  * FIX DOXYGEN documentation
+ * Instead of using two parameters for samplesize and sampling/averaging, use one, where negative values are used for the least common operation and positive for the most common
 // */
 
 

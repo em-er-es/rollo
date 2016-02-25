@@ -144,6 +144,7 @@ int kbhit(void)
  * Compute linear and angular command velocities based on keyboard input.
  * Key pressed character @p <key> as input argument.
  * 
+ * \param character Character to be decoded
  * \param &Speed Linear velocity
  * \param &Turn Angular velocity
  * 
