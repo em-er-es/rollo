@@ -1,5 +1,13 @@
+/**
+ * @file rollo.hpp
+ * @author Rabbia Asghar, Ernest Skrzypczyk
+ * @date 20/2/16
+ * @brief Header file holding Rollo specific parameters and global references for the ROS nodes
+ *
+ */
+
 //! Rollo
-#define ROLLO_AXLE_L 20.5
+#define ROLLO_AXLE_L 0.0205
 #define ROLLO_WHEEL_RADIUS_L 0.020
 #define ROLLO_WHEEL_RADIUS_R 0.020
 #define ROLLO_WHEEL_N 4
