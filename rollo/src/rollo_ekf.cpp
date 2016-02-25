@@ -599,8 +599,8 @@ do {
 
 		//! Pose2D
 		result.pose2d.x = x_cc(0);
-		result.pose2d.x = x_cc(1);
-		result.pose2d.x = x_cc(2);
+		result.pose2d.y = x_cc(1);
+		result.pose2d.theta = x_cc(2);
 
 		//! Covariance
 		result.covariance[0] = E_cc(0,0);
