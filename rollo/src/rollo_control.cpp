@@ -8,7 +8,7 @@
  * @brief Convert input from keyboard and publish control commands for Rollo
  * 
  * Command prototype: <b>rosrun rollo rollo_control _rate:=10</b>
- *  - rate: is the running frequency of the node <!10 [Hz]>
+ *  - rate: Running frequency of the node <!10 [Hz]>
  *
  * Robot control using following key sets
  * 
