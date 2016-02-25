@@ -11,9 +11,9 @@
  *   j    k    l
  *   m    ,    .
  * ---------------------------
- * q/z : increase/decrease max speeds by 10%
- * w/x : increase/decrease only linear speed by 10%
- * e/c : increase/decrease only angular speed by 10%
+ * q/z : increase/decrease speed by 0.1
+ * w/x : increase/decrease only linear speed by 0.1
+ * e/c : increase/decrease only angular speed by 0.1
  * ---------------------------
  * Other keys : stop 
  * <CTRL>-C : quit
@@ -28,7 +28,10 @@
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
 #include "geometry_msgs/Vector3.h"
+#include <stdio.h>
 #include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <sstream>
 #include <iostream>
 #include "rollo.hpp"
@@ -38,118 +41,111 @@
  * @brief Global variables.
  * 
  */
- 
+
 char NodeName[20] = C2 CT CR; // The size is necessary for the GNU/Linux console codes //COLOR
 // char NodeName[20] = CT; // The size is necessary for the GNU/Linux console codes //COLOR
-
-char TopicWheelSpeed[64] = TOPIC_COMM_WS;
 char TopicCmdVel[64] = TOPIC_CTRL_CMD_VEL;
 
+double VelocityFwd_limit = 1;
+double VelocityRev_limit = -1;
+
+double LKeysSteps = 0.1;
+double RKeysLinearV = 0.4;
+double RKeysAngularV = 1;
+  
 
 /**
- * @brief getCharacter function
+ * @brief kbhit function
  *
- * Reads pressed key on keyboard and returns it.
- * @return Char key pressed on keyboard
+ * Checks if a key is pressed on keyboard and returns it.
+ * @return 1 if a key is pressed on keyboard, otherwise 0.
  * @see https://github.com/sdipendra/ros-projects/blob/master/src/keyboard_non_blocking_input/src/keyboard_non_blocking_input_node.cpp
  */
- 
-char getCharacter()
+
+int kbhit(void)
 {
-	fd_set set;
-	struct timeval timeout;
-	char buffer = 0;
-	int rv;
-	int length = 1;
-	int filedesc = 0;
-	FD_ZERO(&set);
-	FD_SET(filedesc, &set);
+struct termios oldt, newt;
+int ch;
+int oldf;
 
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 1000; // Too small period, only 1ms? //~Q
-	// Shouldn't this be directly or indirectly related to rate? //~Q
+tcgetattr(STDIN_FILENO, &oldt);
+newt = oldt;
+newt.c_lflag &= ~(ICANON | ECHO);
+tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
-	rv = select(filedesc + 1, &set, NULL, NULL, &timeout);
+ch = getchar();
 
-	struct termios settings = {0};
-	if (tcgetattr(filedesc, &settings) < 0)
-		ROS_ERROR("tcsetattr()");
-	settings.c_lflag &= ~ICANON;
-	settings.c_lflag &= ~ECHO;
-	settings.c_cc[VMIN] = 1;
-	settings.c_cc[VTIME] = 0;
-	if (tcsetattr(filedesc, TCSANOW, &settings) < 0)
-		ROS_ERROR("tcsetattr ICANON");
+tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+fcntl(STDIN_FILENO, F_SETFL, oldf);
 
-	if (rv == -1)
-		ROS_ERROR("select()");
-	else if (rv == 0)
-		// ROS_INFO("[Rollo][%s][getCharacter] Key pressed: NONE", NodeName);
-		ROS_INFO("[Rollo][%s][getCharacter] No key pressed", NodeName);
-	else {
-		read(filedesc, &buffer, length);
-		ROS_INFO("[Rollo][%s][getCharacter] Key pressed: %c", NodeName, buffer);
+if(ch != EOF) {
+	ungetc(ch, stdin);
+
+	return 1;
 	}
 
-	settings.c_lflag |= ICANON;
-	settings.c_lflag |= ECHO;
-	if (tcsetattr(filedesc, TCSADRAIN, &settings) < 0)
-		ROS_ERROR ("tcsetattr ~ICANON");
-	return (buffer);
+return 0;
 }
+
+
 
 /**
  * @brief Decode key
  *
  * Computes command linear and angular velocities depending on the keyboard key pressed.
  * The function takes keyboard key pressed character @p as input argument. 
- * Parameters declared by reference: @p &x, @p &th, @p &speed, and @p &turn.
+ * Parameters declared by reference: @p &Speed, and @p &Turn.
  * @return NULL
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
  */
-void decodeKey (char character, double &x, double &th, double &speed, double &turn)
+void decodeKey (char character, double &Speed, double &Turn)
 {
-/*
-moveBindings = {
-        'i':(1,0),
-        'o':(1,-1),
-        'j':(0,1),
-        'l':(0,-1),
-        'u':(1,1),
-        ',':(-1,0),
-        '.':(-1,1),
-        'm':(-1,-1),
-        }
-
-speedBindings = {
-        'q':(1.1,1.1),
-        'z':(.9,.9),
-        'w':(1.1,1),
-        'x':(.9,1),
-        'e':(1,1.1),
-        'c':(1,.9),
-    }
-// */
-
+//FIX reverse speed, runs only at 0==6%
 	switch (character){
-		case 'i':		x = 1;	th = 0;		break;
-		case 'o':		x = 1;	th = -1;	break;
-		case 'j':		x = 0;	th = 1;		break;
-		case 'l':		x = 0;	th = -1;	break;
-		case 'u':		x = 1;	th = 1;		break;
-		case ',':		x = -1;	th = 0;		break;
-		case '.':		x = -1;	th = 1;		break;
-		case 'm':		x = -1;	th = -1;	break;
-		case 'q':		speed *= 1.1;	turn *= 1.1;		break;
-		case 'z':		speed *= 0.9;	turn *= 0.9;		break;
-		case 'w':		speed *= 1.1;	turn *= 1;		break;
-		case 'x':		speed *= 0.9;	turn *= 1;		break;
-		case 'e':		speed *= 1;		turn *= 1.1;		break;
-		case 'c':		speed *= 1;		turn *= 0.9;		break;
-		default:		x = 0;	th = 0;	speed = 0.5; turn = 1;	break;
+		case 'i':		Speed = 1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
+		case 'o':		Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
+		case 'j':		Speed = 0 * RKeysLinearV; Turn = -1 * RKeysAngularV; break;
+		case 'l':		Speed = 0 * RKeysLinearV; Turn = 1 * RKeysAngularV; break;
+		case 'u':		Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+		case ',':		Speed = -1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
+		case '.':		Speed = -1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
+		case 'm':		Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+
+		case 'q':		Speed += LKeysSteps; Turn -= LKeysSteps; break;
+		case 'z':		Speed -= LKeysSteps; Turn += LKeysSteps; break;
+		case 'a':		Speed = Speed; Turn += LKeysSteps; break;
+		case 'd':		Speed = Speed; Turn -= LKeysSteps; break;
+		case 'w':		Speed += LKeysSteps; Turn = Turn; break;
+		case 's':		Speed -= LKeysSteps; Turn = Turn; break;
+		case 'e':		Speed += LKeysSteps; Turn += LKeysSteps; break;
+		case 'c':		Speed -= LKeysSteps; Turn -= LKeysSteps; break;
+
+		case 'f':		Speed = 1.0; Turn = 0; break;
+		case 'F':		Speed = -1.0; Turn = 0; break;
+
+		default:		Speed = 0; Turn = 0; break;
 	}
 
-	ROS_INFO("[Rollo][%s][DecodeKey] Character [%c] x [%f] th [%f] speed [%f] turn [%f]", NodeName, character, x, th, speed, turn);
+//! Turn limits
+// if (Turn > 0.55) Turn = 0.55; else if (Turn < -0.60) Turn = -0.6;
+
+//TODO build in restrains for angular velocity, should be -0.6 && 0.5
+double VelocityFwd_limit = 1;
+double VelocityRev_limit = -1;
+
+	if (Speed > VelocityFwd_limit)
+			Speed = VelocityFwd_limit;
+	if (Speed < VelocityRev_limit)
+			Speed = VelocityRev_limit;
+			
+	if (Turn > VelocityFwd_limit)
+			Turn = VelocityFwd_limit;
+	if (Turn < VelocityRev_limit)
+			Turn = VelocityRev_limit;
+
+	ROS_INFO("[Rollo][%s][DecodeKey] Character [%c] Speed [%f] Turn [%f]", NodeName, character, Speed, Turn);
 }
 
 
@@ -183,39 +179,39 @@ int rate_frequency;
 //! Use a private node handle so that multiple instances of the node can be run simultaneously
 //! while using different parameters.
 ros::NodeHandle private_node_handle_("~");
-private_node_handle_.param("rate", rate_frequency, int(10));
+private_node_handle_.param("rate", rate_frequency, int(100));
 
 //! Publishing rate [Hz]
 ros::Rate frequency(rate_frequency); 
 
 //! Publisher variables for conventional messages
-geometry_msgs::Twist PubRolloTwist; // Or PubRolloCmd? //Q
+geometry_msgs::Twist PubRolloTwist; // Or PubRolloCmd? //~Q
 
 //! Initialize variables for computing linear and angular velocity of the robot
-double x = 0;
-double th = 0;
-double speed = 0.5;
-double turn = 1;
+double Speed = 0;
+double Turn = 0;
 
+char c = 0; 
 
 //! Main loop
 while (ros::ok()) {
+	
 	//! Read if any keyboard key is pressed
-	int c = 0; // Initialize each loop? //Q
-	c = getCharacter();
+	if (kbhit()) {
+		//! Read character	
+		c  =  getchar();
 
-	//! Decode key pressed
-	if (c != 0) 
-		decodeKey(c, x, th, speed, turn);
-
-
-	//! Compute linear and angular velocity
-	PubRolloTwist.linear.x = x * speed; 
-	PubRolloTwist.angular.z = th * turn;
+		//! Decode key pressed
+		decodeKey(c, Speed, Turn);
+	}
+	
+	//! Prepare message to publish linear and angular velocity
+	PubRolloTwist.linear.x = Speed; 
+	PubRolloTwist.angular.z = Turn;
 
 
 	//! Publish message in Twist format
-	ROS_INFO("[Rollo][%s][Pub] Linear speed [%f] angular speed [%f]", NodeName, PubRolloTwist.linear.x, PubRolloTwist.angular.z);
+	ROS_INFO("[Rollo][%s][Pub] Linear speed [%f] Angular speed [%f]", NodeName, PubRolloTwist.linear.x, PubRolloTwist.angular.z);
 	RolloTwist.publish(PubRolloTwist);
 
 	//! ROS spinOnce
