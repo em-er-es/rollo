@@ -1,7 +1,32 @@
-<launch> 
+<launch>
+  <include file="$(find mocap_optitrack)/mocap.launch"/>
   <node pkg="rollo"
     type="rollo_preprocessor"
     name="rollo_preprocessor"
+    args="
+    _rate:=25
+    _samplesize:=4
+    _sampling:=0
+    "
+    output="log"
+    respawn="false"
+    launch-prefix=""
+    required="true">
+  </node>
+  <node pkg="rollo"
+    type="rollo_comm"
+    name="rollo_comm"
+    args="
+    _rate:=10
+    _ip:=192.168.0.120
+    _port:=900
+    _em:=3
+    _square:=0
+    _squarespeed:=0.4
+    _forwardtime:=25
+    _turntime:=6
+    "
+    output="log"
     respawn="false"
     launch-prefix=""
     required="true">
@@ -9,6 +34,10 @@
   <node pkg="rollo"
     type="rollo_control"
     name="rollo_control"
+    args="
+    _rate:=25
+    "
+    output="log"
     respawn="false"
     launch-prefix=""
     required="false">
@@ -16,28 +45,33 @@
   <node pkg="rollo"
     type="rollo_ekf"
     name="rollo_ekf"
+    args="
+    _rate:=1
+    "
+    output="log"
     respawn="false"
     launch-prefix=""
     required="false">
-  </node>
-  <node pkg="rollo"
-    type="rollo_comm"
-    name="rollo_comm"
-    respawn="false"
-    launch-prefix=""
-    required="true">
   </node>
 <!--
   <node pkg="rollo"
     type="rollo_visualization"
     name="rollo_visualization"
+    args="
+    _rate:=25
+    _savepath:=4
+    _duration:=0
+    _format:=
+    "
+    output="log"
     respawn="false"
     launch-prefix=""
-    required="true">
+    required="false">
   </node>
   <node pkg="rollo"
     type="rollo_odometry"
     name="rollo_odometry"
+    output="log"
     respawn="false"
     launch-prefix=""
     required="true">
