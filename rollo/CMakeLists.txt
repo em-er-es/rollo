@@ -113,7 +113,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rollo
 #  CATKIN_DEPENDS message_runtime geometry_msgs roscpp rospy std_msgs
-#  CATKIN_DEPENDS message_runtime geometry_msgs std_msgs
+#  CATKIN_DEPENDS message_runtime
 #  DEPENDS system_lib
   DEPENDS Eigen
 )
