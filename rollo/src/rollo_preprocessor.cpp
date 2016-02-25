@@ -9,8 +9,8 @@
  *
  * Command prototype: <b>rosrun rollo rollo_preprocessor _rate:=25 _samplesize:=5 _sampling:=0</b>
  *  - rate: Sampling frequency of the node <!25 [Hz]>
- *  - samplesize: Number of elements that are averaged/subsampled <10>
- *  - sampling: Selects if the raw data should be subsampled after a certain delay or averaged over a certain period <0>
+ *  - samplesize: Number of elements that are averaged/subsampled <!10 [1]>
+ *  - sampling: Selects if the raw data should be subsampled after a certain delay or averaged over a certain period <!0 [1]>
  *    - sampling 0 sets subsampling
  *    - sampling !0 sets averaging
  *
@@ -52,9 +52,9 @@ double x, y, theta;
 double x_mm, y_mm, theta_deg;
 
 //! Topics
-//! Topic motion capture
+//! Topic for motion capture data
 char TopicMotionCapture[64] = TOPIC_PREP_MC;
-//! Topic position and orientation stamped
+//! Topic for position and orientation, stamped
 char TopicPose2DStamped[64] = TOPIC_PREP_P2DT;
 
 
@@ -93,8 +93,7 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
 /**
  * @brief Node main
  *
- * Initializes variables, nodehandle, subscribes to Optitack Ground_pose and publishes position and orientation after processing.
- * It accepts 3 arguments from command line: rate, samplesize, sampling.
+ * Initialize variables, nodehandle, subscribe to motion capture data from @ref mocap_optitrack node and publish position and orientation after processing with time stamp.
  * The position and orientation are published along with timestamp to topic /Rollo/preprocessor/pose2dstamped in format custom defined message, rollo::Pose2DStamped .
  * @return 0
  */
