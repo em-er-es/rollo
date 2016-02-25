@@ -16,14 +16,21 @@
 # \param duration Duration of visualization <!0>
 #
 
-## Import basic libraries
+## Import basic Python libraries
 from __future__ import print_function #Python2
 from matplotlib import pyplot as plt
-# Import ROS libraries
+## Import ROS libraries
+import roslib
+import sys
+roslib.load_manifest('rollo')
 import rospy
 from std_msgs.msg import String
-import 
 
+## Import custom messages for Rollo
+# from rollo import RolloEKF
+# from _rollo_generate_messages_check_deps_EKF.msg import RolloEKF
+# from rollo.msg import _EKF # Works
+from rollo.msg import EKF # Also works!
 
 ''' TODO
  * ADD & FIX DOXYGEN documentation format
@@ -56,13 +63,15 @@ def subscriberCallbackMeasurement():
 '''
 
 def subscriberCallbackEKF(msg):
-	rospy.loginfo("[Rollo][%s][Sub] Message: %s", NodeName, msg.data)
+	rospy.loginfo("[Rollo][%s][Sub] Message: [ %s | %s | %s ]", NodeName, msg.pose2d.x, msg.pose2d.y, msg.pose2d.theta)
+	# rospy.loginfo("[Rollo][%s][Sub] Message: [%s]", NodeName, msg.pose2d.x)
 
 
 ## Node main function
 
 def main():
-	## Initialize rospy
+	## Initiliaze
+	### Initialize rospy
 	# roscpp_initialize(sys.argv)
 	rospy.init_node('rollo_visualization', anonymous=True)
 
@@ -71,7 +80,7 @@ def main():
 
 	## Subscribe to EKF topic
 	# rospy.Subscriber('/Rollo/ekf', std_msgs.msg.Int32, subscriberCallbackMeasurement)
-	rospy.Subscriber('chatter', String, subscriberCallbackEKF, queue_size = 1024)
+	rospy.Subscriber('/Rollo/ekf', EKF, subscriberCallbackEKF, queue_size = 1024)
 
 	while not rospy.is_shutdown():
 		## Main loop
