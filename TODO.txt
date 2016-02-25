@@ -1,4 +1,5 @@
-[ ] - Improve current rollo.launch
+[D] - Improve current rollo.launch
 [ ] - Add analysis node with psuedo real time plotting
-[ ] - Fix doxygen documentation
+[P] - Fix doxygen documentation
 [ ] - Finish local documentation
+[ ] - Document scripts in the LaTeX file, provide description
