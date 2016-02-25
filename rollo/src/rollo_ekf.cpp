@@ -449,7 +449,7 @@ do {
 	std::cout << "Wait for new data from all sensors (motion captutre and odometry) for next EKF iteration. \n" << std::endl; //DB
 
 	//! Check if new data is available from measurement (motion capture) and odometry (control input)
-	if (OdometryTimeSecs > prevOdometrySecs &&  zTimeSecs > prevMeasurementSecs) {
+	if (OdometryTimeSecs > prevOdometrySecs && zTimeSecs > prevMeasurementSecs) {
 		all_sensors_data_available = 1;
 		prevOdometrySecs = OdometryTimeSecs;
 		prevMeasurementSecs = zTimeSecs;
@@ -575,15 +575,15 @@ do {
 		result.pose2d.x = x_cc(2);
 
 		//! Covariance
-		result.covariance[0] = E_cc(0,0); 
+		result.covariance[0] = E_cc(0,0);
 		result.covariance[1] = E_cc(0,1);
 		result.covariance[2] = E_cc(0,2);
 		result.covariance[3] = E_cc(1,0);
-		result.covariance[4] = E_cc(1,1), 
-		result.covariance[5] = E_cc(1,2), 
-		result.covariance[6] = E_cc(2,0), 
-		result.covariance[7] = E_cc(2,1), 
-		result.covariance[8] = E_cc(2,2), 
+		result.covariance[4] = E_cc(1,1),
+		result.covariance[5] = E_cc(1,2),
+		result.covariance[6] = E_cc(2,0),
+		result.covariance[7] = E_cc(2,1),
+		result.covariance[8] = E_cc(2,2),
 
 		//! Publish
 		RolloPub.publish(result);
