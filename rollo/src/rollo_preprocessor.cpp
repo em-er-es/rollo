@@ -7,16 +7,16 @@
  *
  * @brief Preprocessor for Rollo measurement using Mocap OptiTrack motion capture data
  *
- * Command prototype: <b>rosrun rollo rollo_preprocessor _rate:=25 _samplesize:=5 _sampling:=0</b>
+ * Command prototype: <b>rosrun rollo rollo_preprocessor _rate:=25 _samplesize:=4 _sampling:=0</b>
  *  - rate: Sampling frequency of the node <!25 [Hz]>
- *  - samplesize: Number of elements that are averaged/subsampled <!10 [1]>
+ *  - samplesize: Number of elements that are averaged/subsampled <!4 [1]>
  *  - sampling: Selects if the raw data should be subsampled after a certain delay or averaged over a certain period <!0 [1]>
  *    - sampling 0 sets subsampling
  *    - sampling !0 sets averaging
  *
  * Filter the raw data from optitrack motion capture system and
  * publish it along with time stamp for modeling of odometry and
- * the measurement in Kalman Filter
+ * the measurement in Kalman filter
  */
 
 
@@ -188,7 +188,7 @@ do {
 		sum_y  = 0;
 		sum_theta = 0;
 
-		//! - For subsampling sleep for time defined by rate and then read the states from the subscriber callback() without sleep() delay
+		//! - For subsampling sleep for time defined by rate and then read the states from the @ref subscriberCallback() without usleep() delay
 		if (sampling == 0) frequency.sleep();
 	}
 
@@ -197,7 +197,7 @@ do {
 	ros::spinOnce();
 	if (! ros::ok()) loopcondition = 0; //TEST seems unnecessary
 
-	//! For averaging sleep for time defined by rate before reading states from the subscriber callback()
+	//! For averaging sleep for time defined by rate before reading states from the subscriberCallback()
 	if (sampling != 0) frequency.sleep();
 	//! - Increase loop counter
 	loopcounter++;
