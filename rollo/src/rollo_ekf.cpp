@@ -107,7 +107,7 @@ rollo::WheelSpeed Odometry;
 double OdometryTimeSecs = 0;
 
 //! Node name using console codes
-char NodeName[20] = C4 KF CR; // The size is necessary for the GNU/Linux console codes //COLOR
+char NodeName[20] = C1 KF CR; // The size is necessary for the GNU/Linux console codes //COLOR
 // char NodeName[20] = KF; // The size is necessary for the GNU/Linux console codes //COLOR
 
 // Topics
@@ -144,8 +144,8 @@ void subscriberCallbackMeasurement(const rollo::Pose2DStamped msg) {
 	zSeq = msg.header.seq;
 	zTimeSecs = msg.header.stamp.toSec();
 
-	ROS_INFO("[Rollo][%s][Sub][z(0), z(1), z(2)]: %f, %f, %f", NodeName, z(0), z(1), z(2));
-	ROS_INFO("[Rollo][%s][Sub][zseq, zstamp]: %d, %f", NodeName, zSeq, zTimeSecs);
+//	ROS_INFO("[Rollo][%s][Sub][z(0), z(1), z(2)]: %f, %f, %f", NodeName, z(0), z(1), z(2));
+	//ROS_INFO("[Rollo][%s][Sub][zseq, zstamp]: %d, %f", NodeName, zSeq, zTimeSecs);
 
 }
 
@@ -173,8 +173,8 @@ void subscriberCallbackControlInput(const rollo::WheelSpeed msg) {
 	// RightWheelAngularVelocity = msg.wheelspeedright;
 	// LeftWheelAngularVelocity = msg.wheelspeedleft;
 
-	ROS_INFO("[Rollo][%s][Sub][R_AngVelocity, L_AngVelocity]: %f, %f", NodeName, Odometry.wheelspeedright, Odometry.wheelspeedright);
-	ROS_INFO("[Rollo][%s][Sub][OdomSeq, OdomStamp]: %d, %f", NodeName, OdometrySeq, OdometryTimeSecs);
+//	ROS_INFO("[Rollo][%s][Sub][R_AngVelocity, L_AngVelocity]: %f, %f", NodeName, Odometry.wheelspeedright, Odometry.wheelspeedright);
+	//ROS_INFO("[Rollo][%s][Sub][OdomSeq, OdomStamp]: %d, %f", NodeName, OdometrySeq, OdometryTimeSecs);
 
 }
 
@@ -324,47 +324,48 @@ Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
 
 int main(int argc, char **argv)
 {
-
-//! Initialize node
+//! ## Initialize
+//! - Initialize node
 ros::init(argc, argv, "rollo_ekf"); // Name of the node
 ros::start(); // Necessary to be called
 
-//! Initialize nodehandle for subscribers and publisher
+//! - Initialize nodehandle for subscribers and publisher
 ros::NodeHandle RolloEKF;
 
-//! Initialize subscribers
+//! - Initialize subscribers:
+//!   - Initialize subscriber for measurement data
+//!   - Initialize subscriber for actual speed of wheels, preferably extracted from encoders or if not available by using a lookup table
 ros::Subscriber MeasSub = RolloEKF.subscribe(TopicPose2DStamped, 1024, subscriberCallbackMeasurement);
 ros::Subscriber ContSub = RolloEKF.subscribe(TopicWheelSpeed, 1024, subscriberCallbackControlInput);
 
-//! Initialize publisher and define topic and message queue size for the publisher
+//! - Initialize publisher and define topic and message queue size for the publisher
 ros::Publisher RolloPub = RolloEKF.advertise<rollo::EKF>(TopicEKF, 1024);
 
-//! Initialize node arguments using command line
+//! - Initialize node arguments using command line
 int rate_frequency;
 
-// Sample command: rosrun rollo rollo_node _rate:=1 _samplesize:=5 _sampling:='0' //Q ?! IT'S NOT A SAMPLE COMMAND, how many times do I have to change this?!
-//! Initialize node parameters from launch file or command line.
+//! - Initialize node parameters from launch file or command line
 //! Use a private node handle so that multiple instances of the node can be run simultaneously
 //! while using different parameters.
 ros::NodeHandle private_node_handle_("~");
 private_node_handle_.param("rate", rate_frequency, int(1));
 
-//! Publishing rate [Hz]
+//! - Publishing rate [Hz]
 ros::Rate frequency(rate_frequency);
 
-// Loop condition variable
+//! - Loop condition variable
 int loopcondition = 1;
 
-//! Initialize variables involved in computation of EKF
-//! Define number of states
+//! - Initialize variables involved in computation of EKF:
+//!   - Define number of states
+//!   - Initialize noise covariances and matrices
 int nstates = 3; // Number of states: 3 = (position) (x, y) (orientation) (Theta)
 
-//! Initialize noise covariances and matrices
 double q = 0.1; // std of process noise   //CRC
 double r = 0.1; // std of measurement noise //CRC
 
 //CRC
-//q^2*eye(n); // process noise covariance
+//q^2*eye(n); // Process noise covariance
 Eigen::Matrix3d Q = Eigen::Matrix3d::Identity();
 
 Q(0,0) = q*q;
@@ -372,7 +373,7 @@ Q(1,1) = q*q;
 Q(2,2) = q*q;
 
 //CRC
-//r^2*eye(n); //measurement noise covariance
+//r^2*eye(n); // Measurement noise covariance
 Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
 
 R(0,0) = r*r;
@@ -381,7 +382,7 @@ R(2,2) = r*r;
 
 std::cout << "Q:\n" << Q << "\nR:\n" << R << "\n" << std::endl; //VB
 
-//! Initialize vector for control input u and variables involved in its computation
+//!   - Initialize vector for control input u and variables involved in its computation
 Eigen::Vector2d u(0, 0);
 
 double SL = 0;
@@ -392,33 +393,33 @@ double nR = 1;
 double deltaTheta;
 double deltaS;
 
-//! Initialize state estimate vector "a priori" and measurement vector
+//!   - Initialize state estimate vector "a priori" and measurement vector
 Eigen::Vector3d x_pp(0, 0, 0);
 //Eigen::Vector3d z(0, 0, 0);
 
-//! Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for provided system
+//!   - Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for provided system
 Eigen::Matrix3d Jh = Eigen::Matrix3d::Identity();
 
-//! Initialize E_pp: "a priori" estimated state covariance, E_k-1|k-1 (p refers to k-1)
+//!   - Initialize E_pp: "a priori" estimated state covariance, E_k-1|k-1 (p refers to k-1)
 Eigen::Matrix3d E_pp = Eigen::Matrix3d::Identity(); // Initial state covariance matrix
 
-//! Initialize variables involved in the prediction update of EKF
+//!   - Initialize variables involved in the prediction update of EKF
 Eigen::Vector3d x_cp; // State prediction, x_k|k-1
 Eigen::Matrix3d Jf;
 Eigen::Matrix3d E_cp; // E_k|k-1
 
-//! Initialize variables involved in the innovation update of EKF
+//!   - Initialize variables involved in the innovation update of EKF
 Eigen::Vector3d z_estimate;
 Eigen::Matrix3d P12;
 Eigen::Matrix3d S_inv;
 Eigen::Matrix3d H;
 
-//! Initialize state estimate vector and state covariance matrix a posteriori
+//!   - Initialize state estimate vector and state covariance matrix a posteriori
 Eigen::Vector3d x_cc;
 Eigen::Matrix3d E_cc;
 
-//! Variables for time
-char all_sensors_data_available = 0; //WTF?! CRV: flagSensorData
+//! - Variables for time
+char flagSensorsDataAvailable = 0;
 double prevOdometrySecs = 0;
 double prevMeasurementSecs = 0;
 
@@ -434,17 +435,16 @@ double wheelspeedright_EKF;
 Eigen::Vector3d z_EKF(0, 0, 0);
 
 char initialize = 1;
+//initialize = 0; //DB
 
-//ONLY FOR DEBUGGING // THEN WRITE A //DB COMMENT! //CRC - delete this line
-initialize = 0; //DB
-
-//! Initialize measurement vector with timestamp and odometry data with timestamp from subscriber messages
-//! Initialize state estimate using measurement vector reading
+//! - Initialize measurement vector with timestamp and odometry data with timestamp from subscriber messages
+//! - Initialize state estimate using measurement vector reading
 
 std::cout << "Initializing: waiting for sensor data from both the subscribers \n" << std::endl; //DB
 
 //! ## Initialization loop
 while (initialize == 1 && ros::ok()) {
+//TODO Provide more doxygen information here
 	if (zTimeSecs > 0 ){
 		prevzPose2DStamped = zPose2DStamped;
 		prevMeasurementSecs = zTimeSecs;
@@ -467,28 +467,32 @@ while (initialize == 1 && ros::ok()) {
 	std::cout << " Initial time step t0:\n" << PreviousEKFfilterTimeSecs << "\n" << std::endl;//DB
 
 	}
+
+	ros::spinOnce();
+	frequency.sleep();
+
 }
 //! ## Initialization loop end
 
 
 //! ## Main loop
 do {
-	all_sensors_data_available = 1; //DB
+//	flagSensorsDataAvailable = 1; //DB
 	std::cout << "Wait for new data from all sensors (motion captutre and odometry) for next EKF iteration. \n" << std::endl; //DB
 
-	//! Check if new data is available from measurement (motion capture) and odometry (control input)
+	//! - Check if new data is available from measurement (motion capture) and odometry (control input)
 	if (OdometryTimeSecs > prevOdometrySecs && zTimeSecs > prevMeasurementSecs) {
-		all_sensors_data_available = 1;
+		flagSensorsDataAvailable = 1;
 		prevOdometrySecs = OdometryTimeSecs;
 		prevMeasurementSecs = zTimeSecs;
 
-		//! Determine time step for EKF update and perform interpolation for the sensor data not available at respective time step
+		//!   - Determine time step for EKF update and perform interpolation for the sensor data not available at respective time step
 		if (zTimeSecs > OdometryTimeSecs) {
-			//! Update timestamp
+			//! - Update timestamp
 			EKFfilterTimeSecs = OdometryTimeSecs;
-			//! Interpolate measurements
+			//! - Interpolate measurements
 			InterpolatedMeasurement = interpolateMeasurement(prevzPose2DStamped, zPose2DStamped, EKFfilterTimeSecs);
-			//! Update state
+			//! - Update state
 			z_EKF(0) = InterpolatedMeasurement.pose.x;
 			z_EKF(1) = InterpolatedMeasurement.pose.y;
 			z_EKF(2) = InterpolatedMeasurement.pose.theta;
@@ -502,13 +506,13 @@ do {
 
 		} else {
 
-			//! Update timestamp
+			//! - Update timestamp
 			EKFfilterTimeSecs = zTimeSecs;
 
-			//! Interpolate for measurement
+			//! - Interpolate for measurement
 			InterpolatedOdometry = interpolateOdometry(prevOdometry, Odometry, EKFfilterTimeSecs);
 
-			//! Update variables involved in EKF update
+			//! - Update variables involved in EKF update
 			z_EKF(0) = zPose2DStamped.pose.x;
 			z_EKF(1) = zPose2DStamped.pose.y;
 			z_EKF(2) = zPose2DStamped.pose.theta;
@@ -522,33 +526,34 @@ do {
 
 		}
 
-	//! Update @p prevOdometry and @p prevzPose2DStamped for next loop
+	//! - Update @p prevOdometry and @p prevzPose2DStamped for next loop
 	prevOdometry = Odometry;
 	prevzPose2DStamped = zPose2DStamped;
 
 	}
 
-	//! Perform EKF update if all sensor data is available
-	if (all_sensors_data_available == 1) { //Q How is this debug? Check your init of this variable
+	//! - Perform EKF update if all sensor data is available
+	if (flagSensorsDataAvailable == 1) { //Q How is this debug? Check your init of this variable
 
-		all_sensors_data_available = 0;
+		flagSensorsDataAvailable = 0;
 		std::cout << "Perform EKF iteration. \n" << std::endl; //DB
 
-		//! Determine dt
+		//CRD
+		//! - Determine dt
 		dt = EKFfilterTimeSecs - PreviousEKFfilterTimeSecs;
 
-		//! Update PreviousEKFfilterTimeSecs for the next loop
+		//! - Update PreviousEKFfilterTimeSecs for the next loop
 		PreviousEKFfilterTimeSecs = EKFfilterTimeSecs;
 
 //CRC cleanup
-		//! Determine control input u from nL and nR
+		//! - Determine control input u from nL and nR
 		//nL = wheelspeedleft_EKF * 60 / (2 * PI);
 		//nR = wheelspeedright_EKF * 60 / (2 * PI);
 		SL = dt * wheelspeedleft_EKF * ROLLO_WHEEL_RADIUS_L; // Linear distance traveled by left wheel in meters
 		SR = dt * wheelspeedright_EKF * ROLLO_WHEEL_RADIUS_R; // Linear distance traveled by right wheel in meters
 		//SL = dt * (nL / 60) * 2 * PI * ROLLO_WHEEL_RADIUS_L; // Linear distance traveled by left wheel in meters
 		//SR = dt * (nR / 60) * 2 * PI * ROLLO_WHEEL_RADIUS_R; // Linear distance traveled by right wheel in meters
-		deltaTheta = (SL - SR) / 2; //%u(2)
+		deltaTheta = (SL - SR) / ROLLO_AXLE_L; //%u(2)
 		deltaS = (SL + SR) / 2; //% u(1)
 		u << deltaS, deltaTheta;
 
@@ -559,21 +564,21 @@ do {
 		std::cout << "deltaTheta " << deltaTheta << " deltaS " << deltaS << "\n" << std::endl;//DB
 		std::cout << "u:\n" << u << "\n" << std::endl;//DB
 
-		//! Prediction update
-		//! Nonlinear update and linearization at current state
+		//! - Prediction update
+		//! - Nonlinear update and linearization at current state
 		x_cp = FSTATE(x_pp, u); //f_xu; //%state prediction, x_k|k-1
 		Jf = JacobianFSTATE(x_pp, u);
 
 		std::cout << "x_cp:\n" << x_cp << "\nE_pp:\n" << E_pp << "\n" << std::endl; //DB
 		std::cout << "Jf_xu:\n" << Jf << "\nJh:\n" << Jh << "\n" << std::endl; //DB
 
-		//! Partial covariance update
+		//! - Partial covariance update
 		//CRC
 		E_cp = Jf * E_pp * Jf.transpose() + Q;  // %E_k|k-1
 		std::cout << " Prediction Update: \nx_cp:\n" << x_cp << "\nE_cp:\n" << E_cp << "\n" << std::endl; //DB
 
-		//! Innovation update
-		//! Nonlinear measurement and linearization
+		//! - Innovation update
+		//! - Nonlinear measurement and linearization
 		z_estimate = HMEAS(x_cp);
 		std::cout << " Measurement estimate:\n" << z_estimate << "\n" << std::endl; //DB
 
@@ -587,22 +592,22 @@ do {
 		x_cc = x_cp + H * (z_EKF - z_estimate); //    %state estimate, x_k|k;
 		E_cc = E_cp - H * P12.transpose();  //             %state covariance matrix, E_k|k
 
-		//! Update E_pp an x_pp for next loop for next loop
+		//! - Update E_pp an x_pp for next loop for next loop
 		x_pp = x_cc;
 		E_pp = E_cc;
 		std::cout << " Final Measurement Update: \nx_cc:\n" << x_cc << "\nE_cc:\n" << E_cc << "\n" << std::endl; //DB
 
-		//! Prepare data for publishing
+		//! - Prepare data for publishing
 		rollo::EKF result;
 		result.header.stamp.sec = (int) EKFfilterTimeSecs;
 		result.header.stamp.nsec = (int)((EKFfilterTimeSecs - result.header.stamp.sec) * 1000000000); // 1.000.000.000 //Q what is the limit of int here? it is possible to overflow? If so, when? Does that make sense?
 
-		//! Pose2D
+		//! - Pose2D
 		result.pose2d.x = x_cc(0);
 		result.pose2d.y = x_cc(1);
 		result.pose2d.theta = x_cc(2);
 
-		//! Covariance
+		//! - Covariance
 		result.covariance[0] = E_cc(0,0);
 		result.covariance[1] = E_cc(0,1);
 		result.covariance[2] = E_cc(0,2);
@@ -613,7 +618,7 @@ do {
 		result.covariance[7] = E_cc(2,1),
 		result.covariance[8] = E_cc(2,2),
 
-		//! Publish
+		//! - Publish
 		RolloPub.publish(result);
 
 	}
@@ -624,7 +629,7 @@ do {
 
 	if (! ros::ok()) loopcondition = 0;
 
-	//! Synchronize to rate
+	//! - Synchronize to rate
 	frequency.sleep();
 
 } while (loopcondition);
