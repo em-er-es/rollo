@@ -2,32 +2,32 @@
  * @file rollo_ekf.cpp
  * @author Rabbia Asghar
  * @author Ernest Skrzypczyk
- * 
+ *
  * @date 20/2/16
  *
  * @brief EKF implementation for localisation of the robot
  *
  * Command prototype: <b>rosrun rollo rollo_ekf _rate:=1:</b>
- * \param rate: Sampling frequency of the node <!1 [Hz]>
- * 
+ * @param rate: Sampling frequency of the node <!1 [Hz]>
+ *
  * Based on input from communication node in form of control commands and measurement from preprocessor node,
  * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance.
- * 
- * Localization of the robot consists of 3 states: 
+ *
+ * Localization of the robot consists of 3 states:
  *  - Position (x, y)
  *  - Orientation (Theta)
- * 
+ *
  * Timing for EKF update is inspired from @ref Robot Pose EKF (robot/pose/ekf) package available for ROS:\n
  * Timings and data at those specific time instants are synchronized in such a manner, that the latest
  * measurements with newer timestamps are interpolated to one and the same timestamp, when all necessary
  * data is available. This allows for a relative comparison of available data, even though an additional
  * error is introduced through interpolating.
  * @see http://wiki.ros.org/robot_pose_ekf
- *  
+ *
  * Kalman filter equations were first simulated in MATLAB, then translated into C++, compared and verified with previous results.
- * 
+ *
  * @see https://github.com/em-er-es/rollo/
- * 
+ *
  */
 
 
@@ -92,14 +92,14 @@
 
 /**
  * @brief Global variables updated in the SubscriberCallback functions.
- * 
+ *
  * Initialize custom defined messages for meaurement and odometry.
  * Measurement message includes Pose2D along with timestamp.
  * Odometry message includes timestamp and angular velocities for left and right wheel.
  * Initialize variables that save timestamps from both measurement and odometry
  * subscribers in double (float64 in message format).
  */
- 
+
 rollo::Pose2DStamped zPose2DStamped;
 double zTimeSecs = 0;
 
@@ -124,8 +124,10 @@ char TopicPose2DStamped[64] = TOPIC_PREP_P2DT;
  *
  * Subscribe to the topic '/Rollo/preprocessor/pose2dstamped' of the preprocessor node.
  * Read filtered position and orientation of the robot and timestamp.
- * Update global variables @p zPose2DStamped and @p zTimeSecs for use in EKF update.  
- * @param msg - custom defined message (preprocessor node). 
+ * Update global variables @p zPose2DStamped and @p zTimeSecs for use in EKF update.
+ * 
+ * @param msg - custom defined message (preprocessor node).
+ * 
  * @return NULL
  */
 
@@ -153,7 +155,9 @@ void subscriberCallbackMeasurement(const rollo::Pose2DStamped msg) {
  * Subscribe to the topic @var TopicWheelSpeed of the communication node.
  * Read wheel speed for both left and right in radians and timestamp.
  * Update global variables Odometry and OdometryTimeSecs for use in EKF update.
+ * 
  * @param msg - custom defined message (communication node).
+ * 
  * @return NULL
  */
 
@@ -178,10 +182,12 @@ void subscriberCallbackControlInput(const rollo::WheelSpeed msg) {
  * @brief Linear interpolation of values from odometry
  *
  * This function performs linear interpolation of right and left wheel speed for a given time instant.
- * The time for which the odometry values are computed is defined by @p EKFfilterTimeSecs. 
+ * The time for which the odometry values are computed is defined by @p EKFfilterTimeSecs.
+ * 
  * @param Odometryold contains left and right wheel speed and timestamp read at previous instant when EKF was updated.
  * @param Odometrynew contains left and right wheel speed and timestamp read currently.
  * @param EKFfilterTimeSecs is the time instant for which the EKF update need to be performed and odometry values need to be computed.
+ * 
  * @return rollo::WheelSpeed, contains left and right wheel speed [rad/s] computed for time instant given by @p EKFfilterTimeSecs using linear interpolation.
  */
 
@@ -210,10 +216,12 @@ rollo::WheelSpeed interpolateOdometry( rollo::WheelSpeed Odometryold, rollo::Whe
  * @brief Linear interpolation of values from measurement (motion capture)
  *
  * This function performs linear interpolation of robot pose2D for a given time instant.
- * The time for which the robot pose2D are computed is defined by EKFfilterTimeSecs. 
+ * The time for which the robot pose2D are computed is defined by EKFfilterTimeSecs.
+ * 
  * @param zOld contains robot pose2D and timestamp read at previous instant when EKF was updated.
  * @param zNew contains robot pose2D and timestamp read currently.
  * @param EKFfilterTimeSecs is the time instant for which the EKF update need to be performed and robot pose2D need to be computed.
+ * 
  * @return rollo::Pose2DStamped, contains robot pose2D computed for time instant given by EKFfilterTimeSecs using linear interpolation.
  */
 
@@ -243,14 +251,16 @@ rollo::Pose2DStamped interpolateMeasurement( rollo::Pose2DStamped zOld, rollo::P
  *
  * This is part of time update(or prediction update) of EKF. Given "a priori" state estimate, x_k-1|k-1
  * and u_k-1, it computes predicted value for state, x_k|k-1.
+ *
  * @param x_pp contains  "a priori" state estimate, x_k-1|k-1.
  * @param u is control input vector, calculated from odometry. It consists of 2 elements, delta S and delta theta.
+ *
  * @return Eigen::Vector3d, state prediction x_k|k-1.
  */
 
 Eigen::Vector3d FSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 
-	Eigen::Vector3d x_cp(x_pp(0) + u(0) * cos(x_pp(2) - (u(1) / 2)), x_pp(1) + u(0) * sin(x_pp(2) - (u(1) / 2)), x_pp(2) - u(1)); 
+	Eigen::Vector3d x_cp(x_pp(0) + u(0) * cos(x_pp(2) - (u(1) / 2)), x_pp(1) + u(0) * sin(x_pp(2) - (u(1) / 2)), x_pp(2) - u(1));
 
 	return x_cp;
 }
@@ -258,15 +268,17 @@ Eigen::Vector3d FSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 /**
  * @brief JacobianFSTATE
  *
- * This computes Jacobian matrix by taking the partial derivatives of f(x_k-1,u_k-1) w.r.t x
+ * This computes Jacobian matrix by taking the partial derivatives of f(x_k-1,u_k-1) with respect to x.
+ *
  * @param x_pp contains "a priori" state estimate, x_k-1|k-1.
  * @param u is control input vector, calculated from odometry. It consists of 2 elements, delta S and delta theta.
- * @return Eigen::Matrix3d is the Jacobian matrix 
+ *
+ * @return Eigen::Matrix3d is the Jacobian matrix
  */
- 
+
 Eigen::Matrix3d JacobianFSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 
-	Eigen::Matrix3d Jf_xu = Eigen::Matrix3d::Identity(); 
+	Eigen::Matrix3d Jf_xu = Eigen::Matrix3d::Identity();
 	Jf_xu(0, 2) = - u(0) * sin(x_pp(2) - (u(1) / 2));
 	Jf_xu(1, 2) = u(0) * cos(x_pp(2) - (u(1) / 2));
 
@@ -275,16 +287,17 @@ Eigen::Matrix3d JacobianFSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 
 /**
  * @brief HMEAS measurement equation, h(x_k)
- * 
+ *
  * This computes estimated measurement vector based on the latest state estimate.
  *
  * @param x_cp contains state prediction x_k|k-1 computed in time update of EKF
+ *
  * @return Eigen::Vector3d, contains estimated measurement vector.
  */
 
 Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
 
-	Eigen::Vector3d h_x (x_cp(0), x_cp(1), x_cp(2)); 
+	Eigen::Vector3d h_x (x_cp(0), x_cp(1), x_cp(2));
 
 	return h_x;
 }
@@ -293,17 +306,18 @@ Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
 /**
  * @brief Node main
  *
- * Initialize node, nodehandle, subsrcribe to messages from preprocessor and communication nodes and publish estimated state of the robot.
- * Arguments from command line: rate.
- * 
+ * Initialize node, nodehandle, subscribe to messages from preprocessor and communication nodes and publish estimated state of the robot.
+ *
+ * @param rate: Sampling frequency of the node <!1 [Hz]>
+ *
  * Initializes Extended Kalman Filter revelant variables.
  * As a part of initializing, function waits for one message from each subscriber and save timestamps for the first iteration of EKF.
  * State estimate, x_(0|-1) is initialized as the first measurement read from the preprocessor node.
  * Covariance of state estimate, E(0, -1) is initialized as identity matrix.
- * 
+ *
  * Run EKF in loop, update estimates.
  * Await new sensor data, determine time step for EKF update and perform necessary interpolation.
- * 
+ *
  * Publishes newest estimates of state variables, covariance matrix and timestamp.
  * @return 0
  */
@@ -311,7 +325,7 @@ Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
 int main(int argc, char **argv)
 {
 
-//! Initialize node 
+//! Initialize node
 ros::init(argc, argv, "rollo_ekf"); // Name of the node
 ros::start(); // Necessary to be called
 
@@ -335,8 +349,8 @@ int rate_frequency;
 ros::NodeHandle private_node_handle_("~");
 private_node_handle_.param("rate", rate_frequency, int(1));
 
-//! Publishing rate in units of Hz
-ros::Rate frequency(rate_frequency); 
+//! Publishing rate [Hz]
+ros::Rate frequency(rate_frequency);
 
 // Loop condition variable
 int loopcondition = 1;
@@ -350,7 +364,7 @@ double q = 0.1; // std of process noise   //CRC
 double r = 0.1; // std of measurement noise //CRC
 
 //CRC
-//q^2*eye(n); // process noise covariance 
+//q^2*eye(n); // process noise covariance
 Eigen::Matrix3d Q = Eigen::Matrix3d::Identity();
 
 Q(0,0) = q*q;
@@ -382,17 +396,17 @@ double deltaS;
 Eigen::Vector3d x_pp(0, 0, 0);
 //Eigen::Vector3d z(0, 0, 0);
 
-//! Initialize Jacobian matrix with the partial derivatives of h(x_k) w.r.t x, identity for provided system
+//! Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for provided system
 Eigen::Matrix3d Jh = Eigen::Matrix3d::Identity();
 
-//! Initialize E_pp: "a priori" estimated state covariance, E_k-1|k-1 (p refers to k-1) 
+//! Initialize E_pp: "a priori" estimated state covariance, E_k-1|k-1 (p refers to k-1)
 Eigen::Matrix3d E_pp = Eigen::Matrix3d::Identity(); // Initial state covariance matrix
 
 //! Initialize variables involved in the prediction update of EKF
 Eigen::Vector3d x_cp; // State prediction, x_k|k-1
 Eigen::Matrix3d Jf;
 Eigen::Matrix3d E_cp; // E_k|k-1
-  
+
 //! Initialize variables involved in the innovation update of EKF
 Eigen::Vector3d z_estimate;
 Eigen::Matrix3d P12;
@@ -403,7 +417,7 @@ Eigen::Matrix3d H;
 Eigen::Vector3d x_cc;
 Eigen::Matrix3d E_cc;
 
-//! Variables for time 
+//! Variables for time
 char all_sensors_data_available = 0; //WTF?! CRV: flagSensorData
 double prevOdometrySecs = 0;
 double prevMeasurementSecs = 0;
@@ -429,7 +443,7 @@ initialize = 0; //DB
 
 std::cout << "Initializing: waiting for sensor data from both the subscribers \n" << std::endl; //DB
 
-//! Initialization loop
+//! ## Initialization loop
 while (initialize == 1 && ros::ok()) {
 	if (zTimeSecs > 0 ){
 		prevzPose2DStamped = zPose2DStamped;
@@ -454,10 +468,10 @@ while (initialize == 1 && ros::ok()) {
 
 	}
 }
-//! Initialization loop end
+//! ## Initialization loop end
 
 
-//! Main loop
+//! ## Main loop
 do {
 	all_sensors_data_available = 1; //DB
 	std::cout << "Wait for new data from all sensors (motion captutre and odometry) for next EKF iteration. \n" << std::endl; //DB
@@ -467,8 +481,8 @@ do {
 		all_sensors_data_available = 1;
 		prevOdometrySecs = OdometryTimeSecs;
 		prevMeasurementSecs = zTimeSecs;
-		
-		//! Determine time step for EKF update and perform interpolation for the sensor data not available at respective time step 
+
+		//! Determine time step for EKF update and perform interpolation for the sensor data not available at respective time step
 		if (zTimeSecs > OdometryTimeSecs) {
 			//! Update timestamp
 			EKFfilterTimeSecs = OdometryTimeSecs;
@@ -499,7 +513,7 @@ do {
 			z_EKF(1) = zPose2DStamped.pose.y;
 			z_EKF(2) = zPose2DStamped.pose.theta;
 			wheelspeedleft_EKF = InterpolatedOdometry.wheelspeedleft;
-			wheelspeedright_EKF = InterpolatedOdometry.wheelspeedright;	
+			wheelspeedright_EKF = InterpolatedOdometry.wheelspeedright;
 
 			std::cout << "Time stamp for next iteration: "<< EKFfilterTimeSecs << "\n" << std::endl;//DB
 			std::cout << "Linear Interpolation of odometry required for EKF iteration." << "\n" << std::endl;//DB
@@ -555,7 +569,7 @@ do {
 
 		//! Partial covariance update
 		//CRC
-		E_cp = Jf * E_pp * Jf.transpose() + Q;  // %E_k|k-1              
+		E_cp = Jf * E_pp * Jf.transpose() + Q;  // %E_k|k-1
 		std::cout << " Prediction Update: \nx_cp:\n" << x_cp << "\nE_cp:\n" << E_cp << "\n" << std::endl; //DB
 
 		//! Innovation update
@@ -614,7 +628,7 @@ do {
 	frequency.sleep();
 
 } while (loopcondition);
-//! Main loop end
+//! ## Main loop end
 
 return 0;
 }
@@ -628,18 +642,18 @@ function [x_cc,E_cc]= my_ekf_node(x_pp,u,z)
 % Modified further: specific to ROS node, 19/2/2016
 % EKF   Extended Kalman Filter for localization of a robot (nonlinear
 % dynamic systems)
-% [x_cc,E_cc]= my_ekf_node(x_pp,u,z) returns state estimate, x and state covariance, P 
+% [x_cc,E_cc]= my_ekf_node(x_pp,u,z) returns state estimate, x and state covariance, P
 % for nonlinear dynamic system:
 %           x_k = f(x_k-1, u_k-1) + w_k
 %           z_k   = h(x_k) + v_k
 % where w ~ N(0,Q) meaning w is gaussian noise with covariance Q
 %       v ~ N(0,R) meaning v is gaussian noise with covariance R
-% Inputs:   x_pp: "a priori" state estimate, x_k-1|k-1 (p refers to k-1)  
+% Inputs:   x_pp: "a priori" state estimate, x_k-1|k-1 (p refers to k-1)
 %           u: control input, u_k-1 (only for simulation here, originally
 %           node will receive nL and nR
 %           z: current measurement
-% Output:   x_cc: "a posteriori" state estimate, x_k|k (c refers to k) 
-%           E_cc: "a posteriori" state covariance, E_k|k (c refers to k) 
+% Output:   x_cc: "a posteriori" state estimate, x_k|k (c refers to k)
+%           E_cc: "a posteriori" state covariance, E_k|k (c refers to k)
 																																																																																																																	%
 
 																																																																																																																	%% preinitialized variables and functions in the system
@@ -647,9 +661,9 @@ function [x_cc,E_cc]= my_ekf_node(x_pp,u,z)
 																																																																																																																	n=3;      %number of states
 
 %however Q will need to be modeled in actual system
-q=0.1;    %std of process noise  
+q=0.1;    %std of process noise
 r=0.1;    %std of measurement noise
-Q=q^2*eye(n); % process noise covariance 
+Q=q^2*eye(n); % process noise covariance
 R=r^2*eye(n); % measurement noise covariance
 
 %% calculations for u in the node
@@ -663,12 +677,12 @@ R=r^2*eye(n); % measurement noise covariance
 f_xu = [x_pp(1) + u(1)*cos(x_pp(3) - (u(2)/2)); x_pp(2) + u(1)*sin(x_pp(3) - (u(2)/2)); x_pp(3) - u(2)];  % nonlinear state equations, f(x_k-1,u_k-1)
 h_x = [x_pp(1); x_pp(2); x_pp(3)];                  % measurement equation, h(x_k)
 
-Jf_xu = [1, 0, - u(1)*sin(x_pp(3) - (u(2)/2)); 0, 1, u(1)*cos(x_pp(3) - (u(2)/2)); 0, 0, 1]; %Jacobian matrix with the partial derivatives of f(x_k-1,u_k-1) w.r.t x
-Jh = eye(n); %Jacobian matrix with the partial derivatives of h(x_k) w.r.t x, identity for our system
+Jf_xu = [1, 0, - u(1)*sin(x_pp(3) - (u(2)/2)); 0, 1, u(1)*cos(x_pp(3) - (u(2)/2)); 0, 0, 1]; %Jacobian matrix with the partial derivatives of f(x_k-1,u_k-1) with respect to x
+Jh = eye(n); %Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for our system
 
-%E_pp: "a priori" estimated state covariance, E_k-1|k-1 (p refers to k-1) 
+%E_pp: "a priori" estimated state covariance, E_k-1|k-1 (p refers to k-1)
 persistent E_pp;
-if isempty(E_pp) 
+if isempty(E_pp)
     E_pp = eye(n);            % initial state covraiance
 end
 
@@ -679,10 +693,10 @@ x_cp = f_xu; %state prediction, x_k|k-1
 Jf = Jf_xu;
 
 %partial covariance update
-E_cp = Jf*E_pp*Jf' + Q;  %E_k|k-1              
+E_cp = Jf*E_pp*Jf' + Q;  %E_k|k-1
 
 %% INNOVATION UPDATE
-%nonlinear measurement and linearization   
+%nonlinear measurement and linearization
 z_estimate = [x_cp(1); x_cp(2); x_cp(3)];   %h_x;
 
 P12=E_cp*Jh'; %cross covariance

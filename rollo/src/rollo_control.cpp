@@ -103,6 +103,8 @@ double RKeysAngularV = 1;
  *
  * Check if a key is pressed on keyboard and return it.
  * 
+ * \param NONE
+ * 
  * @return 1 if a key is pressed on keyboard, otherwise 0.
  * @see https://github.com/sdipendra/ros-projects/blob/master/src/keyboard_non_blocking_input/src/keyboard_non_blocking_input_node.cpp
  */
@@ -140,8 +142,11 @@ int kbhit(void)
  * @brief Decode key
  *
  * Compute linear and angular command velocities based on keyboard input.
- * Key pressed character @p <key> as input argument. 
- * Parameters declared by reference: @var &Speed, and @var &Turn.
+ * Key pressed character @p <key> as input argument.
+ * 
+ * \param &Speed Linear velocity
+ * \param &Turn Angular velocity
+ * 
  * @return NULL
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
  */
@@ -215,6 +220,8 @@ void decodeKey (char character, double &Speed, double &Turn)
  * @brief Node main
  *
  * Initialize variables and nodehandle, read and translate input information into command messages.\n
+ * 
+ * \param rate Running frequency of the node <!10 [Hz]>
  * 
  * Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @p geometry_msgs::Twist
  * 
