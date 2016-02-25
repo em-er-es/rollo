@@ -292,7 +292,7 @@ while (ros::ok()) {
 	//! - ROS spinOnce
 	ros::spinOnce();
 
-	//! - Sleep to connform node frequency rate
+	//! - Sleep to conform node frequency rate
 	frequency.sleep();
 
 }
