@@ -3,3 +3,4 @@
 [P] - Fix doxygen documentation
 [ ] - Finish local documentation
 [ ] - Document scripts in the LaTeX file, provide description
+[ ] - Add dynamic reconfigure dependency
