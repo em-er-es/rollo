@@ -19,10 +19,12 @@
 ## Import basic Python libraries
 from __future__ import print_function #Python2
 from matplotlib import pyplot as plt
+from matplotlib import animation
+import numpy as np
+import time
 
 ## Import ROS libraries
 import roslib
-import sys
 roslib.load_manifest('rollo')
 import rospy
 
@@ -43,7 +45,8 @@ from rollo.msg import Pose2DStamped
 ''' TODO
  * ADD & FIX DOXYGEN documentation format
  * Subscribe to preprocessor topic
- * Subscribe to EKF topic
+ *! Subscribe to EKF topic
+ * 
  * TODO later
  * Implement saving generated images to a path
  * Implement a duration parameter
@@ -56,8 +59,8 @@ from rollo.msg import Pose2DStamped
 NodeName = "VIS "
 
 ## Visualize rate [Hz] == [fps]
-# rate = 25 # 25 [Hz] = 25 [fps]
-rate = 1 # 25 [Hz] = 25 [fps]
+rate = 25 # 25 [Hz] = 25 [fps]
+# rate = 1 # 25 [Hz] = 25 [fps]
 
 ## Message for measurement data
 # MessageMeasurement = 0
@@ -67,6 +70,7 @@ rate = 1 # 25 [Hz] = 25 [fps]
 
 ## Loop counter
 loopcounter = 0
+markerScale = 0
 
 ## Global flags
 
@@ -77,8 +81,10 @@ flagSubscriber1 = False
 ## Global flag 2
 flagSubscriber2 = False
 
+figure = 0
+
 ## Set pyplot to be non-interactive
-plt.ioff()
+# plt.ioff()
 
 ## Subscriber callback for measurement data
 
@@ -103,18 +109,62 @@ def subscriberCallbackEKF(msg):
 
 	return 0
 
+# initialization function: plot the background of each frame
+def init():
+	plt.set_data([], [])
+	return line
+
+# animation function.  This is called sequentially
+def animate(i):
+	# of = np.rad2deg(MessageMeasurement.theta) - 90
+	# plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	# of = np.rad2deg(MessageEKF.pose2d.theta) - 90
+	# plt.plot(MessageEKF.pose2d.x, MessageEKF.pose2d.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	# x = np.linspace(0, 2, 1000)
+	# y = np.sin(2 * np.pi * (x - 0.01 * i))
+	plt.set_data(MessageMeasurement.x, MessageMeasurement.y)
+	# return line
+	return line
+
+
 ## Generate and update plot
 
 def generatePlot():
 	rospy.loginfo("[Rollo][%s][generatePlot] Init", NodeName) # //DB
 
 	## Generate quiver plot
-	plt.quiver(MessageMeasurement.x, MessageMeasurement.y, MessageMeasurement.theta)
-	plt.quiver(MessageEKF.pose2d.x, MessageEKF.pose2d.y, MessageEKF.pose2d.theta, cmap='gray')
-	if (not loopcounter % 100):
-		plt.hold(False)
-	plt.draw()
+	# plt.quiver(MessageMeasurement.x, MessageMeasurement.y, MessageMeasurement.theta)
+	# plt.quiver(MessageEKF.pose2d.x, MessageEKF.pose2d.y, MessageEKF.pose2d.theta, cmap='gray')
+	# of = np.rad2deg(MessageMeasurement.theta) - 90
+	# plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	# of = np.rad2deg(MessageEKF.pose2d.theta) - 90
+	# plt.plot(MessageEKF.pose2d.x, MessageEKF.pose2d.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	# if (not loopcounter > 100):
+		# plt.ioff()
+		# plt.show()
+		# plt.hold(False)
+		# time.sleep(3)
+	# plt.draw()
+	# global figure
+	# plt.draw()
 
+	# First set up the figure, the axis, and the plot element we want to animate
+	# fig = plt.figure()
+	# ax = plt.axes(xlim=(0, 2), ylim=(-2, 2))
+	# line, = ax.plot([], [], lw=2)
+	global animate
+	# call the animator.  blit=True means only re-draw the parts that have changed.
+	anim = animation.FuncAnimation(figure, animate, init_func = init,
+								   frames = rate * 10, interval = rate, blit = True)
+
+	# save the animation as an mp4.  This requires ffmpeg or mencoder to be
+	# installed.  The extra_args ensure that the x264 codec is used, so that
+	# the video can be embedded in html5.  You may need to adjust this for
+	# your system: for more information, see
+	# http://matplotlib.sourceforge.net/api/animation_api.html
+	anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+
+	plt.show()
 	## Reset subscriber flags
 	global flagSubscriber1
 	flagSubscriber1 = False
@@ -127,13 +177,19 @@ def generatePlot():
 
 def main():
 	## Initiliaze
+	global loopcounter
+
 	### Initialize rospy
 	# roscpp_initialize(sys.argv)
 	rospy.init_node('rollo_visualization', anonymous=True)
 
-	plt.axis([-4, 4, -4, 4])
-	plt.ion()
-	plt.show()
+	if loopcounter == 0:
+		figure = plt.figure()
+		plt.axis([-4, 4, -4, 4])
+		plt.grid(1)
+		plt.ion()
+		plt.show()
+		markerScale = 3
 
 	## Set frequency rate for visualization node
 	rosrate = rospy.Rate(rate)
@@ -148,7 +204,7 @@ def main():
 
 	while not rospy.is_shutdown():
 		## Main loop
-		rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
+		rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, loopcounter) # //DB
 
 		if (flagSubscriber1 == True) and (flagSubscriber2 == True):
 			rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
@@ -157,7 +213,7 @@ def main():
 		## Sleep to conform node frequency rate
 		rosrate.sleep()
 
-		loopcounter =+ 1
+		loopcounter = loopcounter + 1
 		## Main loop end
 
 	# rospy.spin()
