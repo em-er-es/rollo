@@ -62,8 +62,9 @@
 
 
 /* TODO
- *! Get rid of warnings for multi-character constants and overflow
  * Implement squarespeed
+ *! Correct output
+ *! Get rid of warnings for multi-character constants and overflow
  *! Define all possible messages by contructing them out of three bytes
  *! * 1: Movement/operation byte, 2: Left wheel speed, 3: Right wheel speed
  *! Run the node either at a given frequency or if there are problems with too much data for Rollo, at a rate of 60 or 30 Hz
@@ -116,7 +117,7 @@ double currentTime = 0; //!< Current time holder
 int EmergencyTime = 3; //!< Emergency time [s]
 bool FlagEmergency = 0; //!< Emergency flag
 
-char Mode[2]; //!< Message mode description
+char Mode[1]; //!< Message mode description
 int VelocityL, VelocityR; //!< Message velocities description
 
 unsigned int loopcounter = 1; //!< Loop counter for debugging purpose
@@ -165,13 +166,22 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 	if (fabs(x) < tol) { //! Linear velocity is approximately 0:
 
 		if (z == 0) {
-			Message[0] = 0x7b; //! - Complete stop
+			//! - Complete stop
+			Message[0] = 0x7b;
 			VelocityL = 0;
 			VelocityR = 0;
 			Mode[0] = 'S';
 		}
-		else if (z < tol) Message[0] = 0x7f; //! - Right rotation
-		else if (z > tol) Message[0] = 0x7e; //! - Left rotation
+		else if (z < tol) {
+			//! - Right rotation
+			Message[0] = 0x7f;
+			Mode[0] = 'R';
+		}
+		else if (z > tol) {
+			//! - Left rotation
+			Message[0] = 0x7e; 
+			Mode[0] = 'L';
+		}
 
 		Message[1] = 0x50; Message[2] = 0x10; //! - Lowest speeds for previous modes
 
@@ -224,10 +234,9 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 		if (x > tol) {
 			Message[0] = 0x7c;
 			Mode[0] = 'F';
-			// *(Mode) = 'F';
 		} else if (x < -tol) {
 			Message[0] = 0x7d;
-			*(Mode) = 'B';
+			Mode[0] = 'B';
 		}
 
 	}
@@ -279,8 +288,7 @@ int udpSend(char ip[16], int port, char *Message)
 	if (bs == nb) { //! Check if number of bytes sent is equal to bytes of composed message
 		// ROS_INFO("[Rollo][%s][UDP] Message: [%d|%d|%d]", NodeName, Message[0], Message[1], Message[2]); //DB
 		// ROS_INFO("[Rollo][%s][UDP] UDP packets sent successfully", NodeName); //VB
-		// ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %s, %f, %f", NodeName, *(Mode), v_l, v_r); //DB
-		ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %c, %f, %f", NodeName, Mode, VelocityL, VelocityR); //VB
+		ROS_INFO("[Rollo][%s][UDP][Mode [%c] Velocity L [%d] Velocity R [%d]", NodeName, Mode[0], VelocityL, VelocityR); //VB
 	} else if (bs < 0) { //! Error handling
 		ROS_INFO("[Rollo][%s][ERR] UDP packets transmission failed", NodeName); //VB
 		ROS_ERROR("sendto()");
