@@ -1,10 +1,27 @@
 /**
  * @file rollo_comm.cpp
- * @author Rabbia Asghar, Ernest Skrzypczyk
+ * @author Rabbia Asghar
+ * @author Ernest Skrzypczyk
+ * 
  * @date 18/2/16
+ * 
  * @brief Communication between ROS and Rollo
- *
- * Provides basic communication structure between ROS holding nodes used for localization and Rollo.
+ * 
+ * Command prototype: <b>rosrun rollo rollo_control _rate:=10 _ip:=192.168.0.120 _port:=900 _em:=3 _square:=0 _forwardtime:=25 _turntime:=6 _squarespeed:=0.4</b>
+ *  - rate: Command sending frequency of the node <!10 [Hz]>
+ *  - ip: Internet protocl address of target robot <!192.168.0.120 [1]>
+ *  - port: User datagram protocol taget connection port <!900 [1]>
+ *  - em: Emergency time <!3 [s]>
+ *  - square: Square test switch <!0 [1]>:
+ *    - 0 -- Off
+ *    - 1 -- Simple square test
+ *    - 2 -- Double square test
+ *    - n -- N-th order square test
+ *  - forwardtime: Time for forward motion of robot <!25 [s]>
+ *  - turntime: Time for turning the robot <!6 [s]>
+ *  - squarespeed: Square test forward motion speed <!0.4 [1]>:
+ * 
+ * Provides basic communication structure between ROS holding nodes used for localization and Rollo.\n
  * Main aspects include:
  *  - decoding linear and angular velocities provided by control node
  *  - translate and send message to Rollo
@@ -45,12 +62,13 @@
 
 
 /* TODO
+ * Get rid of warnings for multi-character constants and overflow
+ * Implement squarespeed
  *! Define all possible messages by contructing them out of three bytes
  *! * 1: Movement/operation byte, 2: Left wheel speed, 3: Right wheel speed
  *! Run the node either at a given frequency or if there are problems with too much data for Rollo, at a rate of 60 or 30 Hz
  *!/ Make the node accepts parameters for -ip address-, udp port and node frequency
  *! Add publisher for custom message oncluding timestamped velocities [rpm] of Rollo for EKF node
- * Get rid of warnings for multi-character constants and overflow
  * TODO LATER
  *! Priorotize safety over control
  * Define a function that will receive UDP packets
@@ -76,8 +94,8 @@ char TopicCmdVel[64] = TOPIC_CTRL_CMD_VEL;
 //! Rollo default IP: 192.168.0.120
 // Local IP address range: 130.251.13.90-99
 
-// There is no reason for these variables to be signed
-char ip[16] = "192.168.0.120"; //!< Ip address statically assigned
+// There is no reason for these variables to be signed integers
+char ip[16] = "192.168.0.120"; //!< Ip address hardcoded
 // unsigned int port = 900; //! UDP port
 int port = 900; //!< UDP port
 
@@ -93,7 +111,7 @@ char Message[nb] = {0x7b, 0x50, 0x10}; //!< Message combined, complete stop defa
 char MessageEmergencyStop[nb] = {0x7b, 0x50, 0x10}; //!< Emergency message - complete stop
 double lastMessageTime = 0; //!< Last message from control node
 double currentTime = 0; //!< Current time holder
-int EmergencyTime = 10; //!< Emergency time [s]
+int EmergencyTime = 3; //!< Emergency time [s]
 bool FlagEmergency = 0; //!< Emergency flag
 
 char Mode[2]; //!< Message mode description
@@ -134,36 +152,38 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 	// if (! (loopcounter % 10)) ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f] tol: %f)", NodeName, x, z, tol); //DB
 
 	// if (x == 0) { //! Ideal case
-	//! Since control node can provide abstract control values, an ideal case could be used for decoding velocities
-	//! This is discouraged, since using alternative control methods would probably have a realistic value set
-	if (fabs(x) < tol) { //! Linear velocity is approx 0
+	//! Since control node can provide abstract control values, an ideal case could be used for decoding velocities. 
+	//! This is discouraged, since using alternative control methods would probably have a realistic value set.\n
+	if (fabs(x) < tol) { //! Linear velocity is approximately 0:
 
-		if (z == 0) Message[0] = 0x7b; //! Complete stop
+		if (z == 0) Message[0] = 0x7b; //! - Complete stop
 		// if (abs(x) < tol) Message[0] = 0x7b; //! Complete stop
 		// else if (z > 0) Message[0] = 0x7f; //! Right rotation
 		// else if (z < 0) Message[0] = 0x7e; //! Left rotation
 		// else if (z < 0) Message[0] = 0x7f; //! Right rotation
 		// else if (z > 0) Message[0] = 0x7e; //! Left rotation
-		else if (z < tol) Message[0] = 0x7f; //! Right rotation
-		else if (z > tol) Message[0] = 0x7e; //! Left rotation
+		else if (z < tol) Message[0] = 0x7f; //! - Right rotation
+		else if (z > tol) Message[0] = 0x7e; //! - Left rotation
 
-	Message[1] = 0x50; Message[2] = 0x10; //! Lowest speeds for previous modes
+		Message[1] = 0x50; Message[2] = 0x10; //! - Lowest speeds for previous modes
 
 	// } else if (x != 0) { //! Determine speeds
 	} else if (fabs(x) > tol) { //! Linear velocity is above tolerance threshold
-		//! Determine speeds based on the position of the "dial" z\n
-		//! |-a-|- - -*-b- - - - -|\n
-		//! -1   z   0       1
+		//! Determine speeds based on the position of the "dial" z:\n
+		//! <pre>
+		//!    |-a-|- - -*-b- - - - -|
+		//!   -1   z     0           1
+		//! </pre>
 
-		double tx = x * RolloRange; //! Temporary velocity holder
+		double tx = x * RolloRange; //! Temporary velocity holder declaration
 		double a = (z + 1.001); //! Eliminate problems with dividing through zero by adding a small number to variables
 		double b = 2 - (z + 1.001);
 		//! Calculate velocities according to relation expressed in linear and angular velocities ratio
 		v_l = (b / a * tx) / RolloMin;
 		v_r = (a / b * tx) / RolloMin;
 
-		//! Translate velocities for Rollo
-		//! Left velocity - Second byte
+		//! Translate velocities for Rollo:
+		//! - Left wheel velocity - Second byte
 		switch (abs(v_l)){
 			case 0: Message[1] = 0x50; VelocityL = 6; break;
 			case 1: Message[1] = 0x55; VelocityL = 12; break;
@@ -178,11 +198,11 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 			default: Message[1] = 0x50; VelocityL = 6; break;
 		}
 
-		//! Right velocity - Third byte
+		//! - Right wheel velocity - Third byte
 		switch (abs(v_r)){
 			case 0: Message[2] = 0x10; VelocityR = 6; break;
 			case 1: Message[2] = 0x11; VelocityR = 12; break;
-			case 2: Message[2] = 0x25; VelocityR = 19; break; //! Temporary fix for errartic behaviour of Rollo
+			case 2: Message[2] = 0x25; VelocityR = 19; break; //! - Temporary fix for errartic behaviour of Rollo
 			case 3: Message[2] = 0x13; VelocityR = 25; break;
 			case 4: Message[2] = 0x1A; VelocityR = 31; break;
 			case 5: Message[2] = 0x1B; VelocityR = 38; break;
@@ -198,12 +218,12 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 		if (x > tol) {
 			Message[0] = 0x7c; 
 			// Mode[0] = 'F';
-			// *(Mode) = 'F';
+			*(Mode) = 'F';
 		}
 		// else if (x < 0) {
-		else if (-x < tol) {
+		else if (-x > tol) {
 			Message[0] = 0x7d;
-			// *(Mode) = 'B';
+			*(Mode) = 'B';
 		}
 		// } else if (z > 0) *(Mode) = 'R';
 		// else if (z < 0) *(Mode) = 'L';
@@ -226,8 +246,7 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 /**
  * @brief Subscriber callback
  *
- * Reads newest velocities from control node and translates them into UDP message
- * Updates latest message time
+ * Read newest velocities from control node and translate them into UDP message. Update latest message time.
  *
  * @return 0
  */
@@ -241,7 +260,7 @@ void subscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
 	// decodeVelocities(Message); //! Update the UDP message
 	decodeVelocities(msg->linear.x, msg->angular.z, Message, VelocityL, VelocityR); //! Update the UDP message
 	lastMessageTime = ros::Time::now().toSec(); //! Update last message time
-	FlagEmergency = 0;
+	FlagEmergency = 0; //! Reset emergency flag
 }
 
 /**
@@ -262,7 +281,7 @@ int udpSend(char ip[16], int port, char *Message)
 		// ROS_INFO("[Rollo][%s][UDP] Message: [%d|%d|%d]", NodeName, Message[0], Message[1], Message[2]); //DB
 		// ROS_INFO("[Rollo][%s][UDP] UDP packets sent successfully", NodeName); //VB
 		// ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %s, %f, %f", NodeName, *(Mode), v_l, v_r); //DB
-		ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %s, %f, %f", NodeName, Mode, VelocityL, VelocityR); //VB
+		ROS_INFO("[Rollo][%s][UDP][Mode, v_l, v_r]: %c, %f, %f", NodeName, Mode, VelocityL, VelocityR); //VB
 	} else if (bs < 0) { //! Error handling
 		ROS_INFO("[Rollo][%s][ERR] UDP packets transmission failed", NodeName); //VB
 		ROS_ERROR("sendto()");
@@ -272,7 +291,7 @@ int udpSend(char ip[16], int port, char *Message)
 }
 
 /**
- * @brief Main function
+ * @brief Node main
  *
  * Depending on specified parameters processes data from control node and Rollo
  * and transmits them to appropriate targets or runs a square test of n-th order
@@ -282,6 +301,7 @@ int udpSend(char ip[16], int port, char *Message)
 
 int main(int argc, char **argv)
 {
+//! ## Initalization
 //! Initialize node
 ros::init(argc, argv, "rollo_comm"); // Communication node name
 ros::start(); // ROS node initialization
@@ -304,23 +324,26 @@ ros::NodeHandle private_node_handle_("~");
 
 //! Node main parameters
 private_node_handle_.param("rate", rate_frequency, int(25));
-private_node_handle_.param("port", port, int(900));
 // IP address parsing seems to be very problematic, therefore a hardcoded assignment has been made for now
 // private_node_handle_.param("ip", ip, char(16));
 // private_node_handle_.param("ip", ip, "192.168.0.120");
 // private_node_handle_.param("ip", ip, const char("192.168.0.120"));
 // private_node_handle_.param("ip", ip, const char("192.168.0.120"));
-private_node_handle_.param("et", EmergencyTime, int(10));
+private_node_handle_.param("port", port, int(900));
+//! Emergency parameters
+private_node_handle_.param("et", EmergencyTime, int(3));
 
 //! Square test parameters
 //! Default values
 int square = 0;
+double squarespeed = 0.4;
 double turntime = 6;
 double forwardtime = 25;
 // The code below also specifies default values, however for debugging it can be disabled with comments more easily
 private_node_handle_.param("square", square, int(0));
 private_node_handle_.param("forwardtime", forwardtime, double(25));
 private_node_handle_.param("turntime", turntime, double(6));
+private_node_handle_.param("squarespeed", square, double(0.4));
 
 //! Node frequency rate [Hz]
 if (rate_frequency < 0) rate_frequency = 1 / (rate_frequency);
@@ -340,34 +363,36 @@ int rv = 0;
 udp_client_server::udp_client udpClient(ip, port);
 
 
-//! Square test
-//! - Alternatively this square test could be in control node, however communication node is "closer" to Rollo
+//! ## Square test
+//! Alternatively this square test could be in control node, however communication node is "closer" to Rollo
 	while ((square > 0) && ros::ok()) {
 
-		//! Print information on current run
+		//! - Print information on current run
 		ROS_INFO("[Rollo][%s][Square test][%d]", NodeName, square); //DB
 
 		//FIX Get rid of warnings:
 		//warning: multi-character character constant [-Wmultichar]
 		//warning: overflow in implicit constant conversion [-Woverflow]
-		char CmdTurn[4] = {'0x7b', '0x55', '0x11'}; //! Compose turn command
-		if (square % 1) CmdTurn[0] = '0x7e'; else CmdTurn[0] = '0x7f'; //! Check square run variable and determine turning direction
+		//FIX Implement squarespeed
+		char CmdTurn[4] = {'0x7b', '0x55', '0x11'}; //! - Compose turn command
+		if (square % 1) CmdTurn[0] = '0x7e'; else CmdTurn[0] = '0x7f'; //! - Check square run variable and determine turning direction
 		//! For multiple runs the robot would go back and forth providing more reliable data on the actual error
 		//! In ideal case even a high order square run would result in the robot being at the initial position with initial orientation
-		char CmdForward[3] = {'0x7c', '0x55', '0x11'}; //! Compose forward command
+		char CmdForward[3] = {'0x7c', '0x55', '0x11'}; //! - Compose forward command
 		ROS_INFO("[Rollo][%s][Square test][%d] Turning: %d {dec}", NodeName, square, CmdTurn[0]); //DB
-		//! Set initial time
+		//! - Set initial time
 		double initialtime = ros::Time::now().toSec();
-		//! Bytes sent, useful for debugging
+		//! -  Initialize bytes sent variable for debugging
 		int bs;
 
+		//! - Print square test parameters
 		// ROS_INFO("[Rollo][%s][Square test] Starting time %g, forward time %g, turning time %g", NodeName, initialtime, forwardtime, turntime); //DB
-		ROS_INFO("[Rollo][%s][Square test][%d] Forward time %g, turning time %g", NodeName, square, forwardtime, turntime); //DB
+		ROS_INFO("[Rollo][%s][Square test][%d] Forward time %g, forward speed %f, turning time %g", NodeName, square, squarespeed, forwardtime, turntime); //DB
 
-		for (int i = 0; i < 4; i++) { //! Main square loop
+		for (int i = 0; i < 4; i++) { //! ### Main square loop
 
 			//! Moving forward
-			ROS_INFO("[Rollo][%s][Square test][%d] Moving forward: %g [s]", NodeName, square, forwardtime); //DB
+			ROS_INFO("[Rollo][%s][Square test][%d] Moving forward: %g [s] @ %f", NodeName, square, forwardtime, squarespeed); //DB
 			for (int j = 0; j < 3; j++) bs += udpClient.send(CmdForward, nb); //! Send command 3 times
 			ros::Duration(forwardtime, 0).sleep(); //! Wait for the specified time to move forward
 			// Alternatively use a while loop here and update the command either at the rate of the loop or other
@@ -378,7 +403,7 @@ udp_client_server::udp_client udpClient(ip, port);
 			ros::Duration(turntime, 0).sleep(); //! Wait for the specified time to turn
 			// Alternatively use a while loop here and update the command either at the rate of the loop or other
 
-		} //! Main square loop end
+		} //! ### Main square loop end
 
 		double finishtime = ros::Time::now().toSec(); //! Update run finish time
 		//! Print duration time
@@ -390,33 +415,33 @@ udp_client_server::udp_client udpClient(ip, port);
 		// square--;
 		// if (!square) return 0;
 	}
+//! ## Square test end
 
-
-//! Main loop
+//! ## Main loop
 while (ros::ok()) {
 
-	//! Send control command to Rollo
+	//! - Send control command to Rollo
 	rv = udpSend(ip, port, Message);
 
-	//! Check if emergency condition has been met
+	//! - Check if emergency condition has been met:
 	currentTime = ros::Time::now().toSec();
 	if (abs(lastMessageTime - currentTime) > abs(EmergencyTime)) {
-		//! Print emergency message
+		//! - Print emergency message
 		ROS_INFO("[Rollo][%s][Emergency stop][Emergency time: %d] Apparent loss of connection to control node!", NodeName, EmergencyTime); //DB
-		//! Conduct emergency stop
+		//! - Conduct emergency stop
 		for (int i = 0; i < 10; i++) //! Send emergency message 10 times
 			rv = udpSend(ip, port, MessageEmergencyStop);
-		//! Hard condition emergency procedure
+		//! - Hard condition emergency procedure\n
 		//! Exit with an error code if hard condition is set by using negative values for emergency time
 		if (EmergencyTime < 0) return 128;
-		//! Soft condition emergency procedure
+		//! - Soft condition emergency procedure\n
 		FlagEmergency = 1; //! Set emergency flag
-		while (FlagEmergency && ros::ok()) {
+		while (FlagEmergency && ros::ok()) { //! Empty procedure sequence if emergency flag is raised
 
-			//! ROS spinOnce
+			//! - ROS spinOnce
 			ros::spinOnce();
 
-			//! Sleep before running loop again
+			//! - Sleep before running loop again
 			frequency.sleep();
 
 		}
@@ -435,18 +460,19 @@ while (ros::ok()) {
 	// //! Publish encoder readings
 	// VelocityL = v_l;
 	// VelocityR = v_r;
-//! Callback function for subscriber
+	//! Callback function for subscriber
 
-	//! Compose message
+	//! - Compose message
 	PubRolloWheelSpeed.header.stamp = ros::Time::now();
 	// PubRolloWheelSpeed.wheelspeedleft = v_l;
 	// PubRolloWheelSpeed.wheelspeedright = v_r;
 	PubRolloWheelSpeed.wheelspeedleft = VelocityL;
 	PubRolloWheelSpeed.wheelspeedright = VelocityR;
 
-	//! Publish message
+	//! - Publish message
 	PubRollo.publish(PubRolloWheelSpeed);
 
+	//! - Print published message
 	ROS_INFO("[Rollo][%s][Pub] Message: [%d|%d|%d], L[%d], R[%d]", NodeName, Message[0], Message[1], Message[2], VelocityL, VelocityR); //DB
 	// ROS_INFO("[Rollo][%s][Pub] TS[%d.%d] L[%d] R[%d]", NodeName, PubRolloWheelSpeed.header.stamp.sec, PubRolloWheelSpeed.header.stamp.nsec, PubRolloWheelSpeed.wheelspeedleft, PubRolloWheelSpeed.wheelspeedright); //DB
 
@@ -459,7 +485,7 @@ while (ros::ok()) {
 	//! Increase loopcounter
 	loopcounter++;
 }
-//! Main loop end
+//! ## Main loop end
 
 return 0;
 
