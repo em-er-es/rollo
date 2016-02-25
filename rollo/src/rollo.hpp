@@ -16,9 +16,14 @@
 #define ROLLO_AXLE_L 0.0205
 //! Wheel radius:
 //! - Left
-#define ROLLO_WHEEL_RADIUS_L 0.020
+#define ROLLO_WHEEL_RADIUS_L 0.0076
 //! - Right
-#define ROLLO_WHEEL_RADIUS_R 0.020
+#define ROLLO_WHEEL_RADIUS_R 0.0076
+// Original values
+// //! - Left
+// #define ROLLO_WHEEL_RADIUS_L 0.020
+// //! - Right
+// #define ROLLO_WHEEL_RADIUS_R 0.020
 //! Number of wheels
 #define ROLLO_WHEEL_N 4
 //! Maximum speed [%]
