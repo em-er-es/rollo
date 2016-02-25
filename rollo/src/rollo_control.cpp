@@ -61,6 +61,7 @@
  *! Problem with delay: keys can be hold and the command registers and sends old strokes
  * TODO later
  * Values are not kept at their previous level, a linear decline might be better
+ * Add digits as velocity set mechanism
 // */
 
 #include "ros/ros.h"
