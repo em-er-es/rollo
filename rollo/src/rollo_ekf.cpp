@@ -13,7 +13,7 @@
  * Based on input from communication node in form of control commands and measurement from preprocessor node,
  * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance.
  * 
- * Localisation of the robot consists of 3 states: 
+ * Localization of the robot consists of 3 states: 
  *  - Position (x, y)
  *  - Orientation (Theta)
  * 
