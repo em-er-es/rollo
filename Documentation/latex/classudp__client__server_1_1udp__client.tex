@@ -1,0 +1,152 @@
+\hypertarget{classudp__client__server_1_1udp__client}{}\section{udp\+\_\+client\+\_\+server\+:\+:udp\+\_\+client Class Reference}
+\label{classudp__client__server_1_1udp__client}\index{udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classudp__client__server_1_1udp__client_a2d019e5e93a971262f3ee4476be0427a}{udp\+\_\+client} (const std\+::string \&addr, int \hyperlink{rollo__comm_8cpp_a63c89c04d1feae07ca35558055155ffb}{port})
+\begin{DoxyCompactList}\small\item\em Initialize a U\+D\+P client object. \end{DoxyCompactList}\item 
+\hyperlink{classudp__client__server_1_1udp__client_a2d86924b0df64eaa14db80ece0ab7812}{$\sim$udp\+\_\+client} ()
+\begin{DoxyCompactList}\small\item\em Clean up the U\+D\+P client object. \end{DoxyCompactList}\item 
+int \hyperlink{classudp__client__server_1_1udp__client_adb58b691a3fb90f86d6643e01123d528}{get\+\_\+socket} () const 
+\begin{DoxyCompactList}\small\item\em Retrieve a copy of the socket identifier. \end{DoxyCompactList}\item 
+int \hyperlink{classudp__client__server_1_1udp__client_ab4d8fc06bab9b1ab1435fa9d9a7bd9f8}{get\+\_\+port} () const 
+\begin{DoxyCompactList}\small\item\em Retrieve the port used by this U\+D\+P client. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{classudp__client__server_1_1udp__client_a1fbf29e1facd0a802a5032aa0273af63}{get\+\_\+addr} () const 
+\begin{DoxyCompactList}\small\item\em Retrieve a copy of the address. \end{DoxyCompactList}\item 
+int \hyperlink{classudp__client__server_1_1udp__client_ac296d1fb6a6006bec5f8f14a81367d0a}{send} (const char $\ast$msg, size\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Send a message through this U\+D\+P client. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classudp__client__server_1_1udp__client_a2d019e5e93a971262f3ee4476be0427a}{}\index{udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}!udp\+\_\+client@{udp\+\_\+client}}
+\index{udp\+\_\+client@{udp\+\_\+client}!udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}}
+\subsubsection[{udp\+\_\+client(const std\+::string \&addr, int port)}]{\setlength{\rightskip}{0pt plus 5cm}udp\+\_\+client\+\_\+server\+::udp\+\_\+client\+::udp\+\_\+client (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{addr, }
+\item[{int}]{port}
+\end{DoxyParamCaption}
+)}\label{classudp__client__server_1_1udp__client_a2d019e5e93a971262f3ee4476be0427a}
+
+
+Initialize a U\+D\+P client object. 
+
+This function initializes the U\+D\+P client object using the address and the port as specified.
+
+The port is expected to be a host side port number (i.\+e. 59200).
+
+The {\ttfamily addr} parameter is a textual address. It may be an I\+Pv4 or I\+Pv6 address and it can represent a host name or an address defined with just numbers. If the address cannot be resolved then an error occurs and constructor throws.
+
+\begin{DoxyNote}{Note}
+The socket is open in this process. If you fork() or exec() then the socket will be closed by the operating system.
+\end{DoxyNote}
+\begin{DoxyWarning}{Warning}
+We only make use of the first address found by getaddrinfo(). All the other addresses are ignored.
+\end{DoxyWarning}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em \hyperlink{classudp__client__server_1_1udp__client__server__runtime__error}{udp\+\_\+client\+\_\+server\+\_\+runtime\+\_\+error}} & The server could not be initialized properly. Either the address cannot be resolved, the port is incompatible or not available, or the socket could not be created.\\
+\hline
+\end{DoxyExceptions}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em addr} & The address to convert to a numeric I\+P. \\
+\hline
+\mbox{\tt in}  & {\em port} & The port number. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classudp__client__server_1_1udp__client_a2d86924b0df64eaa14db80ece0ab7812}{}\index{udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}!````~udp\+\_\+client@{$\sim$udp\+\_\+client}}
+\index{````~udp\+\_\+client@{$\sim$udp\+\_\+client}!udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}}
+\subsubsection[{$\sim$udp\+\_\+client()}]{\setlength{\rightskip}{0pt plus 5cm}udp\+\_\+client\+\_\+server\+::udp\+\_\+client\+::$\sim$udp\+\_\+client (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classudp__client__server_1_1udp__client_a2d86924b0df64eaa14db80ece0ab7812}
+
+
+Clean up the U\+D\+P client object. 
+
+This function frees the address information structure and close the socket before returning. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classudp__client__server_1_1udp__client_a1fbf29e1facd0a802a5032aa0273af63}{}\index{udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}!get\+\_\+addr@{get\+\_\+addr}}
+\index{get\+\_\+addr@{get\+\_\+addr}!udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}}
+\subsubsection[{get\+\_\+addr() const }]{\setlength{\rightskip}{0pt plus 5cm}std\+::string udp\+\_\+client\+\_\+server\+::udp\+\_\+client\+::get\+\_\+addr (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classudp__client__server_1_1udp__client_a1fbf29e1facd0a802a5032aa0273af63}
+
+
+Retrieve a copy of the address. 
+
+This function returns a copy of the address as it was specified in the constructor. This does not return a canonalized version of the address.
+
+The address cannot be modified. If you need to send data on a different address, create a new U\+D\+P client.
+
+\begin{DoxyReturn}{Returns}
+A string with a copy of the constructor input address. 
+\end{DoxyReturn}
+\hypertarget{classudp__client__server_1_1udp__client_ab4d8fc06bab9b1ab1435fa9d9a7bd9f8}{}\index{udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}!get\+\_\+port@{get\+\_\+port}}
+\index{get\+\_\+port@{get\+\_\+port}!udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}}
+\subsubsection[{get\+\_\+port() const }]{\setlength{\rightskip}{0pt plus 5cm}int udp\+\_\+client\+\_\+server\+::udp\+\_\+client\+::get\+\_\+port (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classudp__client__server_1_1udp__client_ab4d8fc06bab9b1ab1435fa9d9a7bd9f8}
+
+
+Retrieve the port used by this U\+D\+P client. 
+
+This function returns the port used by this U\+D\+P client. The port is defined as an integer, host side.
+
+\begin{DoxyReturn}{Returns}
+The port as expected in a host integer. 
+\end{DoxyReturn}
+\hypertarget{classudp__client__server_1_1udp__client_adb58b691a3fb90f86d6643e01123d528}{}\index{udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}!get\+\_\+socket@{get\+\_\+socket}}
+\index{get\+\_\+socket@{get\+\_\+socket}!udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}}
+\subsubsection[{get\+\_\+socket() const }]{\setlength{\rightskip}{0pt plus 5cm}int udp\+\_\+client\+\_\+server\+::udp\+\_\+client\+::get\+\_\+socket (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classudp__client__server_1_1udp__client_adb58b691a3fb90f86d6643e01123d528}
+
+
+Retrieve a copy of the socket identifier. 
+
+This function return the socket identifier as returned by the socket() function. This can be used to change some flags.
+
+\begin{DoxyReturn}{Returns}
+The socket used by this U\+D\+P client. 
+\end{DoxyReturn}
+\hypertarget{classudp__client__server_1_1udp__client_ac296d1fb6a6006bec5f8f14a81367d0a}{}\index{udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}!send@{send}}
+\index{send@{send}!udp\+\_\+client\+\_\+server\+::udp\+\_\+client@{udp\+\_\+client\+\_\+server\+::udp\+\_\+client}}
+\subsubsection[{send(const char $\ast$msg, size\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}int udp\+\_\+client\+\_\+server\+::udp\+\_\+client\+::send (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{msg, }
+\item[{size\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)}\label{classudp__client__server_1_1udp__client_ac296d1fb6a6006bec5f8f14a81367d0a}
+
+
+Send a message through this U\+D\+P client. 
+
+This function sends {\ttfamily msg} through the U\+D\+P client socket. The function cannot be used to change the destination as it was defined when creating the \hyperlink{classudp__client__server_1_1udp__client}{udp\+\_\+client} object.
+
+The size must be small enough for the message to fit. In most cases we use these in Snap! to send very small signals (i.\+e. 4 bytes commands.) Any data we would want to share remains in the Cassandra database so that way we can avoid losing it because of a U\+D\+P message.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em msg} & The message to send. \\
+\hline
+\mbox{\tt in}  & {\em size} & The number of bytes representing this message.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 if an error occurs, otherwise the number of bytes sent. errno is set accordingly on error. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/emeres/.\+hdd/\+Documents/\+Studia/\+Università degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/udp.\+h\item 
+/home/emeres/.\+hdd/\+Documents/\+Studia/\+Università degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/udp.\+cpp\end{DoxyCompactItemize}

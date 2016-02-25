@@ -1,0 +1,155 @@
+\hypertarget{rollo__control_8cpp}{}\section{/home/emeres/.hdd/\+Documents/\+Studia/\+Università degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/rollo\+\_\+control.cpp File Reference}
+\label{rollo__control_8cpp}\index{/home/emeres/.\+hdd/\+Documents/\+Studia/\+Università degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/rollo\+\_\+control.\+cpp@{/home/emeres/.\+hdd/\+Documents/\+Studia/\+Università degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/rollo\+\_\+control.\+cpp}}
+
+
+Takes input from keyboard and publishes commands to control Rollo.  
+
+
+{\ttfamily \#include \char`\"{}ros/ros.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}geometry\+\_\+msgs/\+Twist.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}geometry\+\_\+msgs/\+Vector3.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$termios.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$sstream$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include \char`\"{}rollo.\+hpp\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{rollo__control_8cpp_a97e9b1fe8d4c010474637a654aad6566}{kbhit} (void)
+\begin{DoxyCompactList}\small\item\em kbhit function \end{DoxyCompactList}\item 
+void \hyperlink{rollo__control_8cpp_a6d79a1785626663654144c02e56cd17d}{decode\+Key} (char character, double \&Speed, double \&Turn)
+\begin{DoxyCompactList}\small\item\em Decode key. \end{DoxyCompactList}\item 
+int \hyperlink{rollo__control_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main} (int argc, char $\ast$$\ast$argv)
+\begin{DoxyCompactList}\small\item\em Main. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{rollo__control_8cpp_ac9c755d41ea44e27fdce963bd3ac8d50}{}char \hyperlink{rollo__control_8cpp_ac9c755d41ea44e27fdce963bd3ac8d50}{Node\+Name} \mbox{[}20\mbox{]} = C2 C\+T \hyperlink{rollo_8hpp_a876ce77f3c672c7162658151e648389e}{C\+R}\label{rollo__control_8cpp_ac9c755d41ea44e27fdce963bd3ac8d50}
+
+\begin{DoxyCompactList}\small\item\em Global variables. \end{DoxyCompactList}\item 
+\hypertarget{rollo__control_8cpp_a88720e7d89de956a13c9cf8eb60aa489}{}char {\bfseries Topic\+Cmd\+Vel} \mbox{[}64\mbox{]} = T\+O\+P\+I\+C\+\_\+\+C\+T\+R\+L\+\_\+\+C\+M\+D\+\_\+\+V\+E\+L\label{rollo__control_8cpp_a88720e7d89de956a13c9cf8eb60aa489}
+
+\item 
+\hypertarget{rollo__control_8cpp_a8c8357c45dd539060a8c8b99ef9985f7}{}double {\bfseries Velocity\+Fwd\+\_\+limit} = 1\label{rollo__control_8cpp_a8c8357c45dd539060a8c8b99ef9985f7}
+
+\item 
+\hypertarget{rollo__control_8cpp_a662ee9680bd369def3f520d7c277ba87}{}double {\bfseries Velocity\+Rev\+\_\+limit} = -\/1\label{rollo__control_8cpp_a662ee9680bd369def3f520d7c277ba87}
+
+\item 
+\hypertarget{rollo__control_8cpp_a40072e0610f63e36239c9725a24231b7}{}double {\bfseries L\+Keys\+Steps} = 0.\+1\label{rollo__control_8cpp_a40072e0610f63e36239c9725a24231b7}
+
+\item 
+\hypertarget{rollo__control_8cpp_a49922af886799b5e27bf51c1a765c0d1}{}double {\bfseries R\+Keys\+Linear\+V} = 0.\+4\label{rollo__control_8cpp_a49922af886799b5e27bf51c1a765c0d1}
+
+\item 
+\hypertarget{rollo__control_8cpp_ac613f20b85195c2f2e0d413613fa5b4d}{}double {\bfseries R\+Keys\+Angular\+V} = 1\label{rollo__control_8cpp_ac613f20b85195c2f2e0d413613fa5b4d}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Takes input from keyboard and publishes commands to control Rollo. 
+
+\begin{DoxyAuthor}{Author}
+Rabbia Asghar 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+18/2/16 \subsubsection*{Robot control using following keys }
+\end{DoxyDate}
+Moving around\+: u i o j k l \subsubsection*{m , . }
+
+q/z \+: increase/decrease speed by 0.\+1 w/x \+: increase/decrease only linear speed by 0.\+1 \subsubsection*{e/c \+: increase/decrease only angular speed by 0.\+1 }
+
+Other keys \+: stop $<$\+C\+T\+R\+L$>$-\/\+C \+: quit Python script available online used as reference \begin{DoxySeeAlso}{See also}
+\href{https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py}{\tt https\+://github.\+com/ros-\/teleop/teleop\+\_\+twist\+\_\+keyboard/blob/master/teleop\+\_\+twist\+\_\+keyboard.\+py} 
+\end{DoxySeeAlso}
+
+
+\subsection{Function Documentation}
+\hypertarget{rollo__control_8cpp_a6d79a1785626663654144c02e56cd17d}{}\index{rollo\+\_\+control.\+cpp@{rollo\+\_\+control.\+cpp}!decode\+Key@{decode\+Key}}
+\index{decode\+Key@{decode\+Key}!rollo\+\_\+control.\+cpp@{rollo\+\_\+control.\+cpp}}
+\subsubsection[{decode\+Key(char character, double \&\+Speed, double \&\+Turn)}]{\setlength{\rightskip}{0pt plus 5cm}void decode\+Key (
+\begin{DoxyParamCaption}
+\item[{char}]{character, }
+\item[{double \&}]{Speed, }
+\item[{double \&}]{Turn}
+\end{DoxyParamCaption}
+)}\label{rollo__control_8cpp_a6d79a1785626663654144c02e56cd17d}
+
+
+Decode key. 
+
+Computes command linear and angular velocities depending on the keyboard key pressed. The function takes keyboard key pressed character {\ttfamily as} input argument. Parameters declared by reference\+: {\ttfamily \&Speed}, and {\ttfamily \&Turn}. \begin{DoxyReturn}{Returns}
+N\+U\+L\+L 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\href{https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py}{\tt https\+://github.\+com/ros-\/teleop/teleop\+\_\+twist\+\_\+keyboard/blob/master/teleop\+\_\+twist\+\_\+keyboard.\+py} 
+\end{DoxySeeAlso}
+Turn limits \hypertarget{rollo__control_8cpp_a97e9b1fe8d4c010474637a654aad6566}{}\index{rollo\+\_\+control.\+cpp@{rollo\+\_\+control.\+cpp}!kbhit@{kbhit}}
+\index{kbhit@{kbhit}!rollo\+\_\+control.\+cpp@{rollo\+\_\+control.\+cpp}}
+\subsubsection[{kbhit(void)}]{\setlength{\rightskip}{0pt plus 5cm}int kbhit (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{rollo__control_8cpp_a97e9b1fe8d4c010474637a654aad6566}
+
+
+kbhit function 
+
+Checks if a key is pressed on keyboard and returns it. \begin{DoxyReturn}{Returns}
+1 if a key is pressed on keyboard, otherwise 0. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\href{https://github.com/sdipendra/ros-projects/blob/master/src/keyboard_non_blocking_input/src/keyboard_non_blocking_input_node.cpp}{\tt https\+://github.\+com/sdipendra/ros-\/projects/blob/master/src/keyboard\+\_\+non\+\_\+blocking\+\_\+input/src/keyboard\+\_\+non\+\_\+blocking\+\_\+input\+\_\+node.\+cpp} 
+\end{DoxySeeAlso}
+\hypertarget{rollo__control_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{}\index{rollo\+\_\+control.\+cpp@{rollo\+\_\+control.\+cpp}!main@{main}}
+\index{main@{main}!rollo\+\_\+control.\+cpp@{rollo\+\_\+control.\+cpp}}
+\subsubsection[{main(int argc, char $\ast$$\ast$argv)}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$$\ast$}]{argv}
+\end{DoxyParamCaption}
+)}\label{rollo__control_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}
+
+
+Main. 
+
+Initializes variables, nodehandle, reads and translated input information into command messages. Accepts 1 argument from command line\+: rate. Default rate is 10 \mbox{[}Hz\mbox{]}. The commands are published to topic /\+Rollo/cmd\+\_\+vel in configuration in format geometry\+\_\+msgs\+::\+Twist \begin{DoxyReturn}{Returns}
+0 
+\end{DoxyReturn}
+Initialization
+
+Initialize nodehandle for publisher
+
+Publisher initialization with topic, message format and queue size definition
+
+Node arguments using command line
+
+Initialize node parameters from launch file or command line. Use a private node handle so that multiple instances of the node can be run simultaneously while using different parameters.
+
+Publishing rate \mbox{[}Hz\mbox{]}
+
+Publisher variables for conventional messages
+
+Initialize variables for computing linear and angular velocity of the robot
+
+Main loop
+
+Read if any keyboard key is pressed
+
+Read character
+
+Decode key pressed
+
+Prepare message to publish linear and angular velocity
+
+Publish message in Twist format
+
+R\+O\+S spin\+Once
+
+Sleep before running loop again
+
+Main loop end 

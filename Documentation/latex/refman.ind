@@ -1,0 +1,157 @@
+\begin{theindex}
+
+  \item {/home/emeres/.\+hdd/\+Documents/\+Studia/\+Universit\IeC {\`a} degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/rollo\+\_\+comm.\+cpp}, 
+		\hyperpage{13}
+  \item {/home/emeres/.\+hdd/\+Documents/\+Studia/\+Universit\IeC {\`a} degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/rollo\+\_\+control.\+cpp}, 
+		\hyperpage{17}
+  \item {/home/emeres/.\+hdd/\+Documents/\+Studia/\+Universit\IeC {\`a} degli studi di Genova/\+D\+I\+B\+R\+I\+S/\+Tutti i corsi/86805 -\/ S\+O\+F\+T\+W\+A\+R\+E A\+R\+C\+H\+I\+T\+E\+C\+T\+U\+R\+E\+S F\+O\+R R\+O\+B\+O\+T\+I\+C\+S/\+A\+S01/rollo/src/rollo\+\_\+ekf.\+cpp}, 
+		\hyperpage{19}
+  \item {$\sim$udp\+\_\+client}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+client}, 
+		\hyperpage{8}
+  \item {$\sim$udp\+\_\+server}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, 
+		\hyperpage{10}
+
+  \indexspace
+
+  \item {decode\+Key}
+    \subitem {rollo\+\_\+control.\+cpp}, \hyperpage{18}
+  \item {decode\+Velocities}
+    \subitem {rollo\+\_\+comm.\+cpp}, \hyperpage{14}
+
+  \indexspace
+
+  \item {F\+S\+T\+A\+T\+E}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{21}
+
+  \indexspace
+
+  \item {get\+\_\+addr}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+client}, 
+		\hyperpage{8}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, 
+		\hyperpage{10}
+  \item {get\+\_\+port}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+client}, 
+		\hyperpage{8}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, 
+		\hyperpage{11}
+  \item {get\+\_\+socket}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+client}, 
+		\hyperpage{8}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, 
+		\hyperpage{11}
+
+  \indexspace
+
+  \item {H\+M\+E\+A\+S}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{21}
+
+  \indexspace
+
+  \item {interpolate\+Measurement}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{21}
+  \item {interpolate\+Odometry}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{22}
+
+  \indexspace
+
+  \item {Jacobian\+F\+S\+T\+A\+T\+E}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{22}
+
+  \indexspace
+
+  \item {kbhit}
+    \subitem {rollo\+\_\+control.\+cpp}, \hyperpage{18}
+
+  \indexspace
+
+  \item {main}
+    \subitem {rollo\+\_\+comm.\+cpp}, \hyperpage{15}
+    \subitem {rollo\+\_\+control.\+cpp}, \hyperpage{18}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{22}
+
+  \indexspace
+
+  \item {Node\+Name}
+    \subitem {rollo\+\_\+comm.\+cpp}, \hyperpage{16}
+
+  \indexspace
+
+  \item {recv}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, 
+		\hyperpage{11}
+  \item {rollo\+\_\+comm.\+cpp}
+    \subitem {decode\+Velocities}, \hyperpage{14}
+    \subitem {main}, \hyperpage{15}
+    \subitem {Node\+Name}, \hyperpage{16}
+    \subitem {subscriber\+Callback}, \hyperpage{16}
+    \subitem {udp\+Send}, \hyperpage{16}
+  \item {rollo\+\_\+control.\+cpp}
+    \subitem {decode\+Key}, \hyperpage{18}
+    \subitem {kbhit}, \hyperpage{18}
+    \subitem {main}, \hyperpage{18}
+  \item {rollo\+\_\+ekf.\+cpp}
+    \subitem {F\+S\+T\+A\+T\+E}, \hyperpage{21}
+    \subitem {H\+M\+E\+A\+S}, \hyperpage{21}
+    \subitem {interpolate\+Measurement}, \hyperpage{21}
+    \subitem {interpolate\+Odometry}, \hyperpage{22}
+    \subitem {Jacobian\+F\+S\+T\+A\+T\+E}, \hyperpage{22}
+    \subitem {main}, \hyperpage{22}
+    \subitem {subscriber\+Callback\+Control\+Input}, \hyperpage{24}
+    \subitem {subscriber\+Callback\+Measurement}, \hyperpage{24}
+    \subitem {z\+Pose2\+D\+Stamped}, \hyperpage{24}
+
+  \indexspace
+
+  \item {send}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+client}, 
+		\hyperpage{8}
+  \item {subscriber\+Callback}
+    \subitem {rollo\+\_\+comm.\+cpp}, \hyperpage{16}
+  \item {subscriber\+Callback\+Control\+Input}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{24}
+  \item {subscriber\+Callback\+Measurement}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{24}
+
+  \indexspace
+
+  \item {timed\+\_\+recv}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, 
+		\hyperpage{11}
+
+  \indexspace
+
+  \item {udp\+\_\+client}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+client}, 
+		\hyperpage{7}
+  \item {udp\+\_\+client\+\_\+server\+::udp\+\_\+client}, \hyperpage{7}
+    \subitem {$\sim$udp\+\_\+client}, \hyperpage{8}
+    \subitem {get\+\_\+addr}, \hyperpage{8}
+    \subitem {get\+\_\+port}, \hyperpage{8}
+    \subitem {get\+\_\+socket}, \hyperpage{8}
+    \subitem {send}, \hyperpage{8}
+    \subitem {udp\+\_\+client}, \hyperpage{7}
+  \item {udp\+\_\+client\+\_\+server\+::udp\+\_\+client\+\_\+server\+\_\+runtime\+\_\+error}, 
+		\hyperpage{9}
+  \item {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, \hyperpage{9}
+    \subitem {$\sim$udp\+\_\+server}, \hyperpage{10}
+    \subitem {get\+\_\+addr}, \hyperpage{10}
+    \subitem {get\+\_\+port}, \hyperpage{11}
+    \subitem {get\+\_\+socket}, \hyperpage{11}
+    \subitem {recv}, \hyperpage{11}
+    \subitem {timed\+\_\+recv}, \hyperpage{11}
+    \subitem {udp\+\_\+server}, \hyperpage{10}
+  \item {udp\+\_\+server}
+    \subitem {udp\+\_\+client\+\_\+server\+::udp\+\_\+server}, 
+		\hyperpage{10}
+  \item {udp\+Send}
+    \subitem {rollo\+\_\+comm.\+cpp}, \hyperpage{16}
+
+  \indexspace
+
+  \item {z\+Pose2\+D\+Stamped}
+    \subitem {rollo\+\_\+ekf.\+cpp}, \hyperpage{24}
+
+\end{theindex}
