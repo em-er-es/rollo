@@ -8,18 +8,18 @@
  * @brief Communication between ROS and Rollo
  * 
  * Command prototype: <b>rosrun rollo rollo_control _rate:=10 _ip:=192.168.0.120 _port:=900 _em:=3 _square:=0 _forwardtime:=25 _turntime:=6 _squarespeed:=0.4</b>
- *  - rate: Command sending frequency of the node <!10 [Hz]>
- *  - ip: Internet protocl address of target robot <!192.168.0.120 [1]>
- *  - port: User datagram protocol taget connection port <!900 [1]>
- *  - em: Emergency time <!3 [s]>
- *  - square: Square test switch <!0 [1]>:
- *    - 0 -- Off
- *    - 1 -- Simple square test
- *    - 2 -- Double square test
- *    - n -- N-th order square test
- *  - forwardtime: Time for forward motion of robot <!25 [s]>
- *  - turntime: Time for turning the robot <!6 [s]>
- *  - squarespeed: Square test forward motion speed <!0.4 [1]>:
+ * \param rate: Command sending frequency of the node <!10 [Hz]>
+ * \param ip: Internet protocl address of target robot <!192.168.0.120 [1]>
+ * \param port: User datagram protocol taget connection port <!900 [1]>
+ * \param em: Emergency time <!3 [s]>
+ * \param square: Square test switch <!0 [1]>:
+ *   - 0 -- Off
+ *   - 1 -- Simple square test
+ *   - 2 -- Double square test
+ *   - n -- N-th order square test
+ * \param forwardtime: Time for forward motion of robot <!25 [s]>
+ * \param turntime: Time for turning the robot <!6 [s]>
+ * \param squarespeed: Square test forward motion speed <!0.4 [1]>:
  * 
  * Provides basic communication structure between ROS holding nodes used for localization and Rollo.\n
  * Main aspects include:

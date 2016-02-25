@@ -8,7 +8,7 @@
  * @brief Convert input from keyboard and publish control commands for Rollo
  * 
  * Command prototype: <b>rosrun rollo rollo_control _rate:=10</b>
- *  - rate: Running frequency of the node <!10 [Hz]>
+ * \param rate Running frequency of the node <!10 [Hz]>
  *
  * Robot control using following key sets
  * 
@@ -165,6 +165,7 @@ void decodeKey (char character, double &Speed, double &Turn)
 		case 'F':	Speed = -1.0; Turn = 0; break;
 
 		//! Right key set control
+		//TODO double check with left key set, then get rid of
 		// case 'u':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
 		// case 'i':	Speed = 1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
 		// case 'o':	Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
@@ -189,10 +190,6 @@ void decodeKey (char character, double &Speed, double &Turn)
 	}
 
 //! Velocity limits
-// Turn limits need further testing
-// if (Turn > 0.55) Turn = 0.55; else if (Turn < -0.60) Turn = -0.6;
-// double LimitVelocityF = 1;
-// double LimitVelocityR = -1;
 
 	//! Linear velocity limits
 	if (Speed > LimitVelocityF)
@@ -201,6 +198,7 @@ void decodeKey (char character, double &Speed, double &Turn)
 			Speed = LimitVelocityR;
 
 	//! Angular velocity limits
+	//TODO Use global variables for these values
 	// if (Turn > LimitVelocityF)
 	if (Turn > 0.55)
 			Turn = LimitVelocityF;
@@ -216,10 +214,7 @@ void decodeKey (char character, double &Speed, double &Turn)
 /**
  * @brief Node main
  *
- * Initialize variables, nodehandle, read and translate input information into command messages.\n
- * 
- * Arguments from command line:
- *  - rate <10 [Hz]>
+ * Initialize variables and nodehandle, read and translate input information into command messages.\n
  * 
  * Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @p geometry_msgs::Twist
  * 

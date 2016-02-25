@@ -8,9 +8,9 @@
  * @brief Preprocessor for Rollo measurement using Mocap OptiTrack motion capture data
  *
  * Command prototype: <b>rosrun rollo rollo_preprocessor _rate:=25 _samplesize:=4 _sampling:=0</b>
- *  - rate: Sampling frequency of the node <!25 [Hz]>
- *  - samplesize: Number of elements that are averaged/subsampled <!4 [1]>
- *  - sampling: Selects if the raw data should be subsampled after a certain delay or averaged over a certain period <!0 [1]>
+ * \param rate: Sampling frequency of the node <!25 [Hz]>
+ * \param samplesize: Number of elements that are averaged/subsampled <!4 [1]>
+ * \param sampling: Selects if the raw data should be subsampled after a certain delay or averaged over a certain period <!0 [1]>
  *    - sampling 0 sets subsampling
  *    - sampling !0 sets averaging
  *

@@ -8,7 +8,7 @@
  * @brief EKF implementation for localisation of the robot
  *
  * Command prototype: <b>rosrun rollo rollo_ekf _rate:=1:</b>
- *  - rate: Sampling frequency of the node <!1 [Hz]>
+ * \param rate: Sampling frequency of the node <!1 [Hz]>
  * 
  * Based on input from communication node in form of control commands and measurement from preprocessor node,
  * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance.
