@@ -62,7 +62,7 @@
 
 
 /* TODO
- * Get rid of warnings for multi-character constants and overflow
+ *! Get rid of warnings for multi-character constants and overflow
  * Implement squarespeed
  *! Define all possible messages by contructing them out of three bytes
  *! * 1: Movement/operation byte, 2: Left wheel speed, 3: Right wheel speed
@@ -73,6 +73,8 @@
  *! Priorotize safety over control
  * Define a function that will receive UDP packets
  * Define function to parse the ip address properly
+ * Determine square test turn by using negative square values
+ * For holomogenic robots implement forwards-backwards square test using negative squarespeed values
 // */
 
 
@@ -221,7 +223,8 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 			*(Mode) = 'F';
 		}
 		// else if (x < 0) {
-		else if (-x > tol) {
+		// else if (fabs(x) > tol) { // Works
+		else if (x < -tol) {
 			Message[0] = 0x7d;
 			*(Mode) = 'B';
 		}
@@ -343,7 +346,7 @@ double forwardtime = 25;
 private_node_handle_.param("square", square, int(0));
 private_node_handle_.param("forwardtime", forwardtime, double(25));
 private_node_handle_.param("turntime", turntime, double(6));
-private_node_handle_.param("squarespeed", square, double(0.4));
+private_node_handle_.param("squarespeed", squarespeed, double(0.4));
 
 //! Node frequency rate [Hz]
 if (rate_frequency < 0) rate_frequency = 1 / (rate_frequency);
@@ -365,7 +368,8 @@ udp_client_server::udp_client udpClient(ip, port);
 
 //! ## Square test
 //! Alternatively this square test could be in control node, however communication node is "closer" to Rollo
-	while ((square > 0) && ros::ok()) {
+	// while ((abs(square) > 0) && ros::ok()) {
+	while (square != 0 && ros::ok()) {
 
 		//! - Print information on current run
 		ROS_INFO("[Rollo][%s][Square test][%d]", NodeName, square); //DB
@@ -374,11 +378,19 @@ udp_client_server::udp_client udpClient(ip, port);
 		//warning: multi-character character constant [-Wmultichar]
 		//warning: overflow in implicit constant conversion [-Woverflow]
 		//FIX Implement squarespeed
-		char CmdTurn[4] = {'0x7b', '0x55', '0x11'}; //! - Compose turn command
-		if (square % 1) CmdTurn[0] = '0x7e'; else CmdTurn[0] = '0x7f'; //! - Check square run variable and determine turning direction
+		char CmdTurn[3] = {0x7b, 0x55, 0x11}; //! - Compose turn command
+		//! - Check square run variable and determine turning direction
+		if (square % 2) {
+			// printf("square % 2 = 1\n"); //DB
+			CmdTurn[0] = 0x7e;
+		} else {
+			// printf("square % 2 = 0\n"); //DB
+			CmdTurn[0] = 0x7f;
+		}
 		//! For multiple runs the robot would go back and forth providing more reliable data on the actual error
 		//! In ideal case even a high order square run would result in the robot being at the initial position with initial orientation
-		char CmdForward[3] = {'0x7c', '0x55', '0x11'}; //! - Compose forward command
+		char CmdForward[3] = {0x7c, 0x55, 0x11}; //! - Compose forward command
+		ROS_INFO("[Rollo][%s][Square test][%d] Message: [%d|%d|%d]", NodeName, square, CmdForward[0], CmdForward[1], CmdForward[2]); //DB
 		ROS_INFO("[Rollo][%s][Square test][%d] Turning: %d {dec}", NodeName, square, CmdTurn[0]); //DB
 		//! - Set initial time
 		double initialtime = ros::Time::now().toSec();
@@ -387,29 +399,50 @@ udp_client_server::udp_client udpClient(ip, port);
 
 		//! - Print square test parameters
 		// ROS_INFO("[Rollo][%s][Square test] Starting time %g, forward time %g, turning time %g", NodeName, initialtime, forwardtime, turntime); //DB
-		ROS_INFO("[Rollo][%s][Square test][%d] Forward time %g, forward speed %f, turning time %g", NodeName, square, squarespeed, forwardtime, turntime); //DB
+		ROS_INFO("[Rollo][%s][Square test][%d] Forward time %g, forward speed %f, turning time %g", NodeName, square, squarespeed, forwardtime, turntime); //VB
 
 		for (int i = 0; i < 4; i++) { //! ### Main square loop
 
 			//! Moving forward
-			ROS_INFO("[Rollo][%s][Square test][%d] Moving forward: %g [s] @ %f", NodeName, square, forwardtime, squarespeed); //DB
+			ROS_INFO("[Rollo][%s][Square test][%d] Moving forward: %g [s] @ %f", NodeName, square, forwardtime, squarespeed); //VB
 			for (int j = 0; j < 3; j++) bs += udpClient.send(CmdForward, nb); //! Send command 3 times
 			ros::Duration(forwardtime, 0).sleep(); //! Wait for the specified time to move forward
 			// Alternatively use a while loop here and update the command either at the rate of the loop or other
 
 			//! Turning
-			ROS_INFO("[Rollo][%s][Square test][%d] Turning: %g [s]", NodeName, square, turntime); //DB
+			ROS_INFO("[Rollo][%s][Square test][%d] Turning: %g [s]", NodeName, square, turntime); //VB
 			for (int j = 0; j < 3; j++) bs += udpClient.send(CmdTurn, nb); //! Send command 3 times
 			ros::Duration(turntime, 0).sleep(); //! Wait for the specified time to turn
 			// Alternatively use a while loop here and update the command either at the rate of the loop or other
 
 		} //! ### Main square loop end
 
-		double finishtime = ros::Time::now().toSec(); //! Update run finish time
-		//! Print duration time
-		ROS_INFO("[Rollo][%s][Square test][%d] Finished: %g [s]", NodeName, square, abs(finishtime - initialtime)); //DB
+			double finishtime = ros::Time::now().toSec(); //! Update run finish time
+			//! Print duration time
+			ROS_INFO("[Rollo][%s][Square test][%d] Finished: %g [s]", NodeName, square, abs(finishtime - initialtime)); //DB
 
-		if (square > 1) square--; else return 0; //! Update square run counter and check for exit condition
+		if (square > 1) {
+			//! Turn around
+			ROS_INFO("[Rollo][%s][Square test][%d] Turn around", NodeName, square); //VB
+			for (int j = 0; j < 3; j++) bs += udpClient.send(CmdTurn, nb); //! Send command 3 times
+			ros::Duration(2 * turntime, 0).sleep(); //! Wait for twice the specified time to turn around
+
+			//! Update square run counter and check for exit condition
+			square--;
+		} else {
+			//! Stop
+			ROS_INFO("[Rollo][%s][Square test][%d] Stop", NodeName, square); //VB
+			for (int j = 0; j < 10; j++) bs += udpClient.send(MessageEmergencyStop, nb); //! Send stop command 10 times
+
+			//! Update square run counter and check for exit condition
+			return 0;
+		}
+
+		// if (square > 1) square--;
+		// else return 0; //! Update square run counter and check for exit condition
+		// if (square > 1) square--;
+		// else if (square < 1) square++;
+		// else return 0;
 		// Alternative approaches for variable check and exit
 		// if (! square % 2) square--; else return 0;
 		// square--;
