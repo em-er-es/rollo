@@ -33,6 +33,7 @@
 
 /* TODO
  * Instead of using two parameters for samplesize and sampling/averaging, use one, where negative values are used for the least common operation and positive for the most common
+ * FIX DOXYGEN documentation
 // */
 
 
@@ -149,7 +150,7 @@ double average_theta = 0;
 rollo::Pose2DStamped PubRolloPositionPose2dStamped;
 PubRolloPositionPose2dStamped.header.frame_id = '1'; // Global frame
 
-//! - Debugging loop variable
+//! - Loop counter holder
 unsigned int loopcounter = 0;
 //! - Loop condition variable
 int loopcondition = 1; // For while(1) loop
@@ -199,7 +200,7 @@ do {
 
 	//! For averaging sleep for time defined by rate before reading states from the subscriber callback()
 	if (sampling != 0) frequency.sleep();
-	//! Increase loop counter
+	//! - Increase loop counter
 	loopcounter++;
 
 } while (loopcondition);
