@@ -53,9 +53,11 @@
  */
 
 /* TODO
-// *! Problem with delay: keys can be hold and the command registers and sends old strokes
-// * Values are not kept at their previous level, a linear decline might be better
-// * FIX DOXYGEN documentation format
+ * FIX DOXYGEN documentation format
+ * Double check corresponding key sets
+ *! Problem with delay: keys can be hold and the command registers and sends old strokes
+ * TODO later
+ * Values are not kept at their previous level, a linear decline might be better
 // */
 
 #include "ros/ros.h"
@@ -163,15 +165,24 @@ void decodeKey (char character, double &Speed, double &Turn)
 		case 'F':	Speed = -1.0; Turn = 0; break;
 
 		//! Right key set control
-		case 'u':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+		// case 'u':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+		// case 'i':	Speed = 1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
+		// case 'o':	Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
+		// case 'j':	Speed = 0 * RKeysLinearV; Turn = -1 * RKeysAngularV; break;
+		// case 'k':	Speed = 0 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
+		// case 'l':	Speed = 0 * RKeysLinearV; Turn = 1 * RKeysAngularV; break;
+		// case ',':	Speed = -1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
+		// case '.':	Speed = -1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
+		// case 'm':	Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+		case 'u':	Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
 		case 'i':	Speed = 1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
-		case 'o':	Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
-		case 'j':	Speed = 0 * RKeysLinearV; Turn = -1 * RKeysAngularV; break;
+		case 'o':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+		case 'j':	Speed = 0 * RKeysLinearV; Turn = 1 * RKeysAngularV; break;
 		case 'k':	Speed = 0 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
-		case 'l':	Speed = 0 * RKeysLinearV; Turn = 1 * RKeysAngularV; break;
+		case 'l':	Speed = 0 * RKeysLinearV; Turn = -1 * RKeysAngularV; break;
+		case 'm':	Speed = -1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
 		case ',':	Speed = -1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
-		case '.':	Speed = -1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
-		case 'm':	Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+		case '.':	Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
 
 		//! Default value
 		default:	Speed = 0; Turn = 0; break;
