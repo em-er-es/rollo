@@ -2,11 +2,11 @@
  * @file rollo_comm.cpp
  * @author Rabbia Asghar
  * @author Ernest Skrzypczyk
- * 
+ *
  * @date 18/2/16
- * 
+ *
  * @brief Communication between ROS and Rollo
- * 
+ *
  * Command prototype: <b>rosrun rollo rollo_control _rate:=10 _ip:=192.168.0.120 _port:=900 _em:=3 _square:=0 _forwardtime:=25 _turntime:=6 _squarespeed:=0.4</b>
  * \param rate: Command sending frequency of the node <!10 [Hz]>
  * \param ip: Internet protocl address of target robot <!192.168.0.120 [1]>
@@ -20,7 +20,7 @@
  * \param forwardtime: Time for forward motion of robot <!25 [s]>
  * \param turntime: Time for turning the robot <!6 [s]>
  * \param squarespeed: Square test forward motion speed <!0.4 [1]>:
- * 
+ *
  * Provides basic communication structure between ROS holding nodes used for localization and Rollo.\n
  * Main aspects include:
  *  - decoding linear and angular velocities provided by control node
@@ -79,7 +79,7 @@
 
 
 /**
- * @brief Global variables updated in the @p SubscriberCallback function, processed and used to send commands to the specified @p IP adress at the @p UDP port.
+ * @brief Global variables updated in the @p subscriberCallback() function, processed and used to send commands to the specified @p ip adress at the UDP @p port.
  *
  */
 
@@ -130,7 +130,13 @@ double RolloRange = RolloMax - RolloMin; //! Range of speed of the Rollo
  * @brief Decode linear and angular velocities
  *
  * Velocities are decoded and stored as partial bytes of the UDP packet
- * Parameters declared: @p x, @p z, @p &Message, @p VelocityL, @p VelocityR.
+ *
+ * \param x Linear velocity
+ * \param z Angular veolocity 
+ * \param &Message UDP message to be send to target robot
+ * \param VelocityL Decoded velocity [%]
+ * \param VelocityR Decoded velocity [%]
+ * 
  * @return 0
  */
 
@@ -154,22 +160,21 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 	// if (! (loopcounter % 10)) ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f] tol: %f)", NodeName, x, z, tol); //DB
 
 	// if (x == 0) { //! Ideal case
-	//! Since control node can provide abstract control values, an ideal case could be used for decoding velocities. 
+	//! Since control node can provide abstract control values, an ideal case could be used for decoding velocities.
 	//! This is discouraged, since using alternative control methods would probably have a realistic value set.\n
 	if (fabs(x) < tol) { //! Linear velocity is approximately 0:
 
-		if (z == 0) Message[0] = 0x7b; //! - Complete stop
-		// if (abs(x) < tol) Message[0] = 0x7b; //! Complete stop
-		// else if (z > 0) Message[0] = 0x7f; //! Right rotation
-		// else if (z < 0) Message[0] = 0x7e; //! Left rotation
-		// else if (z < 0) Message[0] = 0x7f; //! Right rotation
-		// else if (z > 0) Message[0] = 0x7e; //! Left rotation
+		if (z == 0) {
+			Message[0] = 0x7b; //! - Complete stop
+			VelocityL = 0;
+			VelocityR = 0;
+			Mode[0] = 'S';
+		}
 		else if (z < tol) Message[0] = 0x7f; //! - Right rotation
 		else if (z > tol) Message[0] = 0x7e; //! - Left rotation
 
 		Message[1] = 0x50; Message[2] = 0x10; //! - Lowest speeds for previous modes
 
-	// } else if (x != 0) { //! Determine speeds
 	} else if (fabs(x) > tol) { //! Linear velocity is above tolerance threshold
 		//! Determine speeds based on the position of the "dial" z:\n
 		//! <pre>
@@ -216,22 +221,14 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 		}
 
 		//! Determine forward or backward movement based on linear velocity
-		// if (x > 0) {
 		if (x > tol) {
-			Message[0] = 0x7c; 
-			// Mode[0] = 'F';
-			*(Mode) = 'F';
-		}
-		// else if (x < 0) {
-		// else if (fabs(x) > tol) { // Works
-		else if (x < -tol) {
+			Message[0] = 0x7c;
+			Mode[0] = 'F';
+			// *(Mode) = 'F';
+		} else if (x < -tol) {
 			Message[0] = 0x7d;
 			*(Mode) = 'B';
 		}
-		// } else if (z > 0) *(Mode) = 'R';
-		// else if (z < 0) *(Mode) = 'L';
-		// } else if (z > tol) *(Mode) = 'R';
-		// else if (z < tol) *(Mode) = 'L';
 
 	}
 
@@ -251,16 +248,13 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
  *
  * Read newest velocities from control node and translate them into UDP message. Update latest message time.
  *
+ * \param msg Message from control node containing linear and angular velocities
+ *
  * @return 0
  */
 
 void subscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
-	// double xt = msg->linear.x;
-	// double zt = msg->angular.z;
-	// decodeVelocities(xt, zt, Message); //! Update the UDP message
-	// decodeVelocities(msg->linear.x, msg->angular.z, Message); //! Update the UDP message
-	// decodeVelocities(Message); //! Update the UDP message
 	decodeVelocities(msg->linear.x, msg->angular.z, Message, VelocityL, VelocityR); //! Update the UDP message
 	lastMessageTime = ros::Time::now().toSec(); //! Update last message time
 	FlagEmergency = 0; //! Reset emergency flag
@@ -271,7 +265,9 @@ void subscriberCallback(const geometry_msgs::Twist::ConstPtr& msg)
  *
  * Send provided message using included UDP library command @p udp_client_server::udp_client.send()
  *
- * Parameters declared by reference: @p &ip, @p &port, @p &message.
+ * \param &ip IP address of the target robot
+ * \param &port UDP port of the target robot
+ * \param &message UDP message sent to robot
  *
  * @return Bytes sent
  */
@@ -298,6 +294,19 @@ int udpSend(char ip[16], int port, char *Message)
  *
  * Depending on specified parameters processes data from control node and Rollo
  * and transmits them to appropriate targets or runs a square test of n-th order
+ *
+ * \param rate: Command sending frequency of the node <!10 [Hz]>
+ * \param ip: Internet protocl address of target robot <!192.168.0.120 [1]>
+ * \param port: User datagram protocol taget connection port <!900 [1]>
+ * \param em: Emergency time <!3 [s]>
+ * \param square: Square test switch <!0 [1]>:
+ *   - 0 -- Off
+ *   - 1 -- Simple square test
+ *   - 2 -- Double square test
+ *   - n -- N-th order square test
+ * \param forwardtime: Time for forward motion of robot <!25 [s]>
+ * \param turntime: Time for turning the robot <!6 [s]>
+ * \param squarespeed: Square test forward motion speed <!0.4 [1]>:
  *
  * @return 0
  */
