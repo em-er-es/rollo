@@ -44,10 +44,15 @@ from rollo.msg import Pose2DStamped
 
 ''' TODO
  * ADD & FIX DOXYGEN documentation format
- * Subscribe to preprocessor topic
+ * Implement proper animation for pseudo realtime display of measurements
+ *! Subscribe to mocap topic (/Optitrack/ground_pose)
+ * Subscribe to preprocessor topic (Pose2Dstamped)
  *! Subscribe to EKF topic
  * 
  * TODO later
+ * Implement as small buffer for data as possible
+ * Double check results for animation
+ * Implement saving generated images to a video (code is there)
  * Implement saving generated images to a path
  * Implement a duration parameter
  * Add references from node to topics and console colours
@@ -109,22 +114,26 @@ def subscriberCallbackEKF(msg):
 
 	return 0
 
+## Animation
 # initialization function: plot the background of each frame
 def init():
-	plt.set_data([], [])
+	Pos.set_data([], [])
 	return line
 
 # animation function.  This is called sequentially
 def animate(i):
+	# global Pos
 	# of = np.rad2deg(MessageMeasurement.theta) - 90
 	# plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
 	# of = np.rad2deg(MessageEKF.pose2d.theta) - 90
 	# plt.plot(MessageEKF.pose2d.x, MessageEKF.pose2d.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
-	# x = np.linspace(0, 2, 1000)
+	x = np.linspace(0, 2, 1000)
 	# y = np.sin(2 * np.pi * (x - 0.01 * i))
-	plt.set_data(MessageMeasurement.x, MessageMeasurement.y)
+	# Pos.set_data(MessageMeasurement.x, MessageMeasurement.y)
+	Pos.set_data(x, MessageMeasurement.y)
+	# Pos.set_data(1*i, 2*i)
 	# return line
-	return line
+	return
 
 
 ## Generate and update plot
@@ -135,10 +144,11 @@ def generatePlot():
 	## Generate quiver plot
 	# plt.quiver(MessageMeasurement.x, MessageMeasurement.y, MessageMeasurement.theta)
 	# plt.quiver(MessageEKF.pose2d.x, MessageEKF.pose2d.y, MessageEKF.pose2d.theta, cmap='gray')
-	# of = np.rad2deg(MessageMeasurement.theta) - 90
-	# plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	of = np.rad2deg(MessageMeasurement.theta) - 90
+	# Pos = plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
 	# of = np.rad2deg(MessageEKF.pose2d.theta) - 90
-	# plt.plot(MessageEKF.pose2d.x, MessageEKF.pose2d.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	# PosY = plt.plot(MessageEKF.pose2d.x, MessageEKF.pose2d.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
 	# if (not loopcounter > 100):
 		# plt.ioff()
 		# plt.show()
@@ -152,17 +162,15 @@ def generatePlot():
 	# fig = plt.figure()
 	# ax = plt.axes(xlim=(0, 2), ylim=(-2, 2))
 	# line, = ax.plot([], [], lw=2)
-	global animate
 	# call the animator.  blit=True means only re-draw the parts that have changed.
-	anim = animation.FuncAnimation(figure, animate, init_func = init,
-								   frames = rate * 10, interval = rate, blit = True)
+	# anim = animation.FuncAnimation(figure, animate, init_func = init, frames = rate * 10, interval = rate, blit = True)
 
 	# save the animation as an mp4.  This requires ffmpeg or mencoder to be
 	# installed.  The extra_args ensure that the x264 codec is used, so that
 	# the video can be embedded in html5.  You may need to adjust this for
 	# your system: for more information, see
 	# http://matplotlib.sourceforge.net/api/animation_api.html
-	anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+	# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
 	plt.show()
 	## Reset subscriber flags
@@ -176,6 +184,10 @@ def generatePlot():
 ## Node main function
 
 def main():
+	""" Node main function
+	
+		More details
+	"""
 	## Initiliaze
 	global loopcounter
 
@@ -185,11 +197,14 @@ def main():
 
 	if loopcounter == 0:
 		figure = plt.figure()
+		# figure, ax = plt.subplots()
 		plt.axis([-4, 4, -4, 4])
 		plt.grid(1)
-		plt.ion()
-		plt.show()
+		# plt.ion()
+		# plt.show()
 		markerScale = 3
+		# Pos, = ax.plot(0)
+		# Pos, = plt.plot(0)
 
 	## Set frequency rate for visualization node
 	rosrate = rospy.Rate(rate)
@@ -208,7 +223,12 @@ def main():
 
 		if (flagSubscriber1 == True) and (flagSubscriber2 == True):
 			rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
-			generatePlot()
+			# generatePlot()
+			Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
+			global animate
+			# anim = animation.FuncAnimation(figure, animate, frames = 10, interval = 4, blit = True)
+			anim = animation.FuncAnimation(figure, animate, frames = 100, interval = 10)
+			# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
 		## Sleep to conform node frequency rate
 		rosrate.sleep()
