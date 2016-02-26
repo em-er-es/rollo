@@ -10,7 +10,8 @@
 #
 # Command prototype: <b>rosrun rollo rollo_visualization _rate:=25</b>
 # \param rate Running frequency of the node <!25 [Hz]>
-# \param savepath Save path of generated images <!.>
+# \param saveim Save path for generated images <!.>
+# \param savevid Save path for generated animation video <!.>
 # \param type Type of saved images <!png>
 # \param format Format of saved images (dim_x x dim_y) <!512>
 # \param duration Duration of visualization <!0>
