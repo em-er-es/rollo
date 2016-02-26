@@ -44,24 +44,6 @@
 #include "udp.h"
 
 
-// Naming conventions:
-// Global and important variables: CapitalLettersFullName
-// Local, temporary and irrelevant variables: shortlowercase
-// Functions priority: CapitalLettersFunctions
-// Functions conventional: firstLowerLetterFunction
-// Functions and variables special: _FullDescription
-// Comment switches: Debug //DB
-// Comment switches: Verbose //VB
-// Comment switches: Color //COLOR
-// Comment switches: Any other switch //RelevantCapitalLettersAbbreviation
-// Comment tags: Tasks needed to be fixed //FIX
-// Comment tags: Tasks left to do //TODO
-// Comment tags: Question //Q
-// Comment tags: Suggestion //S
-// Comment tags: Correct comment //CRC
-// Comment tags: Correct variable //CRV
-
-
 /* TODO
  * Implement squarespeed
  *! Correct output

@@ -3,9 +3,9 @@
 ## @file rollo_visualization.py
 # @author Rabbia Asghar
 # @author Ernest Skrzypczyk
-# 
+#
 # @date 25/2/16
-# 
+#
 # @brief Visualize motion capture data and EKF estimates
 #
 # Command prototype: <b>rosrun rollo rollo_visualization _rate:=25</b>
@@ -16,6 +16,24 @@
 # \param format Format of saved images (dim_x x dim_y) <!512>
 # \param duration Duration of visualization <!0>
 #
+
+
+''' TODO
+ * ADD & FIX DOXYGEN documentation format
+ * Implement proper animation for pseudo realtime display of measurements
+ *! Subscribe to mocap topic (/Optitrack/ground_pose)
+ * Subscribe to preprocessor topic (Pose2Dstamped)
+ *! Subscribe to EKF topic
+ *
+ * TODO later
+ * Implement as small buffer for data as possible
+ * Double check results for animation
+ * Implement saving generated images to a video (code is there)
+ * Implement saving generated images to a path
+ * Implement a duration parameter
+ * Add references from node to topics and console colours
+'''
+
 
 ## Import basic Python libraries
 from __future__ import print_function #Python2
@@ -43,22 +61,6 @@ from rollo.msg import EKF # Also works!
 ## Import Pose2DStamped message
 from rollo.msg import Pose2DStamped
 
-''' TODO
- * ADD & FIX DOXYGEN documentation format
- * Implement proper animation for pseudo realtime display of measurements
- *! Subscribe to mocap topic (/Optitrack/ground_pose)
- * Subscribe to preprocessor topic (Pose2Dstamped)
- *! Subscribe to EKF topic
- * 
- * TODO later
- * Implement as small buffer for data as possible
- * Double check results for animation
- * Implement saving generated images to a video (code is there)
- * Implement saving generated images to a path
- * Implement a duration parameter
- * Add references from node to topics and console colours
-'''
-
 ## Global variables
 
 ## Node name using console codes
@@ -78,6 +80,11 @@ rate = 25 # 25 [Hz] = 25 [fps]
 loopcounter = 0
 markerScale = 0
 
+## Plot contraints
+## Maximal coordinates - symmetrical
+axlx = 4
+axly = 4
+
 ## Global flags
 
 # if (loopcounter == 0):
@@ -87,7 +94,14 @@ flagSubscriber1 = False
 ## Global flag 2
 flagSubscriber2 = False
 
+## Global figure holder
 figure = 0
+
+## Global axis holder
+axis = 0
+
+## Global plot object holder
+Plot = plt.plot(0)
 
 ## Set pyplot to be non-interactive
 # plt.ioff()
@@ -129,18 +143,13 @@ def initAnimation():
 #
 # Sequentially called
 def animatePlot(i):
-	# global Pos
-	# of = np.rad2deg(MessageMeasurement.theta) - 90
-	# plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
-	# of = np.rad2deg(MessageEKF.pose2d.theta) - 90
-	# plt.plot(MessageEKF.pose2d.x, MessageEKF.pose2d.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
-	x = np.linspace(0, 2, 1000)
-	# y = np.sin(2 * np.pi * (x - 0.01 * i))
+	global Pos
+	# x = np.linspace(0, 2, 1000)
 	# Pos.set_data(MessageMeasurement.x, MessageMeasurement.y)
-	Pos.set_data(x, MessageMeasurement.y)
+	Pos.set_data(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
+	# Pos.set_data(x, MessageMeasurement.y)
 	# Pos.set_data(1*i, 2*i)
-	# return line
-	return
+	return Pos
 
 
 ## Generate and update plot
@@ -151,11 +160,11 @@ def generatePlot():
 	## Generate quiver plot
 	# plt.quiver(MessageMeasurement.x, MessageMeasurement.y, MessageMeasurement.theta)
 	# plt.quiver(MessageEKF.pose2d.x, MessageEKF.pose2d.y, MessageEKF.pose2d.theta, cmap='gray')
-	of = np.rad2deg(MessageMeasurement.theta) - 90
+	# of = np.rad2deg(MessageMeasurement.theta) - 90
+	of = np.rad2deg(MessageMeasurement.pose2d.theta) - 90
 	# Pos = plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
-	Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
-	# of = np.rad2deg(MessageEKF.pose2d.theta) - 90
-	# PosY = plt.plot(MessageEKF.pose2d.x, MessageEKF.pose2d.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
+	# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
+	Pos, = plt.plot(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
 	# if (not loopcounter > 100):
 		# plt.ioff()
 		# plt.show()
@@ -192,7 +201,7 @@ def generatePlot():
 
 def main():
 	""" Node main function
-	
+
 		More details
 	"""
 	##! Initiliaze:
@@ -207,7 +216,7 @@ def main():
 	if loopcounter == 0:
 		# figure = plt.figure()
 		figure, axis = plt.subplots()
-		plt.axis([-4, 4, -4, 4])
+		plt.axis([-axlx, axlx, -axly, axly])
 		plt.grid(1)
 		# plt.ion()
 		# plt.show()
@@ -222,9 +231,9 @@ def main():
 	rospy.Subscriber('/Rollo/ekf', EKF, subscriberCallbackEKF, queue_size = 1024)
 
 	## Subscribe to motion capture topic
-	# rospy.Subscriber('/Optitrack_Rollo/ground_pose', Pose2DStamped, subscriberCallbackMeasurement, queue_size = 1024)
-	rospy.Subscriber('/Optitrack_Rollo/ground_pose', Pose2D, subscriberCallbackMeasurement, queue_size = 1024)
-	# rospy.Subscriber('/Rollo/pose2dstamped', Pose2DStamped, subscriberCallbackMeasurement, queue_size = 1024)
+	# Can use both, but need another callback for that
+	# rospy.Subscriber('/Optitrack_Rollo/ground_pose', Pose2D, subscriberCallbackMeasurement, queue_size = 1024)
+	rospy.Subscriber('/Rollo/pose2dstamped', Pose2DStamped, subscriberCallbackMeasurement, queue_size = 1024)
 
 	while not rospy.is_shutdown():
 		## Main loop
@@ -233,7 +242,8 @@ def main():
 		if (flagSubscriber1 == True) and (flagSubscriber2 == True):
 			rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
 			# generatePlot()
-			Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
+			# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
+			Pos, = plt.plot(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
 			global animatePlot
 			# anim = animation.FuncAnimation(figure, animate, frames = 10, interval = 4, blit = True)
 			anim = animation.FuncAnimation(figure, animatePlot, frames = 100, interval = 10)

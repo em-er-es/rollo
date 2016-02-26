@@ -7,11 +7,11 @@
  *
  * @brief EKF implementation for localisation of the robot
  *
- * Command prototype: <b>rosrun rollo rollo_ekf _rate:=1:</b>
+ * Command prototype: <b>rosrun rollo rollo_ekf _rate:=1</b>
  * @param rate: Sampling frequency of the node <!1 [Hz]>
  *
  * Based on input from communication node in form of control commands and measurement from preprocessor node,
- * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance.
+ * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance. Additional infromation in form of odometry based state estimate are also published for easier analysis of the filter results.
  *
  * Localization of the robot consists of 3 states:
  *  - Position (x, y)
@@ -24,8 +24,8 @@
  * error is introduced through interpolating.
  * @see http://wiki.ros.org/robot_pose_ekf
  *
- * Kalman filter equations were first simulated in MATLAB, then translated into C++, compared and verified with previous results.
- *
+ * Kalman filter equations were first implemented in MATLAB, then translated into C++, compared and verified with previous results.
+ * 
  * @see https://github.com/em-er-es/rollo/
  *
  */
@@ -45,26 +45,6 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Cholesky>
 #include "rollo.hpp"
-
-
-// Naming conventions:
-// Global and important variables: CapitalLettersFullName
-// Local, temporary and irrelevant variables: shortlowercase
-// Functions priority: CapitalLettersFunctions
-// Functions conventional: firstLowerLetterFunction
-// Functions and variables special: _FullDescription
-// Comment switches: Debug //DB
-// Comment switches: Verbose //VB
-// Comment switches: Color //COLOR
-// Comment switches: Any other switch //RelevantCapitalLettersAbbreviation
-// Comment tags: Tasks needed to be fixed //FIX
-// Comment tags: Tasks left to do //TODO
-// Comment tags: Question //Q
-// Comment tags: Answer //A
-// Comment tags: Correct algorithm or code //CRA
-// Comment tags: Correct comment //CRC
-// Comment tags: Correct algorithm or code format //CRF
-// Comment tags: Correct variable //CRV
 
 
 /* TODO
@@ -425,6 +405,10 @@ Eigen::Matrix3d L;
 Eigen::Vector3d x_cc;
 Eigen::Matrix3d E_cc;
 
+//! - Initialize variables involved in Odometry update alone
+Eigen::Vector3d x_pp_odom(0, 0, 0);
+Eigen::Vector3d x_cc_odom(0, 0, 0);
+
 //! - Variables for time
 char flagSensorsDataAvailable = 0;
 double prevOdometrySecs = 0;
@@ -474,6 +458,7 @@ while (initialize == 1 && ros::ok()) {
 		x_pp(0) = zPose2DStamped.pose.x;
 		x_pp(1) = zPose2DStamped.pose.y;
 		x_pp(2) = zPose2DStamped.pose.theta;
+		x_pp_odom = x_pp;
 
 		//!  - Initialization done
 	std::cout << " Initialization done:  \nx_(0|-1):\n" << x_pp << "\nE_pp_(0|-1):\n" << E_pp << "\n" << std::endl;//DB
@@ -630,7 +615,10 @@ do {
 		E_pp = E_cc;
 		std::cout << " Final Measurement Update: \nx_cc:\n" << x_cc << "\nE_cc:\n" << E_cc << "\n" << std::endl; //DB
 
-		//CRD
+		//! - Determine odometry update without filter
+		x_cc_odom = FSTATE(x_pp_odom, u); //f_xu
+		x_pp_odom = x_cc_odom;
+
 		//! - Reinitialize R for the next loop
 		R = Eigen::Matrix3d::Identity();
 
@@ -640,13 +628,13 @@ do {
 		
 		//! - Prepare data for publishing
 		rollo::EKF result;
-		result.header.stamp.sec = (int) EKFfilterTimeSecs;
-		result.header.stamp.nsec = (int)((EKFfilterTimeSecs - result.header.stamp.sec) * 1000000000); // 1.000.000.000 //Q what is the limit of int here? it is possible to overflow? If so, when? Does that make sense?
+		result.header.stamp.sec = (int32_t) EKFfilterTimeSecs;
+		result.header.stamp.nsec = (int32_t)((EKFfilterTimeSecs - result.header.stamp.sec) * 1000000000); // 1.000.000.000 //Q what is the limit of int here? it is possible to overflow? If so, when? Does that make sense?
 
-		//! - Pose2D
-		result.pose2d.x = x_cc(0);
-		result.pose2d.y = x_cc(1);
-		result.pose2d.theta = x_cc(2);
+		//! - Pose2D EKF
+		result.ekfpose2d.x = x_cc(0);
+		result.ekfpose2d.y = x_cc(1);
+		result.ekfpose2d.theta = x_cc(2);
 
 		//! - Covariance
 		result.covariance[0] = E_cc(0,0);
@@ -658,6 +646,12 @@ do {
 		result.covariance[6] = E_cc(2,0),
 		result.covariance[7] = E_cc(2,1),
 		result.covariance[8] = E_cc(2,2),
+
+		//! - Pose2D odometry
+		result.odompose2d.x = x_pp_odom(0);
+		result.odompose2d.y = x_pp_odom(1);
+		result.odompose2d.theta = x_pp_odom(2);
+
 
 		//! - Publish
 		RolloPub.publish(result);

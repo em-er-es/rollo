@@ -55,6 +55,7 @@
  * 
  */
 
+
 /* TODO
  * FIX DOXYGEN documentation format
  * Double check corresponding key sets
@@ -63,6 +64,7 @@
  * Values are not kept at their previous level, a linear decline might be better
  * Add digits as velocity set mechanism
 // */
+
 
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
