@@ -24,9 +24,9 @@ Scripts/rollo_cleanup.sh -- Helper script for ROS cleanup
 Scripts/rollo_sync.sh -- Helper script for ROS synchronizing binaries in bin with devel/lib directory
 
 # Python scripts
-Scripts/Python/compute_position_corrected.py -- 
-Scripts/Python/compute_position.py -- 
-Scripts/Python/rollo_compute_position.py -- 
+Scripts/Python/compute_position_corrected.py -- Odometry model for Rollo - Old version
+Scripts/Python/compute_position.py -- Odometry model for Rollo - Latest version
+Scripts/Python/rollo_compute_position.py -- Symlink to above
 Scripts/Python/rollo_ekf.py -- Attempt to implement EKF in Python - Aborted
 
 # Matlab scripts
