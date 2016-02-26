@@ -243,7 +243,7 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 	}
 
 /* //DB
-	if (! (loopcounter % 10)) {
+	if (! (loopcounter % 10)) { //! Print debug messages every 10th loop, there should be an additional condition to actually print it only once
 		// ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%c][%c][%c]]", NodeName, x, z, Message[0], Message[1], Message[2]); //DB
 		// ROS_INFO("[Rollo][%s][DecodeVelocities] M: %c ([%f], [%f]) => [[%d][%d][%d]]", NodeName, Mode, float(x), float(z), Message[0], Message[1], Message[2]); //DB
 		ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%d][%d][%d]]", NodeName, float(x), float(z), Message[0], Message[1], Message[2]); //DB
@@ -252,8 +252,6 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 // */
 
 }
-
-
 
 /**
  * @brief Assign left and right wheel velocity estimates for a given velocity command
@@ -265,7 +263,7 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
  * \param VelocityL Velocity command decoded from control node [%]
  * \param VelocityR Velocity command decoded from control node [%]
  *
- * @warning Only velocities processed using logs are estimated
+ * @warning Only velocities processed using logs are estimated.
  * 
  * @return 0
  */
@@ -314,7 +312,7 @@ int EstimateFeedbackVelocities(int VelocityL, int VelocityR, double &LeftVelocit
 }
 
 /**
- * @brief Subscriber callback
+ * @brief Subscriber callback from control node
  *
  * Read newest velocities from control node and translate them into UDP message. Update latest message time.
  *
@@ -503,6 +501,7 @@ udp_client_server::udp_client udpClient(ip, port);
 			//! Print duration time
 			ROS_INFO("[Rollo][%s][Square test][%d] Finished: %g [s]", NodeName, square, abs(finishtime - initialtime)); //DB
 
+		//! Check square loop condition
 		if (square > 1) {
 			//! Turn around
 			ROS_INFO("[Rollo][%s][Square test][%d] Turn around", NodeName, square); //VB
@@ -538,6 +537,7 @@ while (ros::ok()) {
 	//! - Send control command to Rollo
 	rv = udpSend(ip, port, Message);
 
+	//! ### Emergency procedure
 	//! - Check if emergency condition has been met:
 	currentTime = ros::Time::now().toSec();
 	if (abs(lastMessageTime - currentTime) > abs(EmergencyTime)) {
@@ -561,21 +561,9 @@ while (ros::ok()) {
 
 		}
 	}
+	//! ### Emergency procedure end
 
-/* //DB
-	// rv = udpSend("192.168.0.120", port, Message);
-	if (rv) {
-		// ROS_INFO("[Rollo][%s] udpSend() command executed", NodeName); //DB
-		ROS_INFO("[Rollo][%s] udpSend() command exited cleanly", NodeName); //VB
-		// usleep(1000000);
-		// usleep(10000);
-	}
-// */
 
-	// //! Publish encoder readings
-	// VelocityL = v_l;
-	// VelocityR = v_r;
-	// //! Callback function for subscriber
 	//! - Estimate feedback velocities
 	EstimateFeedbackVelocities(VelocityL, VelocityR, LFeedbackVelocity, RFeedbackVelocity);
 
