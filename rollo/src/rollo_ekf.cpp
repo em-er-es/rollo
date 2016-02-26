@@ -25,7 +25,7 @@
  * @see http://wiki.ros.org/robot_pose_ekf
  *
  * Kalman filter equations were first implemented in MATLAB, then translated into C++, compared and verified with previous results.
- * 
+ *
  * @see https://github.com/em-er-es/rollo/
  *
  */
@@ -112,9 +112,9 @@ char TopicPose2DStamped[64] = TOPIC_PREP_P2DT;
  * Subscribe to the topic '/Rollo/preprocessor/pose2dstamped' of the preprocessor node.
  * Read filtered position and orientation of the robot and timestamp.
  * Update global variables @p zPose2DStamped and @p zTimeSecs for use in EKF update.
- * 
+ *
  * @param msg - custom defined message (preprocessor node).
- * 
+ *
  * @return NULL
  */
 
@@ -125,9 +125,9 @@ void subscriberCallbackMeasurement(const rollo::Pose2DStamped msg) {
 	unsigned int zSeq = 0;
 
 	//! Read new message
-	z(0) = msg.pose.x;
-	z(1) = msg.pose.y;
-	z(2) = msg.pose.theta;
+	z(0) = msg.pose2d.x;
+	z(1) = msg.pose2d.y;
+	z(2) = msg.pose2d.theta;
 	zSeq = msg.header.seq;
 	zTimeSecs = msg.header.stamp.toSec();
 
@@ -142,9 +142,9 @@ void subscriberCallbackMeasurement(const rollo::Pose2DStamped msg) {
  * Subscribe to the topic @var TopicWheelSpeed of the communication node.
  * Read wheel speed for both left and right in radians and timestamp.
  * Update global variables Odometry and OdometryTimeSecs for use in EKF update.
- * 
+ *
  * @param msg - custom defined message (communication node).
- * 
+ *
  * @return NULL
  */
 
@@ -170,11 +170,11 @@ void subscriberCallbackControlInput(const rollo::WheelSpeed msg) {
  *
  * This function performs linear interpolation of right and left wheel speed for a given time instant.
  * The time for which the odometry values are computed is defined by @p EKFfilterTimeSecs.
- * 
+ *
  * @param Odometryold contains left and right wheel speed and timestamp read at previous instant when EKF was updated.
  * @param Odometrynew contains left and right wheel speed and timestamp read currently.
  * @param EKFfilterTimeSecs is the time instant for which the EKF update need to be performed and odometry values need to be computed.
- * 
+ *
  * @return rollo::WheelSpeed, contains left and right wheel speed [rad/s] computed for time instant given by @p EKFfilterTimeSecs using linear interpolation.
  */
 
@@ -204,11 +204,11 @@ rollo::WheelSpeed interpolateOdometry( rollo::WheelSpeed Odometryold, rollo::Whe
  *
  * This function performs linear interpolation of robot pose2D for a given time instant.
  * The time for which the robot pose2D are computed is defined by EKFfilterTimeSecs.
- * 
+ *
  * @param zOld contains robot pose2D and timestamp read at previous instant when EKF was updated.
  * @param zNew contains robot pose2D and timestamp read currently.
  * @param EKFfilterTimeSecs is the time instant for which the EKF update need to be performed and robot pose2D need to be computed.
- * 
+ *
  * @return rollo::Pose2DStamped, contains robot pose2D computed for time instant given by EKFfilterTimeSecs using linear interpolation.
  */
 
@@ -222,14 +222,14 @@ rollo::Pose2DStamped interpolateMeasurement( rollo::Pose2DStamped zOld, rollo::P
 
 //CRC same as above
 	//y = y0 + ((y1-y0)/(t1-t0))(t-t0)
-	interpolated.pose.x = zOld.pose.x + ((zNew.pose.x - zOld.pose.x)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
-	interpolated.pose.y = zOld.pose.y + ((zNew.pose.y - zOld.pose.y)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
-	interpolated.pose.theta = zOld.pose.theta + ((zNew.pose.theta - zOld.pose.theta)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
+	interpolated.pose2d.x = zOld.pose2d.x + ((zNew.pose2d.x - zOld.pose2d.x)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
+	interpolated.pose2d.y = zOld.pose2d.y + ((zNew.pose2d.y - zOld.pose2d.y)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
+	interpolated.pose2d.theta = zOld.pose2d.theta + ((zNew.pose2d.theta - zOld.pose2d.theta)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
 
 //CRC Provide better description instead of old, new - previous, current, next
-	std::cout << "Measurement old: [" << zOld.pose.x << "  " << zOld.pose.y << "  " << zOld.pose.theta  << "]^T\n" << std::endl;//DB
-	std::cout << "Measurement new: [" << zNew.pose.x << "  " << zNew.pose.y << "  " << zNew.pose.theta  << "]^T\n" << std::endl;//DB
-	std::cout << "Measurement intrepolated: [" << interpolated.pose.x << "  " << interpolated.pose.y << "  " << interpolated.pose.theta  << "]^T\n" << std::endl;//DB
+	std::cout << "Measurement old: [" << zOld.pose2d.x << "  " << zOld.pose2d.y << "  " << zOld.pose2d.theta  << "]^T\n" << std::endl;//DB
+	std::cout << "Measurement new: [" << zNew.pose2d.x << "  " << zNew.pose2d.y << "  " << zNew.pose2d.theta  << "]^T\n" << std::endl;//DB
+	std::cout << "Measurement intrepolated: [" << interpolated.pose2d.x << "  " << interpolated.pose2d.y << "  " << interpolated.pose2d.theta  << "]^T\n" << std::endl;//DB
 
 	return interpolated;
 }
@@ -434,10 +434,10 @@ std::cout << "Initializing: waiting for sensor data from both the subscribers \n
 
 //! ## Initialization loop
 while (initialize == 1 && ros::ok()) {
-	
-	//! - Check if data is available from measurement (motion capture)	
+
+	//! - Check if data is available from measurement (motion capture)
 	if (zTimeSecs > 0 ){
-		//!  - Initialize @p prevzPose2DStamped, @p prevMeasurementSecs and @p PreviousEKFfilterTimeSecs 
+		//!  - Initialize @p prevzPose2DStamped, @p prevMeasurementSecs and @p PreviousEKFfilterTimeSecs
 		prevzPose2DStamped = zPose2DStamped;
 		prevMeasurementSecs = zTimeSecs;
 		PreviousEKFfilterTimeSecs = zTimeSecs;
@@ -445,7 +445,7 @@ while (initialize == 1 && ros::ok()) {
 
 	//! - Check if data is available from odometry (control input)
 	if (OdometryTimeSecs > 0 ){
-		//!  - Initialize @p prevOdometry, @p prevOdometrySecs and @p PreviousEKFfilterTimeSecs 
+		//!  - Initialize @p prevOdometry, @p prevOdometrySecs and @p PreviousEKFfilterTimeSecs
 		prevOdometry = Odometry;
 		prevOdometrySecs = OdometryTimeSecs;
 		PreviousEKFfilterTimeSecs = OdometryTimeSecs;
@@ -453,11 +453,11 @@ while (initialize == 1 && ros::ok()) {
 
 	//! - Check if new data has been read from  both measurement (motion capture) and odometry (control input)
 	if (prevMeasurementSecs > 0 && prevOdometrySecs > 0){
-		//!  - Initialize initial state estimate @p x_pp 
+		//!  - Initialize initial state estimate @p x_pp
 		initialize = 0;
-		x_pp(0) = zPose2DStamped.pose.x;
-		x_pp(1) = zPose2DStamped.pose.y;
-		x_pp(2) = zPose2DStamped.pose.theta;
+		x_pp(0) = zPose2DStamped.pose2d.x;
+		x_pp(1) = zPose2DStamped.pose2d.y;
+		x_pp(2) = zPose2DStamped.pose2d.theta;
 		x_pp_odom = x_pp;
 
 		//!  - Initialization done
@@ -491,9 +491,9 @@ do {
 			//! - Interpolate measurements
 			InterpolatedMeasurement = interpolateMeasurement(prevzPose2DStamped, zPose2DStamped, EKFfilterTimeSecs);
 			//! - Update state
-			z_EKF(0) = InterpolatedMeasurement.pose.x;
-			z_EKF(1) = InterpolatedMeasurement.pose.y;
-			z_EKF(2) = InterpolatedMeasurement.pose.theta;
+			z_EKF(0) = InterpolatedMeasurement.pose2d.x;
+			z_EKF(1) = InterpolatedMeasurement.pose2d.y;
+			z_EKF(2) = InterpolatedMeasurement.pose2d.theta;
 			wheelspeedleft_EKF = Odometry.wheelspeedleft;
 			wheelspeedright_EKF = Odometry.wheelspeedright;
 
@@ -511,9 +511,9 @@ do {
 			InterpolatedOdometry = interpolateOdometry(prevOdometry, Odometry, EKFfilterTimeSecs);
 
 			//! - Update variables involved in EKF update
-			z_EKF(0) = zPose2DStamped.pose.x;
-			z_EKF(1) = zPose2DStamped.pose.y;
-			z_EKF(2) = zPose2DStamped.pose.theta;
+			z_EKF(0) = zPose2DStamped.pose2d.x;
+			z_EKF(1) = zPose2DStamped.pose2d.y;
+			z_EKF(2) = zPose2DStamped.pose2d.theta;
 			wheelspeedleft_EKF = InterpolatedOdometry.wheelspeedleft;
 			wheelspeedright_EKF = InterpolatedOdometry.wheelspeedright;
 
@@ -532,7 +532,7 @@ do {
 
 	//! ### EKF update
 	//! Perform EKF update if all sensor data is available:
-	if (flagSensorsDataAvailable == 1) { 
+	if (flagSensorsDataAvailable == 1) {
 
 		flagSensorsDataAvailable = 0;
 		std::cout << "Perform EKF iteration. \n" << std::endl; //DB
@@ -583,7 +583,7 @@ do {
 
 		P12 = E_cp * Jh.transpose(); //! Cross covariance
 
-/*	
+/*
 		S_inv = (Jh * P12 + R).inverse();
 		H = P12*S_inv; //     %Kalman filter gain, H_k
 		std::cout << " Kalman filter gain: \n" << H << "\n" << std::endl; //DB
@@ -600,15 +600,15 @@ do {
 		L = chol.matrixU();
 
 		R = L;
-		H = P12 * R.inverse(); 
+		H = P12 * R.inverse();
 
 		std::cout << " Verify Cholesky: \nS:\n" << (Jh * P12 + R) << "\nL:\n" << L << "\n Verify\n" << L.transpose() * L << std::endl; //DB
 		std::cout << " P12:\n" << P12 << "\n R:\n" << R << "\nRinv:\n" << R.inverse() << "\n" <<std::endl; //DB
 		std::cout << " H:\n" << H << "\n" <<std::endl; //DB
 
-		//! - Compute state estimate x_k|k and state covariance matrix E_k|k 
-		x_cc = x_cp + H * ((R.transpose() ).inverse()) * (z_EKF - z_estimate);  //state estimate, x_k|k 
-		E_cc = E_cp - H * H.transpose();     //state covariance matrix, E_k|k            
+		//! - Compute state estimate x_k|k and state covariance matrix E_k|k
+		x_cc = x_cp + H * ((R.transpose() ).inverse()) * (z_EKF - z_estimate);  //! State estimate x_k|k
+		E_cc = E_cp - H * H.transpose(); //! State covariance matrix E_k|k
 
 		//! - Update previous covariance matrix E_pp an state x_pp values for next loop
 		x_pp = x_cc;
@@ -622,10 +622,10 @@ do {
 		//! - Reinitialize R for the next loop
 		R = Eigen::Matrix3d::Identity();
 
-		R(0,0) = r*r;
-		R(1,1) = r*r;
-		R(2,2) = r*r;
-		
+		R(0, 0) = r * r;
+		R(1, 1) = r * r;
+		R(2, 2) = r * r;
+
 		//! - Prepare data for publishing
 		rollo::EKF result;
 		result.header.stamp.sec = (int32_t) EKFfilterTimeSecs;
@@ -641,11 +641,11 @@ do {
 		result.covariance[1] = E_cc(0,1);
 		result.covariance[2] = E_cc(0,2);
 		result.covariance[3] = E_cc(1,0);
-		result.covariance[4] = E_cc(1,1),
-		result.covariance[5] = E_cc(1,2),
-		result.covariance[6] = E_cc(2,0),
-		result.covariance[7] = E_cc(2,1),
-		result.covariance[8] = E_cc(2,2),
+		result.covariance[4] = E_cc(1,1);
+		result.covariance[5] = E_cc(1,2);
+		result.covariance[6] = E_cc(2,0);
+		result.covariance[7] = E_cc(2,1);
+		result.covariance[8] = E_cc(2,2);
 
 		//! - Pose2D odometry
 		result.odompose2d.x = x_pp_odom(0);

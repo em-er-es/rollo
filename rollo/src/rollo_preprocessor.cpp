@@ -184,9 +184,9 @@ do {
 		//PubRolloPosition.data = StringStream.str();
 
 		//! - Prepare data for publishing
-		PubRolloPositionPose2dStamped.pose.x  = average_x;
-		PubRolloPositionPose2dStamped.pose.y  = average_y;
-		PubRolloPositionPose2dStamped.pose.theta  = average_theta;
+		PubRolloPositionPose2dStamped.pose2d.x  = average_x;
+		PubRolloPositionPose2dStamped.pose2d.y  = average_y;
+		PubRolloPositionPose2dStamped.pose2d.theta  = average_theta;
 		PubRolloPositionPose2dStamped.header.stamp = ros::Time::now();
 
 		//! - Publish
