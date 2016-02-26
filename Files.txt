@@ -1,0 +1,46 @@
+TODO HEADER
+
+
+# File location/name -- Description
+
+# ROS nodes
+rollo/src/rollo_comm.cpp -- Communication node
+rollo/src/rollo_control.cpp -- Control node
+rollo/src/rollo_ekf.cpp -- Extended Kalman filter for estimating position and orientation node
+rollo/src/rollo_localization.cpp -- //D
+rollo/src/rollo_odometry.cpp -- //D
+rollo/src/rollo_preprocessor.cpp -- Preprocessing motion capture data node
+rollo/src/rollo_template.cpp -- //D
+rollo/src/rollo_visualization.cpp -- Visualization node
+
+# Bash scripts
+Applications/cruderollo/cruderollo.sh -- Cruderollo control script using the independent wheel control protocol
+Logs/average-samples.sh -- Script skeleton for averaging samples using awk - Not implemented
+Logs/filter-logs.sh -- Filtering and converting logs from ROS_INFO output to rosbag format for Pose2D
+Logs/filter-preprocessor-logs.sh -- Filtering and converting logs from preprocessor's ROS_INFO output to rosbag format for Pose2D
+Logs/publish-log.sh -- Crude publishing script with various options
+Logs/test.sh -- Caller script for publish-log.sh
+Scripts/rollo_cleanup.sh -- Helper script for ROS cleanup
+Scripts/rollo_sync.sh -- Helper script for ROS synchronizing binaries in bin with devel/lib directory
+
+# Python scripts
+Scripts/Python/compute_position_corrected.py -- 
+Scripts/Python/compute_position.py -- 
+Scripts/Python/rollo_compute_position.py -- 
+Scripts/Python/rollo_ekf.py -- Attempt to implement EKF in Python - Aborted
+
+# Matlab scripts
+Scripts/Matlab/compute_position.m -- 
+Scripts/Matlab/compute_position_redefined_plot.m -- 
+Scripts/Matlab/compute_position_redefined_plot_org.m -- 
+Scripts/Matlab/ekf_rollo_v1.m -- 
+Scripts/Matlab/estimateControlnput.m -- 
+Scripts/Matlab/estimateQ.m -- 
+Scripts/Matlab/extract_meas.m -- 
+Scripts/Matlab/extract_position_edit2.m -- 
+Scripts/Matlab/matrix3by3_inverse.m -- 
+Scripts/Matlab/modelRollo.m -- 
+Scripts/Matlab/modelRolloRotation.m -- 
+Scripts/Matlab/my_ekf_node.m -- 
+Scripts/Matlab/my_ekf_v1.m -- 
+Scripts/Matlab/rollo_ekf.m -- 
