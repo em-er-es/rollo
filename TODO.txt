@@ -1,6 +1,9 @@
-[D] - Improve current rollo.launch
 [ ] - Add analysis node with psuedo real time plotting
 [P] - Fix doxygen documentation
 [ ] - Finish local documentation
 [ ] - Document scripts in the LaTeX file, provide description
 [ ] - Add dynamic reconfigure dependency
+[ ] - Add a readme file for the repository
+[ ] - Add a readme file specifically for Professor Mastrogiovanni
+[ ] - Add a final tag when done with assignment for SAfR
+[D] - Improve current rollo.launch
