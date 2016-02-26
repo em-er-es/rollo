@@ -1,3 +1,7 @@
+# University of Genova
+# 86805 - Software Architectures for Robotics
+# Assignment 03 - Localization system for a wheeled humanoid robot
+# Rabbia Asghar, Ernest Skrzypczyk
 TODO HEADER
 
 
@@ -30,17 +34,17 @@ Scripts/Python/rollo_compute_position.py -- Symlink to above
 Scripts/Python/rollo_ekf.py -- Attempt to implement EKF in Python - Aborted
 
 # Matlab scripts
-Scripts/Matlab/compute_position.m -- 
-Scripts/Matlab/compute_position_redefined_plot.m -- 
-Scripts/Matlab/compute_position_redefined_plot_org.m -- 
-Scripts/Matlab/ekf_rollo_v1.m -- 
-Scripts/Matlab/estimateControlnput.m -- 
-Scripts/Matlab/estimateQ.m -- 
-Scripts/Matlab/extract_meas.m -- 
-Scripts/Matlab/extract_position_edit2.m -- 
-Scripts/Matlab/matrix3by3_inverse.m -- 
-Scripts/Matlab/modelRollo.m -- 
-Scripts/Matlab/modelRolloRotation.m -- 
-Scripts/Matlab/my_ekf_node.m -- 
-Scripts/Matlab/my_ekf_v1.m -- 
-Scripts/Matlab/rollo_ekf.m -- 
+Scripts/Matlab/compute_position.m -- Initial function for odometry model - Incorrect
+Scripts/Matlab/compute_position_redefined_plot.m -- Corrected function for odometry model - Plots position for given iterations
+Scripts/Matlab/compute_position_redefined_plot_org.m -- Correct function for odometry model - Further edited for analysis
+Scripts/Matlab/ekf_rollo_v1.m -- Script to implement EKF for a given log file
+Scripts/Matlab/estimateControlnput.m -- Initial script to analyze a given plot to estimate control input - Incomplete
+Scripts/Matlab/estimateQ.m -- For a given log determines error in odometry modelling
+Scripts/Matlab/extract_meas.m -- Function for extracting time stamps, position and orientation from a log file
+Scripts/Matlab/extract_position_edit2.m -- Function for extracting position and orientation from a log file
+Scripts/Matlab/matrix3by3_inverse.m -- Function to compute inverse of a 3x3 matrix
+Scripts/Matlab/modelRollo.m -- Script for analysing a log file for a given velocity command and determining control input
+Scripts/Matlab/modelRolloRotation.m -- Script for analysing on spot rotation and determining angular velocity of robot
+Scripts/Matlab/my_ekf_node.m -- Preparing function for EKF to implement it in ROS node
+Scripts/Matlab/my_ekf_v1.m -- Matlab function for computing EKF
+Scripts/Matlab/rollo_ekf.m -- Function for computing EKF - Same as my_ekf_v1.m, outdated version
