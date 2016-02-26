@@ -1,5 +1,5 @@
 % EKF   Extended Kalman Filter for nonlinear dynamic systems
-% [x, P] = ekf(f,x,P,h,z,Q,R) returns state estimate, x and state covariance, P 
+% [x, P] = ekf(f,x,P,h,z,Q,R) returns state estimate, x and state covariance, P
 % for nonlinear dynamic system:
 %           x_k+1 = f(x_k, u_k) + w_k
 %           z_k   = h(x_k) + v_k
@@ -15,9 +15,6 @@
 % Output:   x: "a posteriori" state estimate
 %           P: "a posteriori" state covariance
 
-
-clear all
-%close all
 % initialization of the system
 
 n=3;      %number of states
@@ -31,7 +28,7 @@ R=r^2*eye(n); % covariance of measurement
 
 
 %READ FROM LOGFILE
-[x_log,y_log,theta_log] = extract_position_edit2('Test1v6AB.log', 500, 2000, 1);
+[x_log,y_log,theta_log] = extract_position_edit2('Test1v6AB.log', 1000, 1500, 1);
 %assuming straight line motion
 deltaS = ( x_log(length(x_log)) - x_log(1) )/ length(x_log);
 u = [deltaS ; 0];                   %control input [delta S, theta], assumed constant in this example
@@ -50,16 +47,15 @@ Jh = eye(n); %Jacobian matrix with the partial derivatives of h(x_k) w.r.t x, id
 
 E = eye(n);            % initial state covraiance
 
-N=1500;                    % total dynamic steps
+N=100;                    % total dynamic steps
 xV = zeros(n,N);          % allocate memory for state
 zV = zeros(n,N);          % allocate memory for measurement
 
 for k=1:N
   z = [x_log(k+1);y_log(k+1);theta_log(k+1)];      % measurments from sensor
   zV(:,k)  = z;                             % save measurment
-%  [x, E] = my_ekf(f,x,u,Jf,Jh,E,h,z,Q,R);    % EKF 
-  [x, E] = my_ekf_node(x,u,z);    % EKF 
-   xV(:,k) = x;                            % save estimate
+  [x, E] = my_ekf(f,x,u,Jf,Jh,E,h,z,Q,R);    % EKF
+  xV(:,k) = x;                            % save estimate
 end
 figure
 
