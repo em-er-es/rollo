@@ -43,6 +43,7 @@
 #include <sstream>
 #include <iostream>
 #include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Cholesky>
 #include "rollo.hpp"
 
 
@@ -67,7 +68,13 @@
 
 
 /* TODO
+ *! Complete TODO points can be marked with ! like this one
+ * FIX DOXYGEN formatting
+ * There is a difference between commenting in code and for the documentation, at least take a look at refman.pdf
+ * This needs to be uniform accross all nodes
+ * FIX DOXYGEN formatting
  * Should the frequency be increased to 4 Hz or more?
+ * FIX DOXYGEN formatting
  * FIX DOXYGEN formatting
  * Add more doxygen comments and appropriate description
  * Double check if std:cout and ROS_INFO do not collide or produce unnecessary output, std::cout is fine for debug, just update comment switches for those lines
@@ -239,6 +246,7 @@ rollo::Pose2DStamped interpolateMeasurement( rollo::Pose2DStamped zOld, rollo::P
 	interpolated.pose.y = zOld.pose.y + ((zNew.pose.y - zOld.pose.y)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
 	interpolated.pose.theta = zOld.pose.theta + ((zNew.pose.theta - zOld.pose.theta)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
 
+//CRC Provide better description instead of old, new - previous, current, next
 	std::cout << "Measurement old: [" << zOld.pose.x << "  " << zOld.pose.y << "  " << zOld.pose.theta  << "]^T\n" << std::endl;//DB
 	std::cout << "Measurement new: [" << zNew.pose.x << "  " << zNew.pose.y << "  " << zNew.pose.theta  << "]^T\n" << std::endl;//DB
 	std::cout << "Measurement intrepolated: [" << interpolated.pose.x << "  " << interpolated.pose.y << "  " << interpolated.pose.theta  << "]^T\n" << std::endl;//DB
@@ -364,16 +372,14 @@ int nstates = 3; // Number of states: 3 = (position) (x, y) (orientation) (Theta
 double q = 0.1; // std of process noise   //CRC
 double r = 0.1; // std of measurement noise //CRC
 
-//CRC
-//q^2*eye(n); // Process noise covariance
+//!   - Process noise covariance
 Eigen::Matrix3d Q = Eigen::Matrix3d::Identity();
 
 Q(0,0) = q*q;
 Q(1,1) = q*q;
 Q(2,2) = q*q;
 
-//CRC
-//r^2*eye(n); // Measurement noise covariance
+//!   - Measurement noise covariance
 Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
 
 R(0,0) = r*r;
@@ -413,6 +419,7 @@ Eigen::Vector3d z_estimate;
 Eigen::Matrix3d P12;
 Eigen::Matrix3d S_inv;
 Eigen::Matrix3d H;
+Eigen::Matrix3d L;
 
 //!   - Initialize state estimate vector and state covariance matrix a posteriori
 Eigen::Vector3d x_cc;
@@ -435,7 +442,6 @@ double wheelspeedright_EKF;
 Eigen::Vector3d z_EKF(0, 0, 0);
 
 char initialize = 1;
-//initialize = 0; //DB
 
 //! - Initialize measurement vector with timestamp and odometry data with timestamp from subscriber messages
 //! - Initialize state estimate using measurement vector reading
@@ -444,25 +450,32 @@ std::cout << "Initializing: waiting for sensor data from both the subscribers \n
 
 //! ## Initialization loop
 while (initialize == 1 && ros::ok()) {
-//TODO Provide more doxygen information here
+	
+	//! - Check if data is available from measurement (motion capture)	
 	if (zTimeSecs > 0 ){
+		//!  - Initialize @p prevzPose2DStamped, @p prevMeasurementSecs and @p PreviousEKFfilterTimeSecs 
 		prevzPose2DStamped = zPose2DStamped;
 		prevMeasurementSecs = zTimeSecs;
 		PreviousEKFfilterTimeSecs = zTimeSecs;
 	}
 
+	//! - Check if data is available from odometry (control input)
 	if (OdometryTimeSecs > 0 ){
+		//!  - Initialize @p prevOdometry, @p prevOdometrySecs and @p PreviousEKFfilterTimeSecs 
 		prevOdometry = Odometry;
 		prevOdometrySecs = OdometryTimeSecs;
 		PreviousEKFfilterTimeSecs = OdometryTimeSecs;
 	}
 
+	//! - Check if new data has been read from  both measurement (motion capture) and odometry (control input)
 	if (prevMeasurementSecs > 0 && prevOdometrySecs > 0){
+		//!  - Initialize initial state estimate @p x_pp 
 		initialize = 0;
 		x_pp(0) = zPose2DStamped.pose.x;
 		x_pp(1) = zPose2DStamped.pose.y;
 		x_pp(2) = zPose2DStamped.pose.theta;
 
+		//!  - Initialization done
 	std::cout << " Initialization done:  \nx_(0|-1):\n" << x_pp << "\nE_pp_(0|-1):\n" << E_pp << "\n" << std::endl;//DB
 	std::cout << " Initial time step t0:\n" << PreviousEKFfilterTimeSecs << "\n" << std::endl;//DB
 
@@ -477,7 +490,7 @@ while (initialize == 1 && ros::ok()) {
 
 //! ## Main loop
 do {
-//	flagSensorsDataAvailable = 1; //DB
+
 	std::cout << "Wait for new data from all sensors (motion captutre and odometry) for next EKF iteration. \n" << std::endl; //DB
 
 	//! - Check if new data is available from measurement (motion capture) and odometry (control input)
@@ -532,8 +545,9 @@ do {
 
 	}
 
-	//! - Perform EKF update if all sensor data is available
-	if (flagSensorsDataAvailable == 1) { //Q How is this debug? Check your init of this variable
+	//! ### EKF update
+	//! Perform EKF update if all sensor data is available:
+	if (flagSensorsDataAvailable == 1) { 
 
 		flagSensorsDataAvailable = 0;
 		std::cout << "Perform EKF iteration. \n" << std::endl; //DB
@@ -582,8 +596,9 @@ do {
 		z_estimate = HMEAS(x_cp);
 		std::cout << " Measurement estimate:\n" << z_estimate << "\n" << std::endl; //DB
 
-		//CRC
-		P12 = E_cp * Jh.transpose(); //%cross covariance
+		P12 = E_cp * Jh.transpose(); //! Cross covariance
+
+/*	
 		S_inv = (Jh * P12 + R).inverse();
 		H = P12*S_inv; //     %Kalman filter gain, H_k
 		std::cout << " Kalman filter gain: \n" << H << "\n" << std::endl; //DB
@@ -591,12 +606,38 @@ do {
 		//CRC
 		x_cc = x_cp + H * (z_EKF - z_estimate); //    %state estimate, x_k|k;
 		E_cc = E_cp - H * P12.transpose();  //             %state covariance matrix, E_k|k
+// */
 
-		//! - Update E_pp an x_pp for next loop for next loop
+		//! - Cholesky decomposition:
+		//! Instead of standard equations for EKF, use cholesky factorization for a stable covariance matrix
+		//!   - Compute the Cholesky decomposition
+		Eigen::LLT<Eigen::Matrix3d, Eigen::Upper> chol(Jh * P12 + R);
+		L = chol.matrixU();
+
+		R = L;
+		H = P12 * R.inverse(); 
+
+		std::cout << " Verify Cholesky: \nS:\n" << (Jh * P12 + R) << "\nL:\n" << L << "\n Verify\n" << L.transpose() * L << std::endl; //DB
+		std::cout << " P12:\n" << P12 << "\n R:\n" << R << "\nRinv:\n" << R.inverse() << "\n" <<std::endl; //DB
+		std::cout << " H:\n" << H << "\n" <<std::endl; //DB
+
+		//! - Compute state estimate x_k|k and state covariance matrix E_k|k 
+		x_cc = x_cp + H * ((R.transpose() ).inverse()) * (z_EKF - z_estimate);  //state estimate, x_k|k 
+		E_cc = E_cp - H * H.transpose();     //state covariance matrix, E_k|k            
+
+		//! - Update previous covariance matrix E_pp an state x_pp values for next loop
 		x_pp = x_cc;
 		E_pp = E_cc;
 		std::cout << " Final Measurement Update: \nx_cc:\n" << x_cc << "\nE_cc:\n" << E_cc << "\n" << std::endl; //DB
 
+		//CRD
+		//! - Reinitialize R for the next loop
+		R = Eigen::Matrix3d::Identity();
+
+		R(0,0) = r*r;
+		R(1,1) = r*r;
+		R(2,2) = r*r;
+		
 		//! - Prepare data for publishing
 		rollo::EKF result;
 		result.header.stamp.sec = (int) EKFfilterTimeSecs;
@@ -622,6 +663,7 @@ do {
 		RolloPub.publish(result);
 
 	}
+	//! ### EKF Update end
 
 	ros::spinOnce();
 
