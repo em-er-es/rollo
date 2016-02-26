@@ -115,14 +115,20 @@ def subscriberCallbackEKF(msg):
 
 	return 0
 
-## Animation
-# initialization function: plot the background of each frame
-def init():
+# Animation
+
+## Initialization function for animation
+def initAnimation():
+	## Plot the background of each frame
 	Pos.set_data([], [])
 	return line
 
-# animation function.  This is called sequentially
-def animate(i):
+## Animation callback function
+#
+# \param i Interation step
+#
+# Sequentially called
+def animatePlot(i):
 	# global Pos
 	# of = np.rad2deg(MessageMeasurement.theta) - 90
 	# plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
@@ -189,16 +195,18 @@ def main():
 	
 		More details
 	"""
-	## Initiliaze
+	##! Initiliaze:
+	## - Refer to global variable so that it can be changed
 	global loopcounter
 
-	### Initialize rospy
+	## - Initialize rospy
 	# roscpp_initialize(sys.argv)
 	rospy.init_node('rollo_visualization', anonymous=True)
 
+	## - First run
 	if loopcounter == 0:
-		figure = plt.figure()
-		# figure, ax = plt.subplots()
+		# figure = plt.figure()
+		figure, axis = plt.subplots()
 		plt.axis([-4, 4, -4, 4])
 		plt.grid(1)
 		# plt.ion()
@@ -226,14 +234,15 @@ def main():
 			rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
 			# generatePlot()
 			Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
-			global animate
+			global animatePlot
 			# anim = animation.FuncAnimation(figure, animate, frames = 10, interval = 4, blit = True)
-			anim = animation.FuncAnimation(figure, animate, frames = 100, interval = 10)
+			anim = animation.FuncAnimation(figure, animatePlot, frames = 100, interval = 10)
 			# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
 		## Sleep to conform node frequency rate
 		rosrate.sleep()
 
+		## Update loop counter
 		loopcounter = loopcounter + 1
 		## Main loop end
 
