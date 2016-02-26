@@ -47,6 +47,7 @@ if __name__ == '__main__':
 #    parser.add_argument('-sp', '--save-path', dest='savePath', type=str, default='/tmp', default=0, help='Defines path for generated images, implies save images option', metavar='<SAVEPATH><!/tmp>')
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=0, help='Produce more verbose output')
     args = parser.parse_args() # Parse script call arguments
+
     #%% Assign arguments
     n_L = float(args.n_L)
     n_R = float(args.n_R)
@@ -58,6 +59,7 @@ if __name__ == '__main__':
     r_L = float(args.r_L)
     r_R = float(args.r_R)
     axle_l = float(args.axle_l)
+
     #%% Script arguments
 #    logFile = str(args.logFile)
     degrees = bool(args.degrees)
@@ -99,6 +101,7 @@ if __name__ == '__main__':
         ThetaFormat = 'deg'
     else:
         ThetaFormat = 'rad'
+
     if predefined:
         P_i_x = -2; P_i_y = -2; 
         if degrees:
@@ -107,13 +110,15 @@ if __name__ == '__main__':
             Theta_i = np.pi / 4.0
         n_L = 6; n_R = 5; t = 1000;
         r_L = 0.1; r_R = 0.1; axle_l = 0.205;
+        print('Using predefined variables set')
+
     if verbose:
         print('Time (t [s]): ', t)
         print('Initial position (X [m]; Y [m]): ', P_i_x, ';', P_i_y)
         print('Initial orientation (Theta [', ThetaFormat, ']): ', Theta_i)
         print('Axle length (axle_l [m]): ', axle_l)
-        print('Wheel speed - left (n_L [m/s]): ', n_L)
-        print('Wheel speed - right (n_R [m/s]): ', n_R)
+        print('Wheel rotation speed - left (n_L [1/min]): ', n_L)
+        print('Wheel rotation speed - right (n_R [1/min]): ', n_R)
         print('Wheel radius - left (r_L [m]): ', r_L)
         print('Wheel radius - right (r_R [m]): ', r_R)
 
@@ -133,8 +138,10 @@ if __name__ == '__main__':
         dt = t / steps
     else:
         steps = np.ceil(t / float(dt))
+
     t_s = 0
     t_f = t
+
     if verbose:
         print('Time step (dt [s]): ', dt)
         print('Number of steps (n [1]): ', steps)
@@ -152,6 +159,7 @@ if __name__ == '__main__':
                 of = np.rad2deg(Theta_i_t) - 90
             else:
                 of = Theta_i_t - 90
+
             plt.plot(P_f_x_t, P_f_y_t, 'b', marker=(3, 0, of), markersize = markerScale / 3)
 
         Theta_i_t = Theta_f_t
@@ -166,6 +174,7 @@ if __name__ == '__main__':
 
     if verbose:
         print('Simulation duration (t_s [s]): ', t_s)
+
     # [P_f_x, P_f_y, Theta_f] = rollo_compute_position(P_i_x, P_i_y, Theta_i, n_L, n_R, t, r_L, r_R, axle_l, verbose, degrees)
     print('Final position (x [m], y [m]): ', P_f_x, ',', P_f_y)
     if degrees:
@@ -186,6 +195,7 @@ if __name__ == '__main__':
         else:
             oi = Theta_i - 90
             of = Theta_f - 90
+
         plt.plot(P_i_x, P_i_y, 'g', marker = (3, 0, oi), markersize = markerScale, linewidth = lineWidth)
         # plt.plot(P_f_x_t, P_f_y_t, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
         plt.plot(P_f_x, P_f_y, 'r', marker = (3, 0, of), markersize = markerScale, linewidth = lineWidth)
