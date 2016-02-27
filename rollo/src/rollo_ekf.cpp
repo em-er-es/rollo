@@ -7,8 +7,8 @@
  *
  * @brief EKF implementation for localisation of the robot
  *
- * Command prototype: <b>rosrun rollo rollo_ekf _rate:=1</b>
- * @param rate: Sampling frequency of the node <!1 [Hz]>
+ * Command prototype: <b>rosrun rollo rollo_ekf _rate:=10</b>
+ * @param rate: Sampling frequency of the node <!10 [Hz]>
  *
  * Based on input from communication node in form of control commands and measurement from preprocessor node,
  * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance. Additional infromation in form of odometry based state estimate are also published for easier analysis of the filter results.
@@ -296,7 +296,7 @@ Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
  *
  * Initialize node, nodehandle, subscribe to messages from preprocessor and communication nodes and publish estimated state of the robot.
  *
- * @param rate: Sampling frequency of the node <!1 [Hz]>
+ * @param rate: Sampling frequency of the node <!10 [Hz]>
  *
  * Initializes Extended Kalman Filter revelant variables.
  * As a part of initializing, function waits for one message from each subscriber and save timestamps for the first iteration of EKF.
@@ -336,7 +336,7 @@ int rate_frequency;
 //! Use a private node handle so that multiple instances of the node can be run simultaneously
 //! while using different parameters.
 ros::NodeHandle private_node_handle_("~");
-private_node_handle_.param("rate", rate_frequency, int(1));
+private_node_handle_.param("rate", rate_frequency, int(10));
 
 //! - Publishing rate [Hz]
 ros::Rate frequency(rate_frequency);
@@ -355,7 +355,7 @@ double r = 0.1; // std of measurement noise //CRC
 //!   - Process noise covariance
 Eigen::Matrix3d Q = Eigen::Matrix3d::Identity();
 
-Q(0,0) = q*q;
+Q(0,0) = q * q;
 Q(1,1) = q*q;
 Q(2,2) = q*q;
 
@@ -619,7 +619,7 @@ do {
 
 		//! - Prepare data for publishing
 		rollo::EKF result;
-		result.header.stamp.sec = (int32_t) EKFfilterTimeSecs;
+		result.header.stamp.sec = (int32_t) EKFfilterTimeSecs;	
 		result.header.stamp.nsec = (int32_t)((EKFfilterTimeSecs - result.header.stamp.sec) * 1000000000); // 1.000.000.000 //Q what is the limit of int here? it is possible to overflow? If so, when? Does that make sense?
 
 		//! - Pose2D EKF
