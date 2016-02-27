@@ -399,7 +399,7 @@ Eigen::Vector3d z_estimate;
 Eigen::Matrix3d P12;
 Eigen::Matrix3d S_inv;
 Eigen::Matrix3d H;
-Eigen::Matrix3d L;
+Eigen::Matrix3d U;
 
 //!   - Initialize state estimate vector and state covariance matrix a posteriori
 Eigen::Vector3d x_cc;
@@ -597,18 +597,16 @@ do {
 		//! Instead of standard equations for EKF, use cholesky factorization for a stable covariance matrix
 		//!   - Compute the Cholesky decomposition
 		Eigen::LLT<Eigen::Matrix3d, Eigen::Upper> chol(Jh * P12 + R);
-		L = chol.matrixU();
+		U = chol.matrixU();
 
-		R = L;
-		H = P12 * R.inverse();
+		H = P12 * U.inverse();
 
-		std::cout << " Verify Cholesky: \nS:\n" << (Jh * P12 + R) << "\nL:\n" << L << "\n Verify\n" << L.transpose() * L << std::endl; //DB
+		std::cout << " Verify Cholesky: \nS:\n" << (Jh * P12 + R) << "\nU:\n" << U << "\n Verify\n" << U.transpose() * U << std::endl; //DB
 		std::cout << " P12:\n" << P12 << "\n R:\n" << R << "\nRinv:\n" << R.inverse() << "\n" <<std::endl; //DB
 		std::cout << " H:\n" << H << "\n" <<std::endl; //DB
-
-		//! - Compute state estimate x_k|k and state covariance matrix E_k|k
-		x_cc = x_cp + H * ((R.transpose() ).inverse()) * (z_EKF - z_estimate);  //! State estimate x_k|k
-		E_cc = E_cp - H * H.transpose(); //! State covariance matrix E_k|k
+		//! - Compute state estimate, x_k|k and state covariance matrix, E_k|k
+		x_cc = x_cp + H * ((U.transpose() ).inverse()) * (z_EKF - z_estimate);  //state estimate, x_k|k
+		E_cc = E_cp - H * H.transpose();     //state covariance matrix, E_k|k
 
 		//! - Update previous covariance matrix E_pp an state x_pp values for next loop
 		x_pp = x_cc;
@@ -618,13 +616,6 @@ do {
 		//! - Determine odometry update without filter
 		x_cc_odom = FSTATE(x_pp_odom, u); //f_xu
 		x_pp_odom = x_cc_odom;
-
-		//! - Reinitialize R for the next loop
-		R = Eigen::Matrix3d::Identity();
-
-		R(0, 0) = r * r;
-		R(1, 1) = r * r;
-		R(2, 2) = r * r;
 
 		//! - Prepare data for publishing
 		rollo::EKF result;
