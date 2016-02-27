@@ -8,7 +8,7 @@
     _samplesize:=4
     _sampling:=0
     "
-    output="log"
+    output="screen"
     respawn="false"
     launch-prefix=""
     required="true">
@@ -26,7 +26,7 @@
     _forwardtime:=25
     _turntime:=6
     "
-    output="log"
+    output="screen"
     respawn="false"
     launch-prefix=""
     required="true">
@@ -37,7 +37,7 @@
     args="
     _rate:=25
     "
-    output="log"
+    output="screen"
     respawn="false"
     launch-prefix=""
     required="false">
@@ -48,30 +48,32 @@
     args="
     _rate:=1
     "
-    output="log"
+    output="screen"
+    respawn="false"
+    launch-prefix=""
+    required="false">
+  </node>
+  <node pkg="rollo"
+    type="rollo_visualization"
+    name="rollo_visualization"
+    output="screen"
     respawn="false"
     launch-prefix=""
     required="false">
   </node>
 <!--
-  <node pkg="rollo"
-    type="rollo_visualization"
-    name="rollo_visualization"
     args="
     _rate:=25
     _savepath:=4
     _duration:=0
     _format:=
     "
-    output="log"
-    respawn="false"
-    launch-prefix=""
-    required="false">
-  </node>
+/-->
+<!--
   <node pkg="rollo"
     type="rollo_odometry"
     name="rollo_odometry"
-    output="log"
+    output="screen"
     respawn="false"
     launch-prefix=""
     required="true">
