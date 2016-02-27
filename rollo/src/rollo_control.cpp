@@ -162,9 +162,9 @@ void decodeKey (char character, double &Speed, double &Turn)
 {
 	switch (character){
 		//! Left key set control
-		case 'q':	Speed += LKeysSteps; Turn -= LKeysSteps; break;
+		case 'q':	Speed += LKeysSteps; Turn += LKeysSteps; break;
 		case 'w':	Speed += LKeysSteps; Turn = Turn; break;
-		case 'e':	Speed += LKeysSteps; Turn += LKeysSteps; break;
+		case 'e':	Speed += LKeysSteps; Turn -= LKeysSteps; break;
 		case 'a':	Speed = Speed; Turn += LKeysSteps; break;
 		case 's':	Speed -= LKeysSteps; Turn = Turn; break;
 		case 'd':	Speed = Speed; Turn -= LKeysSteps; break;
