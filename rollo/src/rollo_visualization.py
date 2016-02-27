@@ -19,6 +19,10 @@
 
 
 ''' TODO
+ * Add parameters for refreshing plot, size
+ * Make marker gradual transition from previous position to current
+ * Cleanup this mess
+ * for EKF message use odompose2d and ekfpose2d
  * ADD & FIX DOXYGEN documentation format
  * Implement proper animation for pseudo realtime display of measurements
  *! Subscribe to mocap topic (/Optitrack/ground_pose)
@@ -37,10 +41,16 @@
 
 ## Import basic Python libraries
 from __future__ import print_function #Python2
+import matplotlib
+matplotlib.use('GtkAgg')
 from matplotlib import pyplot as plt
 from matplotlib import animation
+from matplotlib import interactive
 import numpy as np
 import time
+# import multiprocessing
+from multiprocessing import Process, Pipe
+import gobject
 
 ## Import ROS libraries
 import roslib
@@ -68,7 +78,7 @@ NodeName = "VIS "
 
 ## Visualize rate [Hz] == [fps]
 rate = 25 # 25 [Hz] = 25 [fps]
-# rate = 1 # 25 [Hz] = 25 [fps]
+# rate = 30 # 25 [Hz] = 25 [fps]
 
 ## Message for measurement data
 # MessageMeasurement = 0
@@ -79,32 +89,24 @@ rate = 25 # 25 [Hz] = 25 [fps]
 ## Loop counter
 loopcounter = 0
 markerScale = 0
+plotRefreshRate = 100
 
-## Plot contraints
+## Plot components and parameters
 ## Maximal coordinates - symmetrical
-axlx = 4
-axly = 4
+axl = -4
+axlx = axl
+axly = axl
+# axlx = 2
+# axly = 2
 
 ## Global flags
 
-# if (loopcounter == 0):
 ## Global flag 1
 flagSubscriber1 = False
 
 ## Global flag 2
 flagSubscriber2 = False
 
-## Global figure holder
-figure = 0
-
-## Global axis holder
-axis = 0
-
-## Global plot object holder
-Plot = plt.plot(0)
-
-## Set pyplot to be non-interactive
-# plt.ioff()
 
 ## Subscriber callback for measurement data
 
@@ -130,12 +132,12 @@ def subscriberCallbackEKF(msg):
 	return 0
 
 # Animation
-
 ## Initialization function for animation
 def initAnimation():
 	## Plot the background of each frame
+	global Pos
 	Pos.set_data([], [])
-	return line
+	return Pos
 
 ## Animation callback function
 #
@@ -147,27 +149,88 @@ def animatePlot(i):
 	# x = np.linspace(0, 2, 1000)
 	# Pos.set_data(MessageMeasurement.x, MessageMeasurement.y)
 	Pos.set_data(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
+	# Pos.set_data(2, 2)
 	# Pos.set_data(x, MessageMeasurement.y)
 	# Pos.set_data(1*i, 2*i)
 	return Pos
 
+## Initilize plot
+def initPlot(object):
+	self.axes(xlim=(-axlx, axlx), ylim=(-axly, axly))
+	self.grid(1)
+
+# def clearPlot():
+	# ax = plt.axes(xlim=(-axlx, axlx), ylim=(-axly, axly))
+	# plt.grid(1)
+
 
 ## Generate and update plot
 
-def generatePlot():
+def generatePlot(initcond):
 	rospy.loginfo("[Rollo][%s][generatePlot] Init", NodeName) # //DB
 
+	## Initialization function for animation
+	# def initAnimation():
+		## Plot the background of each frame
+		# global PoS
+		# Pos.set_data([], [])
+		# return Pos,
+
+	## Animation callback function
+	#
+	# \param i Interation step
+	#
+	# Sequentially called
+	# def animatePlot(i):
+		# global Pos
+		# x = np.linspace(0, 2, 1000)
+		# Pos.set_data(MessageMeasurement.x, MessageMeasurement.y)
+		# Pos.set_data(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
+		# Pos.set_data(2, 0.1 * i)
+		# Pos.set_data(x, MessageMeasurement.y)
+		# Pos.set_data(1*i, 2*i)
+		# return Pos,
+
+	## - First loop
+	if (initcond == 0):
+		figure = plt.figure()
+		# figure, axis = plt.subplots()
+		# plt.axis([-axlx, axlx, -axly, axly])
+		ax = plt.axes(xlim=(-axlx, axlx), ylim=(-axly, axly))
+		plt.grid(1)
+		# plt.ion()
+		# Pos, = plt.plot(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
+		global Pos
+		Pos, = ax.plot([], [], lw = 2)
+		# plt.show(figure)
+		markerScale = 3
+		# anim = animation.FuncAnimation(figure, animatePlot, init_func=initAnimation, frames = 25, interval = 1, blit = True)
+		# anim = animation.FuncAnimation(figure, animatePlot, init_func=initAnimation, frames = 200, interval = 20, blit = True)
+		# anim = animation.FuncAnimation(figure, animatePlot, init_func=initAnimation, frames = 30, interval = 1, blit = True)
+		# Pos, = ax.plot(0)
+		# Pos, = plt.plot(0)
+		initcond = 1
+
 	## Generate quiver plot
+	# global MessageMeasurement
 	# plt.quiver(MessageMeasurement.x, MessageMeasurement.y, MessageMeasurement.theta)
 	# plt.quiver(MessageEKF.pose2d.x, MessageEKF.pose2d.y, MessageEKF.pose2d.theta, cmap='gray')
 	# of = np.rad2deg(MessageMeasurement.theta) - 90
-	of = np.rad2deg(MessageMeasurement.pose2d.theta) - 90
+	# of = np.rad2deg(MessageMeasurement.pose2d.theta) - 90
 	# Pos = plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
 	# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
 	Pos, = plt.plot(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
-	# if (not loopcounter > 100):
+	# if (loopcounter > 4):
 		# plt.ioff()
-		# plt.show()
+	# plt.ion()
+
+	# interactive(True)
+	# matplotlib.interactive(False)
+	# interactive(False)
+	# plt.ioff()
+	# plt.show()
+	plt.show(block=False)
+	# plt.show(block=True)
 		# plt.hold(False)
 		# time.sleep(3)
 	# plt.draw()
@@ -182,13 +245,15 @@ def generatePlot():
 	# anim = animation.FuncAnimation(figure, animate, init_func = init, frames = rate * 10, interval = rate, blit = True)
 
 	# save the animation as an mp4.  This requires ffmpeg or mencoder to be
-	# installed.  The extra_args ensure that the x264 codec is used, so that
+	# installed. The extra_args ensure that the x264 codec is used, so that
 	# the video can be embedded in html5.  You may need to adjust this for
 	# your system: for more information, see
 	# http://matplotlib.sourceforge.net/api/animation_api.html
 	# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+	# anim.save('video', fps=30, extra_args=['-vcodec', 'libx264'])
 
-	plt.show()
+	# plt.savefig('L%d.png' % loopcounter)
+	# plt.show(block=False)
 	## Reset subscriber flags
 	global flagSubscriber1
 	flagSubscriber1 = False
@@ -197,6 +262,124 @@ def generatePlot():
 
 	return 0
 
+class ProcessPlotter(object):
+	def __init__(self):
+		# self.x = []
+		# self.y = []
+		global samples
+		samples = 2 ## Sufficient to connect markers
+		self.x1 = np.zeros(samples)
+		self.y1 = np.zeros(samples)
+		self.x2 = np.zeros(samples)
+		self.y2 = np.zeros(samples)
+		self.x3 = np.zeros(samples)
+		self.y3 = np.zeros(samples)
+		# self.y = range(samples)
+
+	def terminate(self):
+		plt.close('all')
+
+	def poll_draw(self):
+
+		def call_back():
+			# global samples = 10
+			samples
+			# ofd = - 90
+			ofd = - 135
+			# plot(0, 0)
+			self.ax.axis([-axlx, axlx, -axly, axly])
+			while 1:
+				if not self.pipe.poll():
+					break
+
+				data = self.pipe.recv()
+
+				if data is None:
+					self.terminate()
+					return False
+
+				else:
+					# self.x.append(data[0])
+					# self.y.append(data[1])
+					for i in range(samples - 1):
+						self.x1[i + 1] = self.x1[i]
+						self.y1[i + 1] = self.y1[i]
+						self.x2[i + 1] = self.x2[i]
+						self.y2[i + 1] = self.y2[i]
+						self.x3[i + 1] = self.x3[i]
+						self.y3[i + 1] = self.y3[i]
+					self.x1[0] = data[1]
+					self.y1[0] = data[2]
+					self.x2[0] = data[4]
+					self.y2[0] = data[5]
+					self.x3[0] = data[7]
+					self.y3[0] = data[8]
+					# of = np.rad2deg(data[3]) - 90
+					
+					of1 = np.rad2deg(data[3]) + ofd
+					of2 = np.rad2deg(data[6]) + ofd
+					of3 = np.rad2deg(data[9]) + ofd
+					self.ax.plot(self.x1, self.y1, 'r', marker = (3, 0, of1), markersize = 20)
+					self.ax.plot(self.x2, self.y2, 'g', marker = (3, 0, of2), markersize = 15)
+					self.ax.plot(self.x3, self.y3, 'b', marker = (3, 0, of3), markersize = 12)
+					# global loop
+					# print('L', loop)
+					# print(loopcounter)
+					# global loopcounter
+					if data[0]: # Clear every so often
+						print('Clear')
+						#matplotlib.pyplot.cla()
+						self.ax.cla()
+						# initPlot(self.ax)
+						self.ax.grid(1)
+						self.ax.axis([-axlx, axlx, -axly, axly])
+
+			self.fig.canvas.draw()
+			return True
+
+		return call_back
+
+	def __call__(self, pipe):
+		print('starting plotter...')
+
+		self.pipe = pipe
+		self.fig, self.ax = plt.subplots()
+		plt.grid(1)
+		self.gid = gobject.timeout_add(0, self.poll_draw())
+
+		print('...done')
+		plt.ioff()
+		plt.show()
+
+class NBPlot(object):
+	def __init__(self):
+		self.plot_pipe, plotter_pipe = Pipe()
+		self.plotter = ProcessPlotter()
+		self.plot_process = Process(target=self.plotter,
+									args=(plotter_pipe,))
+		self.plot_process.daemon = True
+		self.plot_process.start()
+
+	def plot(self, finished=False):
+		send = self.plot_pipe.send
+		if finished:
+			send(None)
+		else:
+			if not loopcounter % plotRefreshRate:
+				reset = 1
+			else:
+				reset = 0
+			data = [reset, 
+						MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y, MessageMeasurement.pose2d.theta, 
+						MessageEKF.odompose2d.x, MessageEKF.odompose2d.y, MessageEKF.odompose2d.theta,
+						MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta]
+			# print(MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta)
+			# print(MessageEKF.odompose2d.x, MessageEKF.odompose2d.y, MessageEKF.odompose2d.theta)
+			send(data)
+			flagSubscriber1 = False
+			flagSubscriber2 = False
+
+
 ## Node main function
 
 def main():
@@ -204,6 +387,7 @@ def main():
 
 		More details
 	"""
+
 	##! Initiliaze:
 	## - Refer to global variable so that it can be changed
 	global loopcounter
@@ -211,18 +395,6 @@ def main():
 	## - Initialize rospy
 	# roscpp_initialize(sys.argv)
 	rospy.init_node('rollo_visualization', anonymous=True)
-
-	## - First run
-	if loopcounter == 0:
-		# figure = plt.figure()
-		figure, axis = plt.subplots()
-		plt.axis([-axlx, axlx, -axly, axly])
-		plt.grid(1)
-		# plt.ion()
-		# plt.show()
-		markerScale = 3
-		# Pos, = ax.plot(0)
-		# Pos, = plt.plot(0)
 
 	## Set frequency rate for visualization node
 	rosrate = rospy.Rate(rate)
@@ -235,18 +407,38 @@ def main():
 	# rospy.Subscriber('/Optitrack_Rollo/ground_pose', Pose2D, subscriberCallbackMeasurement, queue_size = 1024)
 	rospy.Subscriber('/Rollo/pose2dstamped', Pose2DStamped, subscriberCallbackMeasurement, queue_size = 1024)
 
+	initcond = 0
+
+	## Multiprocessing
+	## Start another process for plotting
+	# plt.ion()
+	# processPlotting = multiprocessing.Process(target = generatePlot(0), args=())
+	# processPlotting = Process(target = generatePlot(0), args=())
+	# processPlotting.daemon = True
+	# processPlotting.start()
+	# print('1')
+	# print(multiprocessing.current_process())
+# multiprocessing.current_process()
+	pl = NBPlot()
+	# plt.ioff()
+	# plt.show()
+	# if loopcounter == 20:
+		# plt.show()
+
+
 	while not rospy.is_shutdown():
 		## Main loop
-		rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, loopcounter) # //DB
+		# rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, loopcounter) # //DB
+		if not loopcounter % 10:
+			rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, loopcounter) # //DB
 
 		if (flagSubscriber1 == True) and (flagSubscriber2 == True):
-			rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
-			# generatePlot()
+			# rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
+			# generatePlot(1)
+			pl.plot()
 			# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
-			Pos, = plt.plot(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
-			global animatePlot
+			# global animatePlot
 			# anim = animation.FuncAnimation(figure, animate, frames = 10, interval = 4, blit = True)
-			anim = animation.FuncAnimation(figure, animatePlot, frames = 100, interval = 10)
 			# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
 		## Sleep to conform node frequency rate
@@ -254,6 +446,7 @@ def main():
 
 		## Update loop counter
 		loopcounter = loopcounter + 1
+		# processPlotting.join()
 		## Main loop end
 
 	# rospy.spin()
