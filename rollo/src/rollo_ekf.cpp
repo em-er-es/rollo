@@ -248,7 +248,8 @@ rollo::Pose2DStamped interpolateMeasurement( rollo::Pose2DStamped zOld, rollo::P
 
 Eigen::Vector3d FSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 
-	Eigen::Vector3d x_cp(x_pp(0) + u(0) * cos(x_pp(2) - (u(1) / 2)), x_pp(1) + u(0) * sin(x_pp(2) - (u(1) / 2)), x_pp(2) - u(1));
+	// Eigen::Vector3d x_cp(x_pp(0) + u(0) * cos(x_pp(2) - (u(1) / 2)), x_pp(1) + u(0) * sin(x_pp(2) - (u(1) / 2)), x_pp(2) - u(1));
+	Eigen::Vector3d x_cp(x_pp(0) - u(0) * cos(x_pp(2) - (u(1) / 2)), x_pp(1) + u(0) * sin(x_pp(2) - (u(1) / 2)), x_pp(2) - u(1));
 
 	return x_cp;
 }
@@ -652,7 +653,7 @@ do {
 
 	ros::spinOnce();
 
-	// ROS_INFO("[Rollo][Debug][Counter]: %d", loopcounter); //DB
+	// ROS_INFO("[Rollo][Debug][Counter]: %d", LoopCounter); //DB
 
 	if (! ros::ok()) loopcondition = 0;
 

@@ -103,7 +103,7 @@ bool FlagEmergency = 0; //!< Emergency flag
 char Mode[1]; //!< Message mode description
 int VelocityL, VelocityR; //!< Message velocities description
 
-unsigned int loopcounter = 1; //!< Loop counter for debugging purpose
+unsigned int LoopCounter = 1; //!< Loop counter for debugging purpose
 
 double RolloMax = ROLLO_SPEED_MAX; //!< Maximum speed of the Rollo
 double RolloMin = ROLLO_SPEED_MIN; //!< Minimum speed of the Rollo
@@ -141,7 +141,7 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 #		INFO="100%"; // Not used
 // */
 
-	// if (! (loopcounter % 10)) ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f] tol: %f)", NodeName, x, z, tol); //DB
+	// if (! (LoopCounter % 10)) ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f] tol: %f)", NodeName, x, z, tol); //DB
 
 	// if (x == 0) { //! Ideal case
 	//! Since control node can provide abstract control values, an ideal case could be used for decoding velocities.
@@ -225,7 +225,7 @@ int decodeVelocities(double x, double z, char *Message, int &VelocityL, int &Vel
 	}
 
 /* //DB
-	if (! (loopcounter % 10)) { //! Print debug messages every 10th loop, there should be an additional condition to actually print it only once
+	if (! (LoopCounter % 10)) { //! Print debug messages every 10th loop, there should be an additional condition to actually print it only once
 		// ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%c][%c][%c]]", NodeName, x, z, Message[0], Message[1], Message[2]); //DB
 		// ROS_INFO("[Rollo][%s][DecodeVelocities] M: %c ([%f], [%f]) => [[%d][%d][%d]]", NodeName, Mode, float(x), float(z), Message[0], Message[1], Message[2]); //DB
 		ROS_INFO("[Rollo][%s][DecodeVelocities] ([%f], [%f]) => [[%d][%d][%d]]", NodeName, float(x), float(z), Message[0], Message[1], Message[2]); //DB
@@ -432,10 +432,10 @@ udp_client_server::udp_client udpClient(ip, port);
 //! Alternatively this square test could be in control node, however communication node is "closer" to Rollo
 	// while ((abs(square) > 0) && ros::ok()) {
 	while (square != 0 && ros::ok()) {
-		loopcounter++; // Use loopcounter as square test run indicator
+		LoopCounter++; // Use LoopCounter as square test run indicator
 
 		//! - Print information on current run
-		ROS_INFO("[Rollo][%s][Square test][%d]", NodeName, loopcounter); //DB
+		ROS_INFO("[Rollo][%s][Square test][%d]", NodeName, LoopCounter); //DB
 
 		//FIX Get rid of warnings:
 		//warning: multi-character character constant [-Wmultichar]
@@ -453,8 +453,8 @@ udp_client_server::udp_client udpClient(ip, port);
 		//! For multiple runs the robot would go back and forth providing more reliable data on the actual error
 		//! In ideal case even a high order square run would result in the robot being at the initial position with initial orientation
 		char CmdForward[3] = {0x7c, 0x55, 0x11}; //! - Compose forward command
-		ROS_INFO("[Rollo][%s][Square test][%d] Message: [%d|%d|%d]", NodeName, loopcounter, CmdForward[0], CmdForward[1], CmdForward[2]); //DB
-		ROS_INFO("[Rollo][%s][Square test][%d] Turning: %d {dec}", NodeName, loopcounter, CmdTurn[0]); //DB
+		ROS_INFO("[Rollo][%s][Square test][%d] Message: [%d|%d|%d]", NodeName, LoopCounter, CmdForward[0], CmdForward[1], CmdForward[2]); //DB
+		ROS_INFO("[Rollo][%s][Square test][%d] Turning: %d {dec}", NodeName, LoopCounter, CmdTurn[0]); //DB
 		//! - Set initial time
 		double initialtime = ros::Time::now().toSec();
 		//! -  Initialize bytes sent variable for debugging
@@ -462,18 +462,18 @@ udp_client_server::udp_client udpClient(ip, port);
 
 		//! - Print square test parameters
 		// ROS_INFO("[Rollo][%s][Square test] Starting time %g, forward time %g, turning time %g", NodeName, initialtime, forwardtime, turntime); //DB
-		ROS_INFO("[Rollo][%s][Square test][%d] Forward time %g, forward speed %f, turning time %g", NodeName, loopcounter, squarespeed, forwardtime, turntime); //VB
+		ROS_INFO("[Rollo][%s][Square test][%d] Forward time %g, forward speed %f, turning time %g", NodeName, LoopCounter, squarespeed, forwardtime, turntime); //VB
 
 		for (int i = 0; i < 4; i++) { //! ### Main square loop
 
 			//! Moving forward
-			ROS_INFO("[Rollo][%s][Square test][%d] Moving forward: %g [s] @ %f", NodeName, loopcounter, forwardtime, squarespeed); //VB
+			ROS_INFO("[Rollo][%s][Square test][%d] Moving forward: %g [s] @ %f", NodeName, LoopCounter, forwardtime, squarespeed); //VB
 			for (int j = 0; j < 3; j++) bs += udpClient.send(CmdForward, nb); //! Send command 3 times
 			ros::Duration(forwardtime, 0).sleep(); //! Wait for the specified time to move forward
 			// Alternatively use a while loop here and update the command either at the rate of the loop or other
 
 			//! Turning
-			ROS_INFO("[Rollo][%s][Square test][%d] Turning: %g [s]", NodeName, loopcounter, turntime); //VB
+			ROS_INFO("[Rollo][%s][Square test][%d] Turning: %g [s]", NodeName, LoopCounter, turntime); //VB
 			for (int j = 0; j < 3; j++) bs += udpClient.send(CmdTurn, nb); //! Send command 3 times
 			ros::Duration(turntime, 0).sleep(); //! Wait for the specified time to turn
 			// Alternatively use a while loop here and update the command either at the rate of the loop or other
@@ -482,12 +482,12 @@ udp_client_server::udp_client udpClient(ip, port);
 
 			double finishtime = ros::Time::now().toSec(); //! Update run finish time
 			//! Print duration time
-			ROS_INFO("[Rollo][%s][Square test][%d] Finished: %g [s]", NodeName, loopcounter, abs(finishtime - initialtime)); //DB
+			ROS_INFO("[Rollo][%s][Square test][%d] Finished: %g [s]", NodeName, LoopCounter, abs(finishtime - initialtime)); //DB
 
 		//! Check square loop condition
 		if (square > 1) {
 			//! Turn around
-			ROS_INFO("[Rollo][%s][Square test][%d] Turn around", NodeName, loopcounter); //VB
+			ROS_INFO("[Rollo][%s][Square test][%d] Turn around", NodeName, LoopCounter); //VB
 			for (int j = 0; j < 3; j++) bs += udpClient.send(CmdTurn, nb); //! Send command 3 times
 			ros::Duration(2 * turntime, 0).sleep(); //! Wait for twice the specified time to turn around
 
@@ -495,7 +495,7 @@ udp_client_server::udp_client udpClient(ip, port);
 			square--;
 		} else {
 			//! Stop
-			ROS_INFO("[Rollo][%s][Square test][%d] Stop", NodeName, loopcounter); //VB
+			ROS_INFO("[Rollo][%s][Square test][%d] Stop", NodeName, LoopCounter); //VB
 			for (int j = 0; j < 10; j++) bs += udpClient.send(MessageEmergencyStop, nb); //! Send stop command 10 times
 
 			//! Update square run counter and check for exit condition
@@ -573,8 +573,8 @@ while (ros::ok()) {
 	//! Sleep before running loop again
 	frequency.sleep();
 
-	//! Increase loopcounter
-	loopcounter++;
+	//! Increase LoopCounter
+	LoopCounter++;
 }
 //! ## Main loop end
 

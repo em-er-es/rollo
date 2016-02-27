@@ -160,7 +160,7 @@ rollo::Pose2DStamped PubRolloPositionPose2dStamped;
 PubRolloPositionPose2dStamped.header.frame_id = '1'; // Global frame
 
 //! - Loop counter holder
-unsigned int loopcounter = 0;
+unsigned int LoopCounter = 0;
 //! - Loop condition variable
 int loopcondition = 1; // For while(1) loop
 
@@ -171,7 +171,7 @@ do {
 	sum_y += y;
 	sum_theta += theta;
 
-	if (loopcounter >= samplesize)
+	if (LoopCounter >= samplesize)
 	{
 		average_x = sum_x / samplesize;
 		average_y = sum_y / samplesize;
@@ -193,7 +193,7 @@ do {
 		RolloPub.publish(PubRolloPositionPose2dStamped);
 
 		//! - Reset variables
-		loopcounter = 0;
+		LoopCounter = 0;
 		sum_x  = 0;
 		sum_y  = 0;
 		sum_theta = 0;
@@ -203,14 +203,14 @@ do {
 	}
 
 
-	// ROS_INFO("[Rollo][%s][Debug][Counter]: %d", NodeName, loopcounter); //DB
+	// ROS_INFO("[Rollo][%s][Debug][Counter]: %d", NodeName, LoopCounter); //DB
 	ros::spinOnce();
 	if (! ros::ok()) loopcondition = 0; //TEST seems unnecessary
 
 	//! For averaging sleep for time defined by rate before reading states from the subscriberCallback()
 	if (sampling != 0) frequency.sleep();
 	//! - Increase loop counter
-	loopcounter++;
+	LoopCounter++;
 
 } while (loopcondition);
 //! ## Main loop end

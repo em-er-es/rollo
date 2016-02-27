@@ -87,7 +87,7 @@ rate = 25 # 25 [Hz] = 25 [fps]
 # MessageEKF = 0
 
 ## Loop counter
-loopcounter = 0
+LoopCounter = 0
 markerScale = 0
 plotRefreshRate = 100
 
@@ -220,7 +220,7 @@ def generatePlot(initcond):
 	# Pos = plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
 	# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
 	Pos, = plt.plot(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
-	# if (loopcounter > 4):
+	# if (LoopCounter > 4):
 		# plt.ioff()
 	# plt.ion()
 
@@ -252,7 +252,7 @@ def generatePlot(initcond):
 	# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 	# anim.save('video', fps=30, extra_args=['-vcodec', 'libx264'])
 
-	# plt.savefig('L%d.png' % loopcounter)
+	# plt.savefig('L%d.png' % LoopCounter)
 	# plt.show(block=False)
 	## Reset subscriber flags
 	global flagSubscriber1
@@ -315,7 +315,7 @@ class ProcessPlotter(object):
 					self.x3[0] = data[7]
 					self.y3[0] = data[8]
 					# of = np.rad2deg(data[3]) - 90
-					
+
 					of1 = np.rad2deg(data[3]) + ofd
 					of2 = np.rad2deg(data[6]) + ofd
 					of3 = np.rad2deg(data[9]) + ofd
@@ -324,8 +324,8 @@ class ProcessPlotter(object):
 					self.ax.plot(self.x3, self.y3, 'b', marker = (3, 0, of3), markersize = 12)
 					# global loop
 					# print('L', loop)
-					# print(loopcounter)
-					# global loopcounter
+					# print(LoopCounter)
+					# global LoopCounter
 					if data[0]: # Clear every so often
 						print('Clear')
 						#matplotlib.pyplot.cla()
@@ -365,7 +365,7 @@ class NBPlot(object):
 		if finished:
 			send(None)
 		else:
-			if not loopcounter % plotRefreshRate:
+			if not LoopCounter % plotRefreshRate:
 				reset = 1
 			else:
 				reset = 0
@@ -390,7 +390,7 @@ def main():
 
 	##! Initiliaze:
 	## - Refer to global variable so that it can be changed
-	global loopcounter
+	global LoopCounter
 
 	## - Initialize rospy
 	# roscpp_initialize(sys.argv)
@@ -422,15 +422,15 @@ def main():
 	pl = NBPlot()
 	# plt.ioff()
 	# plt.show()
-	# if loopcounter == 20:
+	# if LoopCounter == 20:
 		# plt.show()
 
 
 	while not rospy.is_shutdown():
 		## Main loop
-		# rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, loopcounter) # //DB
-		if not loopcounter % 10:
-			rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, loopcounter) # //DB
+		# rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, LoopCounter) # //DB
+		if not LoopCounter % 10:
+			rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, LoopCounter) # //DB
 
 		if (flagSubscriber1 == True) and (flagSubscriber2 == True):
 			# rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
@@ -445,7 +445,7 @@ def main():
 		rosrate.sleep()
 
 		## Update loop counter
-		loopcounter = loopcounter + 1
+		LoopCounter = LoopCounter + 1
 		# processPlotting.join()
 		## Main loop end
 
