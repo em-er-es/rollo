@@ -30,6 +30,7 @@ Logs/average-samples.sh -- Script skeleton for averaging samples using awk - Not
 Logs/filter-logs.sh -- Filtering and converting logs from ROS_INFO output to rosbag format for Pose2D
 Logs/filter-preprocessor-logs.sh -- Filtering and converting logs from preprocessor's ROS_INFO output to rosbag format for Pose2D
 Logs/publish-log.sh -- Crude publishing script with various options
+Logs/record.sh -- Record testlogs utility scripts
 Logs/test.sh -- Caller script for publish-log.sh
 Scripts/rollo_cleanup.sh -- Helper script for ROS cleanup
 Scripts/rollo_sync.sh -- Helper script for ROS synchronizing binaries in bin with devel/lib directory
