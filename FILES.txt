@@ -2,10 +2,17 @@
 # 86805 - Software Architectures for Robotics
 # Assignment 03 - Localization system for a wheeled humanoid robot
 # Rabbia Asghar, Ernest Skrzypczyk
-TODO HEADER
 
+
+# Project relevant files
 
 # File location/name -- Description
+
+# Internal documentation files
+README.txt - Project readme
+NOTES.txt - Global notes
+TODO.txt - A global TODO list
+FILES.txt - This file
 
 # ROS nodes
 rollo/src/rollo_comm.cpp -- Communication node
