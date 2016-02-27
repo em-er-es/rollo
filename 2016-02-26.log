@@ -1,3 +1,5 @@
 * Formatting and documentation
 * Minor node improvements
 * Testing the whole system
+* Problems with initial orientation for odometry
+* Finished alpha state visualization node
