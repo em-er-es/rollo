@@ -26,29 +26,34 @@
  * ADD & FIX DOXYGEN documentation format
  * Implement proper animation for pseudo realtime display of measurements
  *! Subscribe to mocap topic (/Optitrack/ground_pose)
- * Subscribe to preprocessor topic (Pose2Dstamped)
+ *! Subscribe to preprocessor topic (Pose2Dstamped)
  *! Subscribe to EKF topic
  *
  * TODO later
- * Implement as small buffer for data as possible
+ *! Implement as small buffer for data as possible
  * Double check results for animation
  * Implement saving generated images to a video (code is there)
  * Implement saving generated images to a path
  * Implement a duration parameter
- * Add references from node to topics and console colours
+ * Add references from node to topics and console colors, parse them properly (pycparse)
 '''
 
+## Import
 
 ## Import basic Python libraries
 from __future__ import print_function #Python2
+## Import matplotlib
 import matplotlib
+## Set UI specifics
 matplotlib.use('GtkAgg')
+## Import plot
 from matplotlib import pyplot as plt
+## Import animation for export to video
 from matplotlib import animation
-from matplotlib import interactive
+# from matplotlib import interactive
 import numpy as np
 import time
-# import multiprocessing
+## Multiprocessing library for process and pipe
 from multiprocessing import Process, Pipe
 import gobject
 
@@ -58,15 +63,15 @@ roslib.load_manifest('rollo')
 import rospy
 
 ## Import messages for Rollo
-## Import Pose2D
+## Import standard Pose2D
 from geometry_msgs.msg import Pose2D
 
 ## Import custom messages for Rollo
-# Confirm the PYTHONPATH content
-# from rollo.msg import _EKF # Works
+# Confirm the PYTHONPATH environment variable content
 
 ## Import EKF message
-from rollo.msg import EKF # Also works!
+from rollo.msg import EKF
+# from rollo.msg import _EKF # Also works
 
 ## Import Pose2DStamped message
 from rollo.msg import Pose2DStamped
@@ -78,13 +83,14 @@ NodeName = "VIS "
 
 ## Visualize rate [Hz] == [fps]
 rate = 25 # 25 [Hz] = 25 [fps]
-# rate = 30 # 25 [Hz] = 25 [fps]
 
+#//D
 ## Message for measurement data
 # MessageMeasurement = 0
 
 ## Message for EKF data
 # MessageEKF = 0
+#*//D
 
 ## Loop counter
 LoopCounter = 0
@@ -93,11 +99,9 @@ plotRefreshRate = 100
 
 ## Plot components and parameters
 ## Maximal coordinates - symmetrical
-axl = -4
+axl = -4 # Negative value used to mirror the current calibration setup of motion capture system and keep sanity with adjustments to the plot
 axlx = axl
 axly = axl
-# axlx = 2
-# axly = 2
 
 ## Global flags
 
@@ -131,6 +135,7 @@ def subscriberCallbackEKF(msg):
 
 	return 0
 
+### Functions unused
 # Animation
 ## Initialization function for animation
 def initAnimation():
@@ -144,6 +149,7 @@ def initAnimation():
 # \param i Interation step
 #
 # Sequentially called
+
 def animatePlot(i):
 	global Pos
 	# x = np.linspace(0, 2, 1000)
@@ -155,6 +161,7 @@ def animatePlot(i):
 	return Pos
 
 ## Initilize plot
+
 def initPlot(object):
 	self.axes(xlim=(-axlx, axlx), ylim=(-axly, axly))
 	self.grid(1)
@@ -169,33 +176,12 @@ def initPlot(object):
 def generatePlot(initcond):
 	rospy.loginfo("[Rollo][%s][generatePlot] Init", NodeName) # //DB
 
-	## Initialization function for animation
-	# def initAnimation():
-		## Plot the background of each frame
-		# global PoS
-		# Pos.set_data([], [])
-		# return Pos,
-
-	## Animation callback function
-	#
-	# \param i Interation step
-	#
-	# Sequentially called
-	# def animatePlot(i):
-		# global Pos
-		# x = np.linspace(0, 2, 1000)
-		# Pos.set_data(MessageMeasurement.x, MessageMeasurement.y)
-		# Pos.set_data(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
-		# Pos.set_data(2, 0.1 * i)
-		# Pos.set_data(x, MessageMeasurement.y)
-		# Pos.set_data(1*i, 2*i)
-		# return Pos,
-
 	## - First loop
 	if (initcond == 0):
-		figure = plt.figure()
+		## Initilize plot skeleton
 		# figure, axis = plt.subplots()
 		# plt.axis([-axlx, axlx, -axly, axly])
+		figure = plt.figure()
 		ax = plt.axes(xlim=(-axlx, axlx), ylim=(-axly, axly))
 		plt.grid(1)
 		# plt.ion()
@@ -204,38 +190,18 @@ def generatePlot(initcond):
 		Pos, = ax.plot([], [], lw = 2)
 		# plt.show(figure)
 		markerScale = 3
+		## Animation calls
 		# anim = animation.FuncAnimation(figure, animatePlot, init_func=initAnimation, frames = 25, interval = 1, blit = True)
 		# anim = animation.FuncAnimation(figure, animatePlot, init_func=initAnimation, frames = 200, interval = 20, blit = True)
 		# anim = animation.FuncAnimation(figure, animatePlot, init_func=initAnimation, frames = 30, interval = 1, blit = True)
-		# Pos, = ax.plot(0)
-		# Pos, = plt.plot(0)
+		## After initilization send the condition variable
 		initcond = 1
 
 	## Generate quiver plot
-	# global MessageMeasurement
-	# plt.quiver(MessageMeasurement.x, MessageMeasurement.y, MessageMeasurement.theta)
-	# plt.quiver(MessageEKF.pose2d.x, MessageEKF.pose2d.y, MessageEKF.pose2d.theta, cmap='gray')
-	# of = np.rad2deg(MessageMeasurement.theta) - 90
-	# of = np.rad2deg(MessageMeasurement.pose2d.theta) - 90
 	# Pos = plt.plot(MessageMeasurement.x, MessageMeasurement.y, 'b', marker=(3, 0, of), markersize = markerScale / 3)
 	# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
 	Pos, = plt.plot(MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y)
-	# if (LoopCounter > 4):
-		# plt.ioff()
-	# plt.ion()
-
-	# interactive(True)
-	# matplotlib.interactive(False)
-	# interactive(False)
-	# plt.ioff()
-	# plt.show()
 	plt.show(block=False)
-	# plt.show(block=True)
-		# plt.hold(False)
-		# time.sleep(3)
-	# plt.draw()
-	# global figure
-	# plt.draw()
 
 	# First set up the figure, the axis, and the plot element we want to animate
 	# fig = plt.figure()
@@ -244,16 +210,19 @@ def generatePlot(initcond):
 	# call the animator.  blit=True means only re-draw the parts that have changed.
 	# anim = animation.FuncAnimation(figure, animate, init_func = init, frames = rate * 10, interval = rate, blit = True)
 
-	# save the animation as an mp4.  This requires ffmpeg or mencoder to be
+	# Save the animation as an mp4.  This requires ffmpeg or mencoder to be
 	# installed. The extra_args ensure that the x264 codec is used, so that
 	# the video can be embedded in html5.  You may need to adjust this for
 	# your system: for more information, see
 	# http://matplotlib.sourceforge.net/api/animation_api.html
 	# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+	# Save to pipe, read from pipe: $ mpv video
 	# anim.save('video', fps=30, extra_args=['-vcodec', 'libx264'])
 
+	# Save generated plot
 	# plt.savefig('L%d.png' % LoopCounter)
 	# plt.show(block=False)
+
 	## Reset subscriber flags
 	global flagSubscriber1
 	flagSubscriber1 = False
@@ -264,17 +233,16 @@ def generatePlot(initcond):
 
 class ProcessPlotter(object):
 	def __init__(self):
-		# self.x = []
-		# self.y = []
+		## Global variables used from callback
 		global samples
-		samples = 2 ## Sufficient to connect markers
+		samples = 2 ##< Sufficient to connect markers
+		## Initialize samples with zeroes
 		self.x1 = np.zeros(samples)
 		self.y1 = np.zeros(samples)
 		self.x2 = np.zeros(samples)
 		self.y2 = np.zeros(samples)
 		self.x3 = np.zeros(samples)
 		self.y3 = np.zeros(samples)
-		# self.y = range(samples)
 
 	def terminate(self):
 		plt.close('all')
@@ -282,25 +250,32 @@ class ProcessPlotter(object):
 	def poll_draw(self):
 
 		def call_back():
+			## Local variables
 			# global samples = 10
 			samples
 			# ofd = - 90
 			ofd = - 135
-			# plot(0, 0)
+
+			## Set plot limits
 			self.ax.axis([-axlx, axlx, -axly, axly])
+
+			## Main loop
 			while 1:
+				## Exception handler
 				if not self.pipe.poll():
 					break
 
+				## Read data from pipe
 				data = self.pipe.recv()
 
+				## Exception handler
 				if data is None:
 					self.terminate()
 					return False
 
+				## Proceed with processing
 				else:
-					# self.x.append(data[0])
-					# self.y.append(data[1])
+					## Shift last samples
 					for i in range(samples - 1):
 						self.x1[i + 1] = self.x1[i]
 						self.y1[i + 1] = self.y1[i]
@@ -308,28 +283,34 @@ class ProcessPlotter(object):
 						self.y2[i + 1] = self.y2[i]
 						self.x3[i + 1] = self.x3[i]
 						self.y3[i + 1] = self.y3[i]
+
+					## Assign data from pipe to local variables
 					self.x1[0] = data[1]
 					self.y1[0] = data[2]
 					self.x2[0] = data[4]
 					self.y2[0] = data[5]
 					self.x3[0] = data[7]
 					self.y3[0] = data[8]
-					# of = np.rad2deg(data[3]) - 90
 
+					## Correct and assign orientation of marker/robot
 					of1 = np.rad2deg(data[3]) + ofd
 					of2 = np.rad2deg(data[6]) + ofd
 					of3 = np.rad2deg(data[9]) + ofd
+
+					## Plot n-samples
+					## Red - Data from preprocessor
 					self.ax.plot(self.x1, self.y1, 'r', marker = (3, 0, of1), markersize = 20)
+					## Green - Data from odometry sent by EKF
 					self.ax.plot(self.x2, self.y2, 'g', marker = (3, 0, of2), markersize = 15)
+					## Green - Data from EKF
 					self.ax.plot(self.x3, self.y3, 'b', marker = (3, 0, of3), markersize = 12)
-					# global loop
-					# print('L', loop)
-					# print(LoopCounter)
-					# global LoopCounter
+
 					if data[0]: # Clear every so often
-						print('Clear')
-						#matplotlib.pyplot.cla()
+						rospy.loginfo("[Rollo][%s][ProcessPlotter] Clear and reinitalize plot @ loop: %d", NodeName, LoopCounter) # //VB
+						rospy.loginfo("[Rollo][%s][ProcessPlotter] Clear and reinitalize plot", NodeName) # //VB
+						## Clear plot
 						self.ax.cla()
+						## Reinitialize plot
 						# initPlot(self.ax)
 						self.ax.grid(1)
 						self.ax.axis([-axlx, axlx, -axly, axly])
@@ -340,28 +321,29 @@ class ProcessPlotter(object):
 		return call_back
 
 	def __call__(self, pipe):
-		print('starting plotter...')
+		rospy.loginfo("[Rollo][%s][ProcessPlotter] Loop: %d", NodeName, LoopCounter) # //VB
 
+		## Initialize plot skeleton
 		self.pipe = pipe
 		self.fig, self.ax = plt.subplots()
 		plt.grid(1)
 		self.gid = gobject.timeout_add(0, self.poll_draw())
 
-		print('...done')
+		rospy.loginfo("[Rollo][%s][ProcessPlotter] Initialized", NodeName) # //VB
 		plt.ioff()
 		plt.show()
 
-class NBPlot(object):
+class MultiProcessPlot(object):
 	def __init__(self):
-		self.plot_pipe, plotter_pipe = Pipe()
+		self.plotpipe, PlotterPipe = Pipe()
 		self.plotter = ProcessPlotter()
-		self.plot_process = Process(target=self.plotter,
-									args=(plotter_pipe,))
-		self.plot_process.daemon = True
-		self.plot_process.start()
+		self.plotprocess = Process(target = self.plotter, args = (PlotterPipe, ))
+		self.plotprocess.daemon = True
+		self.plotprocess.start()
 
 	def plot(self, finished=False):
-		send = self.plot_pipe.send
+		send = self.plotpipe.send
+
 		if finished:
 			send(None)
 		else:
@@ -369,13 +351,17 @@ class NBPlot(object):
 				reset = 1
 			else:
 				reset = 0
+
+			## Compose data for pipe
 			data = [reset, 
-						MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y, MessageMeasurement.pose2d.theta, 
-						MessageEKF.odompose2d.x, MessageEKF.odompose2d.y, MessageEKF.odompose2d.theta,
-						MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta]
-			# print(MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta)
-			# print(MessageEKF.odompose2d.x, MessageEKF.odompose2d.y, MessageEKF.odompose2d.theta)
+					MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y, MessageMeasurement.pose2d.theta, 
+					MessageEKF.odompose2d.x, MessageEKF.odompose2d.y, MessageEKF.odompose2d.theta,
+					MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta]
+			# print(MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta) # //VB
+			# print(MessageEKF.odompose2d.x, MessageEKF.odompose2d.y, MessageEKF.odompose2d.theta) # //VB
+			## Send data through pipe
 			send(data)
+			## Reset global flags to receive new input
 			flagSubscriber1 = False
 			flagSubscriber2 = False
 
@@ -411,31 +397,24 @@ def main():
 
 	## Multiprocessing
 	## Start another process for plotting
-	# plt.ion()
+	mpp = MultiProcessPlot()
 	# processPlotting = multiprocessing.Process(target = generatePlot(0), args=())
 	# processPlotting = Process(target = generatePlot(0), args=())
 	# processPlotting.daemon = True
 	# processPlotting.start()
-	# print('1')
-	# print(multiprocessing.current_process())
-# multiprocessing.current_process()
-	pl = NBPlot()
-	# plt.ioff()
-	# plt.show()
-	# if LoopCounter == 20:
-		# plt.show()
 
 
 	while not rospy.is_shutdown():
 		## Main loop
 		# rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, LoopCounter) # //DB
-		if not LoopCounter % 10:
+		if not LoopCounter % 1000:
 			rospy.loginfo("[Rollo][%s][Main] Loop: %d", NodeName, LoopCounter) # //DB
 
+		## Plot new message set
 		if (flagSubscriber1 == True) and (flagSubscriber2 == True):
 			# rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
-			# generatePlot(1)
-			pl.plot()
+			mpp.plot()
+			## Animation
 			# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
 			# global animatePlot
 			# anim = animation.FuncAnimation(figure, animate, frames = 10, interval = 4, blit = True)
@@ -446,12 +425,15 @@ def main():
 
 		## Update loop counter
 		LoopCounter = LoopCounter + 1
-		# processPlotting.join()
+
 		## Main loop end
 
+	## Wait for plotprocess to finish
+	mpp.plotprocess.join()
 	# rospy.spin()
 
 
+## Script run condition
 if __name__ == '__main__':
 	try:
 		main()
