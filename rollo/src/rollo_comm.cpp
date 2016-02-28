@@ -432,14 +432,10 @@ udp_client_server::udp_client udpClient(ip, port);
 //! Alternatively this square test could be in control node, however communication node is "closer" to Rollo
 	// while ((abs(square) > 0) && ros::ok()) {
 	while (square != 0 && ros::ok()) {
-		LoopCounter++; // Use LoopCounter as square test run indicator
 
 		//! - Print information on current run
 		ROS_INFO("[Rollo][%s][Square test][%d]", NodeName, LoopCounter); //DB
 
-		//FIX Get rid of warnings:
-		//warning: multi-character character constant [-Wmultichar]
-		//warning: overflow in implicit constant conversion [-Woverflow]
 		//FIX Implement squarespeed
 		char CmdTurn[3] = {0x7b, 0x55, 0x11}; //! - Compose turn command
 		//! - Check square run variable and determine turning direction
@@ -501,6 +497,8 @@ udp_client_server::udp_client udpClient(ip, port);
 			//! Update square run counter and check for exit condition
 			return 0;
 		}
+
+		LoopCounter++; // Use LoopCounter as square test run indicator
 
 		// if (square > 1) square--;
 		// else return 0; //! Update square run counter and check for exit condition
