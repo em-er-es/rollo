@@ -274,20 +274,20 @@ int EstimateFeedbackVelocities(int VelocityL, int VelocityR, double &LeftVelocit
 		RightVelocityEstimate = 31.24964;
 	//! - Combination of different movement speeds -- L12% & R19%
 	} else if (VelocityL == 12 && VelocityR == 19) {
-		LeftVelocityEstimate = 11.99827796;
-		RightVelocityEstimate = 11.77803783;
+		LeftVelocityEstimate = 11.77803783;
+		RightVelocityEstimate = 11.99827796;
 	//! - Combination of different movement speeds -- L19% & R12%
 	} else if (VelocityL == 19 && VelocityR == 12) {
-		LeftVelocityEstimate = 11.7195477;
-		RightVelocityEstimate = 11.97782072;
+		LeftVelocityEstimate = 11.97782072;
+		RighttVelocityEstimate = 11.7195477;
 	//! - Combination of different movement speeds -- L31% & R38%
 	} else if (VelocityL == 31 && VelocityR == 38) {
-		LeftVelocityEstimate = 28.11346659;
-		RightVelocityEstimate = 27.97425271;
+		LeftVelocityEstimate = 27.97425271;
+		RightVelocityEstimate = 28.11346659;
 	//! - Combination of different movement speeds -- L38% & R31%
 	} else if (VelocityL == 38 && VelocityR == 31) {
-		LeftVelocityEstimate = 23.6848081;
-		RightVelocityEstimate = 23.79264803;
+		LeftVelocityEstimate = 23.79264803;
+		RightVelocityEstimate = 23.6848081;
 	}
 
 	return 0;
