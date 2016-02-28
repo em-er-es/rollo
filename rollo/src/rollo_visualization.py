@@ -99,7 +99,8 @@ plotRefreshRate = 100
 
 ## Plot components and parameters
 ## Maximal coordinates - symmetrical
-axl = -4 # Negative value used to mirror the current calibration setup of motion capture system and keep sanity with adjustments to the plot
+# axl = -4 # Negative value used to mirror the current calibration setup of motion capture system and keep sanity with adjustments to the plot
+axl = 4 # Positive value used to represent the current calibration setup of motion capture system and keep sanity with adjustments to the plot
 axlx = axl
 axly = axl
 
@@ -253,8 +254,10 @@ class ProcessPlotter(object):
 			## Local variables
 			# global samples = 10
 			samples
+			## Orientation of the triangular marker
 			# ofd = - 90
-			ofd = - 135
+			# ofd = - 135
+			ofd = 150
 
 			## Set plot limits
 			self.ax.axis([-axlx, axlx, -axly, axly])
@@ -306,7 +309,7 @@ class ProcessPlotter(object):
 					self.ax.plot(self.x3, self.y3, 'b', marker = (3, 0, of3), markersize = 12)
 
 					if data[0]: # Clear every so often
-						rospy.loginfo("[Rollo][%s][ProcessPlotter] Clear and reinitalize plot @ loop: %d", NodeName, LoopCounter) # //VB
+						# rospy.loginfo("[Rollo][%s][ProcessPlotter] Clear and reinitalize plot @ loop: %d", NodeName, LoopCounter) # //VB
 						rospy.loginfo("[Rollo][%s][ProcessPlotter] Clear and reinitalize plot", NodeName) # //VB
 						## Clear plot
 						self.ax.cla()
