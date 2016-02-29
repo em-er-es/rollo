@@ -24,7 +24,7 @@ n=3;      %number of states
 
 %however Q will need to be modeled in actual system
 q=0.1;    %std of process noise  
-r=0.1;    %std of measurement noise
+r=1.0;%0.1;    %std of measurement noise
 Q=q^2*eye(n); % covariance of process
 R=r^2*eye(n); % covariance of measurement  
 
@@ -50,7 +50,7 @@ Jh = eye(n); %Jacobian matrix with the partial derivatives of h(x_k) w.r.t x, id
 
 E = eye(n);            % initial state covraiance
 
-N=1500;                    % total dynamic steps
+N= 300;                    % total dynamic steps
 xV = zeros(n,N);          % allocate memory for state
 zV = zeros(n,N);          % allocate memory for measurement
 
@@ -61,12 +61,46 @@ for k=1:N
   [x, E] = my_ekf_node(x,u,z);    % EKF 
    xV(:,k) = x;                            % save estimate
 end
-figure
 
- % plot results
-for k=1:3                                
-  subplot(3,1,k)
-  plot(1:N, xV(k,:), '-', 1:N, zV(k,:), '--')
-  title(['x state [',num2str(k),']'])
-  legend('state estimate', 'measurement')
-end
+
+filename = 'ekfstability';
+
+fig = figure
+set(gcf, 'Position', get(0,'Screensize')); % Maximize figure.
+
+%  % plot results
+% for k=1:3                                
+%   subplot(3,1,k)
+%   plot(1:N, xV(k,:), '-', 1:N, zV(k,:), '--')
+%   title(['x state [',num2str(k),']'])
+%   legend('state estimate', 'measurement')
+% end
+% 
+% figure
+subplot(3,1,1)
+plot(1:N, xV(1,:), '-', 1:N, zV(1,:), '--')
+axis ([0 N*1.35 1.43 1.46])
+grid on
+title(['Position x - x state [1]'],'FontName','Times New Roman','FontSize',16);
+legend('State estimate', 'Measurement')
+
+  
+subplot(3,1,2)
+plot(1:N, xV(2,:), '-', 1:N, zV(2,:), '--')
+grid on
+axis ([0 N*1.35 0.302 0.308])
+title(['Position y - x state [2]'],'FontName','Times New Roman','FontSize',16);
+legend('State estimate', 'Measurement')
+
+  
+subplot(3,1,3)
+plot(1:N, xV(3,:), '-', 1:N, zV(3,:), '--')
+grid on
+axis ([0 N*1.35 -3.07 -3.05])
+title(['Orientation - x state [3]'],'FontName','Times New Roman','FontSize',16);
+legend('State estimate', 'Measurement')
+
+saveas(fig, strcat(filename,'.jpg'));
+saveas(fig, strcat(filename,'.fig'));
+saveas(fig, strcat(filename,'.pdf'));
+saveas(fig, strcat(filename,'.svg'));
