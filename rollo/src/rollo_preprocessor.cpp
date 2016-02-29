@@ -16,10 +16,12 @@
  *
  * Filter the raw data from optitrack motion capture system and
  * publish it along with time stamp for modeling of odometry and
- * the measurement in Kalman filter
- * 
+ * the measurement in Kalman filter.
+ *
+ * Project github repository.
+ *
  * @see https://github.com/em-er-es/rollo/
- * 
+ *
  */
 
 
@@ -40,10 +42,7 @@
 // */
 
 
-/**
- * @brief Global variables updated in the SubscriberCallback function, processed and published.
- *
- */
+// Global variables updated in the SubscriberCallback function, processed and published.
 
 //! Node name using console codes
 char NodeName[20] = C1 PP CR; // The size is necessary for the GNU/Linux console codes //~COLOR
@@ -97,13 +96,13 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
  *
  * Initialize variables, nodehandle, subscribe to motion capture data from @ref mocap_optitrack node and publish position and orientation after processing with time stamp.
  * The position and orientation are published along with timestamp in custom defined message format @ref rollo::Pose2DStamped.
- * 
+ *
  * \param rate: Sampling frequency of the node <!25 [Hz]>
  * \param samplesize: Number of elements that are averaged/subsampled <!4 [1]>
  * \param sampling: Selects if the raw data should be subsampled after a certain delay or averaged over a certain period <!0 [1]>
  *    - sampling 0 sets subsampling
  *    - sampling !0 sets averaging
- * 
+ *
  * @return 0
  */
 int main(int argc, char **argv)
