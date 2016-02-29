@@ -5,26 +5,29 @@
  *
  * @date 20/2/16
  *
- * @brief EKF implementation for localisation of the robot
+ * @brief EKF implementation for localisation of a robot
  *
  * Command prototype: <b>rosrun rollo rollo_ekf _rate:=10</b>
  * @param rate: Sampling frequency of the node <!10 [Hz]>
  *
- * Based on input from communication node in form of control commands and measurement from preprocessor node,
- * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance. Additional infromation in form of odometry based state estimate are also published for easier analysis of the filter results.
+ * Based on control input from communication node in form of control commands and measurement from preprocessor node,
+ * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance. 
+ * Additional information in form of odometry based state estimate are also published for easier analysis of the filter results.
+ * Kalman filter equations were first implemented in MATLAB, then translated into C++, compared and verified with test values.
  *
  * Localization of the robot consists of 3 states:
  *  - Position (x, y)
  *  - Orientation (Theta)
- *
+ * 
+ * For initial state estimate the node uses robots position and orientation taken from Pose2D message from preprocessor node before running EKF iterations.
+ * Initial state covariance matrix is taken as an identity matrix.
+ * 
  * Timing for EKF update is inspired from @ref Robot Pose EKF (robot/pose/ekf) package available for ROS:\n
  * Timings and data at those specific time instants are synchronized in such a manner, that the latest
  * measurements with newer timestamps are interpolated to one and the same timestamp, when all necessary
  * data is available. This allows for a relative comparison of available data, even though an additional
  * error is introduced through interpolating.
  * @see http://wiki.ros.org/robot_pose_ekf
- *
- * Kalman filter equations were first implemented in MATLAB, then translated into C++, compared and verified with previous results.
  *
  * @see https://github.com/em-er-es/rollo/
  *
@@ -48,21 +51,7 @@
 
 
 /* TODO
- *! Complete TODO points can be marked with ! like this one
- * FIX DOXYGEN formatting
- * Add more doxygen comments and appropriate description
- * Double check if std:cout and ROS_INFO do not collide or produce unnecessary output, std::cout is fine for debug, just update comment switches for those lines
- * Topics should be held in one place at the beginning of the code or maybe even better in the header file TOPIC_nodename#number, so TOPIC_COMM1 or TOPIC_COMM_WS for wheel speed
- * I suggest using descriptive names for node references, so communication node instead of rollo_comm, because that might change, the main name less likely
- * Massive clean up of comments in code and description of functions
- * Use short straight to the point impersonal description
- * Get rid of double, triple and multiple spaces in the code, one space as whitespace seperator, not more
- * Double check indents, main stays without any, while loops have indents just as much as do if, else, switches and so on -- Use CTRL-B to jump between braces
- * Write command;[SPACE]//DB not command;//DB -- this is much more difficult to parse
- * For unit use [SI_UNIT] format in comments and even output
- * Use double line break between sections, like global variables, function declarations
- * Use one line breaks between sections in functions and between specific elements of a section
- * Use spacing between parameters and operators like *, /, +, -, sometimes even braces or brackets -- Make the code more readable
+ * 
  * TODO LATER
  * Create appropriate comment switches
 // */
@@ -122,8 +111,8 @@ void subscriberCallbackMeasurement(const rollo::Pose2DStamped msg) {
 	zSeq = msg.header.seq;
 	zTimeSecs = msg.header.stamp.toSec();
 
-//	ROS_INFO("[Rollo][%s][Sub][z(0), z(1), z(2)]: %f, %f, %f", NodeName, z(0), z(1), z(2));
-	//ROS_INFO("[Rollo][%s][Sub][zseq, zstamp]: %d, %f", NodeName, zSeq, zTimeSecs);
+// ROS_INFO("[Rollo][%s][Sub][z(0), z(1), z(2)]: %f, %f, %f", NodeName, z(0), z(1), z(2)); // DB
+// ROS_INFO("[Rollo][%s][Sub][zseq, zstamp]: %d, %f", NodeName, zSeq, zTimeSecs); // DB
 
 }
 
@@ -162,29 +151,27 @@ void subscriberCallbackControlInput(const rollo::WheelSpeed msg) {
  * This function performs linear interpolation of right and left wheel speed for a given time instant.
  * The time for which the odometry values are computed is defined by @p EKFfilterTimeSecs.
  *
- * @param Odometryold contains left and right wheel speed and timestamp read at previous instant when EKF was updated.
- * @param Odometrynew contains left and right wheel speed and timestamp read currently.
+ * @param OdometryPrev contains left and right wheel speed and time stamp read at previous instant when EKF was updated.
+ * @param OdometryCurrent contains left and right wheel speed and time stamp read currently.
  * @param EKFfilterTimeSecs is the time instant for which the EKF update need to be performed and odometry values need to be computed.
  *
  * @return rollo::WheelSpeed, contains left and right wheel speed [rad/s] computed for time instant given by @p EKFfilterTimeSecs using linear interpolation.
  */
 
-//CRF
-rollo::WheelSpeed interpolateOdometry( rollo::WheelSpeed Odometryold, rollo::WheelSpeed Odometrynew, double EKFfilterTimeSecs ) {
+rollo::WheelSpeed interpolateOdometry( rollo::WheelSpeed OdometryPrev, rollo::WheelSpeed OdometryCurrent, double EKFfilterTimeSecs ) {
 
 	rollo::WheelSpeed interpolated;
 
-	double OdometryOldTimeSecs = Odometryold.header.stamp.toSec();
-	double OdometryNewTimeSecs = Odometrynew.header.stamp.toSec();
+	double OdometryPrevTimeSecs = OdometryPrev.header.stamp.toSec();
+	double OdometryCurrentTimeSecs = OdometryCurrent.header.stamp.toSec();
 
-//CRC
-	//y = y0 + ((y1-y0)/(t1-t0))(t-t0)
-	//TODO Maybe you could use temporary variables for more readability?
-	interpolated.wheelspeedright = Odometryold.wheelspeedright + ((Odometrynew.wheelspeedright - Odometryold.wheelspeedright) * (EKFfilterTimeSecs - OdometryOldTimeSecs)) / (OdometryNewTimeSecs - OdometryOldTimeSecs);
-	interpolated.wheelspeedleft = Odometryold.wheelspeedleft + ((Odometrynew.wheelspeedleft - Odometryold.wheelspeedleft) * (EKFfilterTimeSecs - OdometryOldTimeSecs)) / (OdometryNewTimeSecs - OdometryOldTimeSecs);
+	//TODO Maybe you could use temporary variables for more readability? This is more direct and simple. It might be more direct, but certainly not more simple for someone from the outside looking at the code for the first time. Leave it at that.
+	//y = y0 + ((y1 - y0) / (t1 - t0)) * (t - t0)
+	interpolated.wheelspeedright = OdometryPrev.wheelspeedright + ((OdometryCurrent.wheelspeedright - OdometryPrev.wheelspeedright) * (EKFfilterTimeSecs - OdometryPrevTimeSecs)) / (OdometryCurrentTimeSecs - OdometryPrevTimeSecs);
+	interpolated.wheelspeedleft = OdometryPrev.wheelspeedleft + ((OdometryCurrent.wheelspeedleft - OdometryPrev.wheelspeedleft) * (EKFfilterTimeSecs - OdometryPrevTimeSecs)) / (OdometryCurrentTimeSecs - OdometryPrevTimeSecs);
 
-	std::cout << "Odometry old: Wheelspeed Left " << Odometryold.wheelspeedleft << " Wheelspeed Right " << Odometryold.wheelspeedright << "\n" << std::endl; //DB
-	std::cout << "Odometry new: Wheelspeed Left " << Odometrynew.wheelspeedleft << " Wheelspeed Right " << Odometrynew.wheelspeedright << "\n" << std::endl; //DB
+	std::cout << "Odometry previous: Wheelspeed Left " << OdometryPrev.wheelspeedleft << " Wheelspeed Right " << OdometryPrev.wheelspeedright << "\n" << std::endl; //DB
+	std::cout << "Odometry current: Wheelspeed Left " << OdometryCurrent.wheelspeedleft << " Wheelspeed Right " << OdometryCurrent.wheelspeedright << "\n" << std::endl; //DB
 	std::cout << "Odometry intrepolated: Wheelspeed Left " << interpolated.wheelspeedleft << " Wheelspeed Right " << interpolated.wheelspeedright << "\n" << std::endl; //DB
 
 	return interpolated;
@@ -196,45 +183,42 @@ rollo::WheelSpeed interpolateOdometry( rollo::WheelSpeed Odometryold, rollo::Whe
  * This function performs linear interpolation of robot pose2D for a given time instant.
  * The time for which the robot pose2D are computed is defined by EKFfilterTimeSecs.
  *
- * @param zOld contains robot pose2D and timestamp read at previous instant when EKF was updated.
- * @param zNew contains robot pose2D and timestamp read currently.
+ * @param zPrev contains robot pose2D and time stamp read at previous instant when EKF was updated.
+ * @param zCurrent contains robot pose2D and time stamp read currently.
  * @param EKFfilterTimeSecs is the time instant for which the EKF update need to be performed and robot pose2D need to be computed.
  *
  * @return rollo::Pose2DStamped, contains robot pose2D computed for time instant given by EKFfilterTimeSecs using linear interpolation.
  */
 
-//CRF
-rollo::Pose2DStamped interpolateMeasurement( rollo::Pose2DStamped zOld, rollo::Pose2DStamped zNew, double EKFfilterTimeSecs ) {
+rollo::Pose2DStamped interpolateMeasurement( rollo::Pose2DStamped zPrev, rollo::Pose2DStamped zCurrent, double EKFfilterTimeSecs ) {
 
 	rollo::Pose2DStamped interpolated;
 
-	double zOldTimeSecs = zOld.header.stamp.toSec();
-	double zNewTimeSecs = zNew.header.stamp.toSec();
+	double zPrevTimeSecs = zPrev.header.stamp.toSec();
+	double zCurrentTimeSecs = zCurrent.header.stamp.toSec();
 
-//CRC same as above
-	//y = y0 + ((y1-y0)/(t1-t0))(t-t0)
-	interpolated.pose2d.x = zOld.pose2d.x + ((zNew.pose2d.x - zOld.pose2d.x)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
-	interpolated.pose2d.y = zOld.pose2d.y + ((zNew.pose2d.y - zOld.pose2d.y)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
-	interpolated.pose2d.theta = zOld.pose2d.theta + ((zNew.pose2d.theta - zOld.pose2d.theta)*(EKFfilterTimeSecs - zOldTimeSecs))/(zNewTimeSecs - zOldTimeSecs);
+	//y = y0 + ((y1 - y0) / (t1 - t0)) * (t - t0)
+	interpolated.pose2d.x = zPrev.pose2d.x + ((zCurrent.pose2d.x - zPrev.pose2d.x) * (EKFfilterTimeSecs - zPrevTimeSecs)) / (zCurrentTimeSecs - zPrevTimeSecs);
+	interpolated.pose2d.y = zPrev.pose2d.y + ((zCurrent.pose2d.y - zPrev.pose2d.y) * (EKFfilterTimeSecs - zPrevTimeSecs)) / (zCurrentTimeSecs - zPrevTimeSecs);
+	interpolated.pose2d.theta = zPrev.pose2d.theta + ((zCurrent.pose2d.theta - zPrev.pose2d.theta) * (EKFfilterTimeSecs - zPrevTimeSecs)) / (zCurrentTimeSecs - zPrevTimeSecs);
 
-//CRC Provide better description instead of old, new - previous, current, next
-	std::cout << "Measurement old: [" << zOld.pose2d.x << "  " << zOld.pose2d.y << "  " << zOld.pose2d.theta  << "]^T\n" << std::endl; //DB
-	std::cout << "Measurement new: [" << zNew.pose2d.x << "  " << zNew.pose2d.y << "  " << zNew.pose2d.theta  << "]^T\n" << std::endl; //DB
-	std::cout << "Measurement intrepolated: [" << interpolated.pose2d.x << "  " << interpolated.pose2d.y << "  " << interpolated.pose2d.theta  << "]^T\n" << std::endl; //DB
+	std::cout << "Measurement previous: [" << zPrev.pose2d.x << "  " << zPrev.pose2d.y << "  " << zPrev.pose2d.theta  << "]^T\n" << std::endl; //DB
+	std::cout << "Measurement current: [" << zCurrent.pose2d.x << "  " << zCurrent.pose2d.y << "  " << zCurrent.pose2d.theta << "]^T\n" << std::endl; //DB
+	std::cout << "Measurement interpolated: [" << interpolated.pose2d.x << "  " << interpolated.pose2d.y << "  " << interpolated.pose2d.theta << "]^T\n" << std::endl; //DB
 
 	return interpolated;
 }
 
 /**
- * @brief FSTATE nonlinear state equations, f(x_k-1, u_k-1)
+ * @brief Nonlinear state equation function f(x_k-1, u_k-1)
+ * 
+ * This is part of time update (or prediction update) of EKF. Given a priori state estimate x_k-1|k-1
+ * and u_k-1, it computes predicted value for state x_k|k-1.
  *
- * This is part of time update(or prediction update) of EKF. Given "a priori" state estimate, x_k-1|k-1
- * and u_k-1, it computes predicted value for state, x_k|k-1.
+ * @param x_pp contains a priori state estimate, x_k-1|k-1
+ * @param u is control input vector, calculated from odometry. It consists of 2 elements, delta S and delta theta
  *
- * @param x_pp contains  "a priori" state estimate, x_k-1|k-1.
- * @param u is control input vector, calculated from odometry. It consists of 2 elements, delta S and delta theta.
- *
- * @return Eigen::Vector3d, state prediction x_k|k-1.
+ * @return Eigen::Vector3d, state prediction x_k|k-1
  */
 
 Eigen::Vector3d FSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
@@ -245,12 +229,13 @@ Eigen::Vector3d FSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 }
 
 /**
- * @brief JacobianFSTATE
+ * @brief Linearization of f(x_k-1, u_k-1)
  *
- * This computes Jacobian matrix by taking the partial derivatives of f(x_k-1,u_k-1) with respect to x.
+ * This is part of time update(or prediction update) of EKF. This computes Jacobian matrix by taking the partial derivatives of f(x_k-1,u_k-1) with respect to x, 
+ * evaluated at the last state estimate x_k-1|k-1.
  *
- * @param x_pp contains "a priori" state estimate, x_k-1|k-1.
- * @param u is control input vector, calculated from odometry. It consists of 2 elements, delta S and delta theta.
+ * @param x_pp contains a priori state estimate x_k-1|k-1
+ * @param u is control input vector, calculated from odometry. It consists of 2 elements, delta S and delta theta
  *
  * @return Eigen::Matrix3d is the Jacobian matrix
  */
@@ -265,13 +250,13 @@ Eigen::Matrix3d JacobianFSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 }
 
 /**
- * @brief HMEAS measurement equation, h(x_k)
+ * @brief Measurement function h(x_k)
  *
  * This computes estimated measurement vector based on the latest state estimate.
  *
  * @param x_cp contains state prediction x_k|k-1 computed in time update of EKF
  *
- * @return Eigen::Vector3d, contains estimated measurement vector.
+ * @return Eigen::Vector3d, contains estimated measurement vector
  */
 
 Eigen::Vector3d HMEAS(Eigen::Vector3d x_cp) {
@@ -306,7 +291,7 @@ int main(int argc, char **argv)
 //! ## Initialize
 //! - Initialize node
 ros::init(argc, argv, "rollo_ekf"); // Name of the node
-ros::start(); // Necessary to be called
+ros::start();
 
 //! - Initialize nodehandle for subscribers and publisher
 ros::NodeHandle RolloEKF;
@@ -337,26 +322,25 @@ int loopcondition = 1;
 
 //! - Initialize variables involved in computation of EKF:
 //!   - Define number of states
-//!   - Initialize noise covariances and matrices
 int nstates = 3; // Number of states: 3 = (position) (x, y) (orientation) (Theta)
 
-double q = 0.1; // std of process noise   //CRC
+//!   - Initialize process noise covariance matrix
+double q = 0.1; // Standard deviation of process noise
 
-//!   - Process noise covariance
 Eigen::Matrix3d Q = Eigen::Matrix3d::Identity();
 
-Q(0,0) = q * q;
-Q(1,1) = q * q;
-Q(2,2) = q * q;
+Q(0, 0) = q * q;
+Q(1, 1) = q * q;
+Q(2, 2) = q * q;
 
-//! - Measurement noise covariance matrix
-double r = 0.1; // std of measurement noise //CRC
+//!   - Initialize measurement noise covariance matrix
+double r = 0.1; // Standard deviation of measurement noise
 
 Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
 
-R(0,0) = r * r;
-R(1,1) = r * r;
-R(2,2) = r * r;
+R(0, 0) = r * r;
+R(1, 1) = r * r;
+R(2, 2) = r * r;
 
 std::cout << "Q:\n" << Q << "\nR:\n" << R << "\n" << std::endl; //VB
 
@@ -371,13 +355,13 @@ double nR = 1;
 double deltaTheta;
 double deltaS;
 
-//!   - Initialize state estimate vector "a priori" 
+//!   - Initialize state estimate vector a priori 
 Eigen::Vector3d x_pp(0, 0, 0);
 
-//!   - Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for provided system
+//!   - Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for given system
 Eigen::Matrix3d Jh = Eigen::Matrix3d::Identity();
 
-//!   - Initialize E_pp: "a priori" estimated state covariance, E_k-1|k-1 (p refers to k-1)
+//!   - Initialize E_pp: a priori estimated state covariance, E_k-1|k-1 (p refers to k-1)
 Eigen::Matrix3d E_pp = Eigen::Matrix3d::Identity(); // Initial state covariance matrix
 
 //!   - Initialize variables involved in the prediction update of EKF
@@ -419,10 +403,8 @@ double wheelspeedleft_EKF;
 double wheelspeedright_EKF;
 Eigen::Vector3d z_EKF(0, 0, 0);
 
-char initialize = 1; //Q Why is this a char? It's used only as a boolean would
+bool initialize = 1;
 
-//!   - Measurement vector with timestamp and odometry data with timestamp from subscriber messages
-//!   - State estimate using measurement vector reading
 
 std::cout << "Initializing: waiting for sensor data from both the subscribers \n" << std::endl; //VB
 
@@ -477,13 +459,13 @@ do {
 		prevOdometrySecs = OdometryTimeSecs;
 		prevMeasurementSecs = zTimeSecs;
 
-		//!   - Determine time step for EKF update and perform interpolation for the sensor data not available at respective time step
+		//!   - If new data is available and measurement data is for timestamp later than odometry's, perform interpolation for measurement
 		if (zTimeSecs > OdometryTimeSecs) {
 			//! - Update timestamp
 			EKFfilterTimeSecs = OdometryTimeSecs;
 			//! - Interpolate measurements
 			InterpolatedMeasurement = interpolateMeasurement(prevzPose2DStamped, zPose2DStamped, EKFfilterTimeSecs);
-			//! - Update state
+			//! - Update measurement and control input for EKF update
 			z_EKF(0) = InterpolatedMeasurement.pose2d.x;
 			z_EKF(1) = InterpolatedMeasurement.pose2d.y;
 			z_EKF(2) = InterpolatedMeasurement.pose2d.theta;
@@ -496,14 +478,14 @@ do {
 		std::cout << "Odometry: Wheelspeed: L: " << wheelspeedleft_EKF << " R: " << wheelspeedright_EKF << "\n" << std::endl; //DB
 
 		} else {
-
-			//! - Update timestamp
+			//! - If new data is available and odometry data is for time stamp later than measurement's, perform interpolation for odometry
+			//!   - Update timestamp
 			EKFfilterTimeSecs = zTimeSecs;
 
-			//! - Interpolate for measurement
+			//!   - Interpolate odometry
 			InterpolatedOdometry = interpolateOdometry(prevOdometry, Odometry, EKFfilterTimeSecs);
 
-			//! - Update variables involved in EKF update
+			//!   - Update measurement and control input for EKF update
 			z_EKF(0) = zPose2DStamped.pose2d.x;
 			z_EKF(1) = zPose2DStamped.pose2d.y;
 			z_EKF(2) = zPose2DStamped.pose2d.theta;
@@ -530,14 +512,12 @@ do {
 		flagSensorsDataAvailable = 0;
 		std::cout << "Perform EKF iteration. \n" << std::endl; //DB
 
-		//CRD
 		//! - Determine time step for EKF update
 		dt = EKFfilterTimeSecs - PreviousEKFfilterTimeSecs;
 
 		//! - Update @p PreviousEKFfilterTimeSecs for the next loop
 		PreviousEKFfilterTimeSecs = EKFfilterTimeSecs;
 
-//CRC cleanup
 		//! - Determine control input u from left and right wheel speed for EKF update
 		SL = dt * wheelspeedleft_EKF * ROLLO_WHEEL_RADIUS_L; // Linear distance travelled by left wheel in meters
 		SR = dt * wheelspeedright_EKF * ROLLO_WHEEL_RADIUS_R; // Linear distance travelled by right wheel in meters
@@ -545,15 +525,14 @@ do {
 		deltaS = (SL + SR) / 2; // u(1)
 		u << deltaS, deltaTheta;
 
-//CRC
 		std::cout << "dt: " << dt << "\n" << std::endl; //DB
 		std::cout << "SL: " << SL << " SR: " << SR << "\n" << std::endl; //DB
-		std::cout << "deltaTheta " << deltaTheta << " deltaS " << deltaS << "\n" << std::endl; //DB
+		std::cout << "deltaTheta: " << deltaTheta << " deltaS: " << deltaS << "\n" << std::endl; //DB
 		std::cout << "u:\n" << u << "\n" << std::endl; //DB
 		
 		//! - Prediction update
 		//! - Update state prediction based on a priori state estimate and control input
-		x_cp = FSTATE(x_pp, u); //f_xu; //%state prediction, x_k|k-1
+		x_cp = FSTATE(x_pp, u); // f_xu; // State prediction, x_k|k-1
 		Jf = JacobianFSTATE(x_pp, u);
 
 		std::cout << "x_cp:\n" << x_cp << "\nE_pp:\n" << E_pp << "\n" << std::endl; //DB
@@ -562,28 +541,26 @@ do {
 		//! - Update predicted state estimate covariance matrix based on a priori state and control input
 		//CRC
 		E_cp = Jf * E_pp * Jf.transpose() + Q;  // %E_k|k-1
-		std::cout << " Prediction Update: \nx_cp:\n" << x_cp << "\nE_cp:\n" << E_cp << "\n" << std::endl; //DB
+		std::cout << "Prediction Update: \nx_cp:\n" << x_cp << "\nE_cp:\n" << E_cp << "\n" << std::endl; //DB
 
 		//! - Innovation update
 		//! - Estimate measurement based on a priori state estimate
 		z_estimate = HMEAS(x_cp);
-		std::cout << " Measurement estimate:\n" << z_estimate << "\n" << std::endl; //DB
+		std::cout << "Measurement estimate:\n" << z_estimate << "\n" << std::endl; //DB
 
 
 /*
-		P12 = E_cp * Jh.transpose(); //! Cross covariance
+		P12 = E_cp * Jh.transpose();
 		S_inv = (Jh * P12 + R).inverse();
 		H = P12*S_inv; //     %Kalman filter gain, H_k
 		std::cout << " Kalman filter gain: \n" << H << "\n" << std::endl; //DB
-
-		//CRC
 		x_cc = x_cp + H * (z_EKF - z_estimate); //    %state estimate, x_k|k;
 		E_cc = E_cp - H * P12.transpose();  //             %state covariance matrix, E_k|k
 // */
 
 		//! - Perform Cholesky decomposition:
 		//! Instead of standard equations for EKF, use Cholesky factorization for a stable covariance matrix
-		P12 = E_cp * Jh.transpose(); //! Cross covariance
+		P12 = E_cp * Jh.transpose();
 		Eigen::LLT<Eigen::Matrix3d, Eigen::Upper> chol(Jh * P12 + R);
 		U = chol.matrixU();
 
@@ -593,8 +570,8 @@ do {
 		std::cout << " P12:\n" << P12 << "\n R:\n" << R << "\nRinv:\n" << R.inverse() << "\n" <<std::endl; //DB
 		std::cout << " H:\n" << H << "\n" <<std::endl; //DB
 		//! - Compute a posteriori state estimate x_k|k and a posteriori state covariance matrix E_k|k
-		x_cc = x_cp + H * ((U.transpose() ).inverse()) * (z_EKF - z_estimate);  //state estimate, x_k|k
-		E_cc = E_cp - H * H.transpose();     //state covariance matrix, E_k|k
+		x_cc = x_cp + H * ((U.transpose() ).inverse()) * (z_EKF - z_estimate); // State estimate, x_k|k
+		E_cc = E_cp - H * H.transpose(); // State covariance matrix, E_k|k
 
 		//! - Update a priori state estimate x_pp and a priori state covariance matrix E_pp for next loop
 		x_pp = x_cc;
@@ -608,7 +585,7 @@ do {
 		//! - Prepare data for publishing
 		rollo::EKF result;
 		result.header.stamp.sec = (int32_t) EKFfilterTimeSecs;
-		result.header.stamp.nsec = (int32_t)((EKFfilterTimeSecs - result.header.stamp.sec) * 1000000000); // 1.000.000.000 //Q what is the limit of int here? it is possible to overflow? If so, when? Does that make sense?
+		result.header.stamp.nsec = (int32_t)((EKFfilterTimeSecs - result.header.stamp.sec) * 1000000000);
 
 		//! - Pose2D EKF
 		result.ekfpose2d.x = x_cc(0);
