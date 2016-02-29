@@ -92,16 +92,21 @@ char NodeName[20] = C2 CT CR; // The size is necessary for the GNU/Linux console
 char TopicCmdVel[64] = TOPIC_CTRL_CMD_VEL;
 
 //! Limit velocity forward
-double LimitVelocityF = 1;
+const double LimitVelocityF = 1;
 //! Limit velocity reverse
-double LimitVelocityR = -1;
+const double LimitVelocityR = -1;
+
+//! Limit turn velocity right
+const double LimitTurnVelocityR = 0.50;
+//! Limit turn velocity left
+const double LimitTurnVelocityL = -0.60;
 
 //! Left key set velocity step
-double LKeysSteps = 0.1;
+const double LKeysSteps = 0.1;
 //! Right key set linear velocity step
-double RKeysLinearV = 0.4;
+const double RKeysLinearV = 0.4;
 //! Right key set angular velocity step
-double RKeysAngularV = 1;
+const double RKeysAngularV = 1;
 
 
 /**
@@ -158,7 +163,7 @@ int kbhit(void)
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
  */
 
-void decodeKey (char character, double &Speed, double &Turn)
+void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
 {
 	switch (character){
 		//! Left key set control
@@ -169,7 +174,7 @@ void decodeKey (char character, double &Speed, double &Turn)
 		case 's':	Speed -= LKeysSteps; Turn = Turn; break;
 		case 'd':	Speed = Speed; Turn -= LKeysSteps; break;
 		case 'z':	Speed -= LKeysSteps; Turn += LKeysSteps; break;
-		case 'x':	Speed = Speed; Turn = 0; break;
+		case 'x':	Speed = Speed; Turn = 0; LastTurn = 0; break;
 		case 'c':	Speed -= LKeysSteps; Turn -= LKeysSteps; break;
 
 		//! Full speed forward/backward
@@ -177,7 +182,8 @@ void decodeKey (char character, double &Speed, double &Turn)
 		case 'F':	Speed = -1.0; Turn = 0; break;
 
 		//! Right key set control
-		//TODO double check with left key set, then get rid of
+		//TODO Double check with left key set, then get rid of
+		//DONE Can be removed, but keep it here
 		// case 'u':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
 		// case 'i':	Speed = 1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
 		// case 'o':	Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
@@ -187,15 +193,15 @@ void decodeKey (char character, double &Speed, double &Turn)
 		// case ',':	Speed = -1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
 		// case '.':	Speed = -1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
 		// case 'm':	Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
-		case 'u':	Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
-		case 'i':	Speed = 1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
-		case 'o':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
-		case 'j':	Speed = 0 * RKeysLinearV; Turn = 1 * RKeysAngularV; break;
-		case 'k':	Speed = 0 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
-		case 'l':	Speed = 0 * RKeysLinearV; Turn = -1 * RKeysAngularV; break;
-		case 'm':	Speed = -1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; break;
-		case ',':	Speed = -1 * RKeysLinearV; Turn = 0 * RKeysAngularV; break;
-		case '.':	Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
+		case 'u':	Speed = 1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; LastTurn = Turn; break;
+		case 'i':	Speed = 1 * RKeysLinearV; Turn = 0 * RKeysAngularV; LastTurn = Turn; break;
+		case 'o':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; LastTurn = Turn; break;
+		case 'j':	Speed = 0 * RKeysLinearV; Turn = 1 * RKeysAngularV; LastTurn = Turn; break;
+		case 'k':	Speed = 0 * RKeysLinearV; Turn = 0 * RKeysAngularV; LastTurn = Turn; break;
+		case 'l':	Speed = 0 * RKeysLinearV; Turn = -1 * RKeysAngularV; LastTurn = Turn; break;
+		case 'm':	Speed = -1 * RKeysLinearV; Turn = 0.3 * RKeysAngularV; LastTurn = Turn; break;
+		case ',':	Speed = -1 * RKeysLinearV; Turn = 0 * RKeysAngularV; LastTurn = Turn; break;
+		case '.':	Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; LastTurn = Turn; break;
 
 		//! Default value
 		default:	Speed = 0; Turn = 0; break;
@@ -210,13 +216,22 @@ void decodeKey (char character, double &Speed, double &Turn)
 			Speed = LimitVelocityR;
 
 	//! Angular velocity limits
-	//TODO Use global variables for these values
-	// if (Turn > LimitVelocityF)
-	if (Turn > 0.55)
+	if ((LastTurn == LimitVelocityF) && (Turn < LimitVelocityF))
+	// else if (Turn == LimitVelocityF)
+		Turn = LimitTurnVelocityR;
+	else if ((LastTurn == LimitVelocityR) && (Turn > LimitVelocityR))
+	// else if (Turn == LimitVelocityR)
+		Turn = LimitTurnVelocityL;
+	else if (Turn > LimitTurnVelocityR)
+	// if (Turn > 0.55)
+			// Turn = LimitTurnVelocityR;
 			Turn = LimitVelocityF;
-	// if (Turn < LimitVelocityR)
-	if (Turn < -0.60)
+	else if (Turn < LimitTurnVelocityL)
+	// if (Turn < -0.60)
+			// Turn = LimitTurnVelocityL;
 			Turn = LimitVelocityR;
+
+	LastTurn = Turn;
 
 	//! Print decoded velocities
 	ROS_INFO("[Rollo][%s][DecodeKey] Character [%c] => Speed [%f] Turn [%f]", NodeName, character, Speed, Turn);
@@ -267,6 +282,7 @@ geometry_msgs::Twist PubRolloCmd;
 //! - Initialize variables for computing linear and angular velocity of the robot
 double Speed = 0;
 double Turn = 0;
+double LastTurn = 0;
 
 //! - Initialize character holder
 char c = 0;
@@ -280,7 +296,7 @@ while (ros::ok()) {
 		c  =  getchar();
 
 		//! - Decode key pressed
-		decodeKey(c, Speed, Turn);
+		decodeKey(c, Speed, Turn, LastTurn);
 	}
 
 	//! - Prepare message to publish linear and angular velocities
