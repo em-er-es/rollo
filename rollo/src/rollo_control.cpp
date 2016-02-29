@@ -2,18 +2,18 @@
  * @file rollo_control.cpp
  * @author Rabbia Asghar
  * @author Ernest Skrzypczyk
- * 
+ *
  * @date 18/2/16
- * 
+ *
  * @brief Convert input from keyboard and publish control commands for Rollo
- * 
+ *
  * Command prototype: <b>rosrun rollo rollo_control _rate:=10</b>
  * \param rate Running frequency of the node <!10 [Hz]>
  *
  * Robot control using following key sets
- * 
+ *
  * - - - - - - - - - - - - - - - - - - -
- * 
+ *
  * <pre>
  *    q    w    e           u    i    o
  *    a    s    d    f/F    j    k    l
@@ -29,12 +29,12 @@
  * - x : reset angular speed
  *
  * - - - - - - - - - - - - - - - - - - -
- * 
+ *
  * Independent key set:
  * - f/F : full speed forwards/backwards
  *
  * - - - - - - - - - - - - - - - - - - -
- * 
+ *
  * Right key set:
  * - u/o : increase/decrease set speeds for diagonal movement forwards
  * - i/, : increase/decrease set speeds for forward/backward movement
@@ -43,23 +43,24 @@
  * - k : stop
  *
  * - - - - - - - - - - - - - - - - - - -
- * 
+ *
  * Global key set:
  * - * : stop
  * - <CTRL>-C : quit
- * 
+ *
  * Python script available online used as reference.
+ *
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
- * 
+ *
+ * Project github repository.
+ *
  * @see https://github.com/em-er-es/rollo/
- * 
+ *
  */
 
 
 /* TODO
- * FIX DOXYGEN documentation format
- * Double check corresponding key sets
- *! Problem with delay: keys can be hold and the command registers and sends old strokes
+ *
  * TODO later
  * Values are not kept at their previous level, a linear decline might be better
  * Add digits as velocity set mechanism
@@ -78,10 +79,7 @@
 #include "rollo.hpp"
 
 
-/**
- * @brief Global variables.
- * 
- */
+// Global variables.
 
 //! Node name using console codes
 char NodeName[20] = C2 CT CR; // The size is necessary for the GNU/Linux console codes //COLOR
@@ -113,9 +111,9 @@ const double RKeysAngularV = 1;
  * @brief Keyboard keystroke
  *
  * Check if a key is pressed on keyboard and return it.
- * 
+ *
  * \param NONE
- * 
+ *
  * @return 1 if a key is pressed on keyboard, otherwise 0.
  * @see https://github.com/sdipendra/ros-projects/blob/master/src/keyboard_non_blocking_input/src/keyboard_non_blocking_input_node.cpp
  */
@@ -154,19 +152,24 @@ int kbhit(void)
  *
  * Compute linear and angular command velocities based on keyboard input.
  * Key pressed character @p <key> as input argument.
- * 
+ *
  * \param character Character to be decoded
  * \param &Speed Linear velocity
  * \param &Turn Angular velocity
- * 
+ *
  * @return NULL
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
  */
 
 void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
-{
+{//! ### Algorithm:
+		//! Switch character to decode:
+		//! - Left key set control
+		//! - Full speed forward/backward
+		//! - Right key set control
+		//! - Default value
 	switch (character){
-		//! Left key set control
+		// Left key set control
 		case 'q':	Speed += LKeysSteps; Turn += LKeysSteps; break;
 		case 'w':	Speed += LKeysSteps; Turn = Turn; break;
 		case 'e':	Speed += LKeysSteps; Turn -= LKeysSteps; break;
@@ -177,11 +180,11 @@ void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
 		case 'x':	Speed = Speed; Turn = 0; LastTurn = 0; break;
 		case 'c':	Speed -= LKeysSteps; Turn -= LKeysSteps; break;
 
-		//! Full speed forward/backward
+		// Full speed forward/backward
 		case 'f':	Speed = 1.0; Turn = 0; break;
 		case 'F':	Speed = -1.0; Turn = 0; break;
 
-		//! Right key set control
+		// Right key set control
 		//TODO Double check with left key set, then get rid of
 		//DONE Can be removed, but keep it here
 		// case 'u':	Speed = 1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; break;
@@ -203,19 +206,21 @@ void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
 		case ',':	Speed = -1 * RKeysLinearV; Turn = 0 * RKeysAngularV; LastTurn = Turn; break;
 		case '.':	Speed = -1 * RKeysLinearV; Turn = -0.3 * RKeysAngularV; LastTurn = Turn; break;
 
-		//! Default value
+		// Default value
 		default:	Speed = 0; Turn = 0; break;
 	}
 
-//! Velocity limits
+//! Velocity limits:
+	//! - Linear velocity limits
+	//! - Angular velocity limits
 
-	//! Linear velocity limits
+	// Linear velocity limits
 	if (Speed > LimitVelocityF)
 			Speed = LimitVelocityF;
 	if (Speed < LimitVelocityR)
 			Speed = LimitVelocityR;
 
-	//! Angular velocity limits
+	// Angular velocity limits
 	if ((LastTurn == LimitVelocityF) && (Turn < LimitVelocityF))
 		Turn = LimitTurnVelocityR;
 	else if ((LastTurn == LimitVelocityR) && (Turn > LimitVelocityR))
@@ -236,11 +241,11 @@ void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
  * @brief Node main
  *
  * Initialize variables and nodehandle, read and translate input information into command messages.\n
- * 
+ *
  * \param rate Running frequency of the node <!10 [Hz]>
- * 
+ *
  * Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @ref geometry_msgs::Twist
- * 
+ *
  * @return 0
  */
 
@@ -267,7 +272,7 @@ ros::NodeHandle private_node_handle_("~");
 private_node_handle_.param("rate", rate_frequency, int(100));
 
 //! - Publishing rate [Hz]
-ros::Rate frequency(rate_frequency); 
+ros::Rate frequency(rate_frequency);
 
 //! - Publisher variables for conventional messages
 geometry_msgs::Twist PubRolloCmd;
@@ -283,12 +288,14 @@ char c = 0;
 //! ## Main loop
 while (ros::ok()) {
 
-	//! - Check if a key is pressed
+	//! - Check if a key is pressed:
+	//!   - Read character
+	//!   - Decode key pressed
 	if (kbhit()) {
-		//! - Read character
+		// Read character
 		c  =  getchar();
 
-		//! - Decode key pressed
+		// Decode key pressed
 		decodeKey(c, Speed, Turn, LastTurn);
 	}
 
