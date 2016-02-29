@@ -8,32 +8,35 @@
 #
 # @brief Visualize motion capture data and EKF estimates
 #
-# Command prototype: <b>rosrun rollo rollo_visualization _rate:=25</b>
+# Command prototype: <b>rosrun rollo rollo_visualization _rate:=25 _plotrefreshperiod:=100</b>
 # \param rate Running frequency of the node <!25 [Hz]>
+# \param plotrefreshperiod Plot refresh period <!100 [1]>
+# \param ms Marker scale reference value <20 [1]>
 # \param saveim Save path for generated images <!.>
 # \param savevid Save path for generated animation video <!.>
-# \param type Type of saved images <!png>
-# \param format Format of saved images (dim_x x dim_y) <!512>
+# \param imtype Type of saved images <!png>
+# \param imformat Format of saved images (dim_x x dim_y) <!512>
 # \param duration Duration of visualization <!0>
 #
+# \warning Not all parameters and functions are currently processed
 
 
 ''' TODO
  * Add parameters for refreshing plot, size
  * Make marker gradual transition from previous position to current
- * Cleanup this mess
  * for EKF message use odompose2d and ekfpose2d
  * ADD & FIX DOXYGEN documentation format
- * Implement proper animation for pseudo realtime display of measurements
+ *C Implement proper animation for pseudo realtime display of measurements
  *! Subscribe to mocap topic (/Optitrack/ground_pose)
  *! Subscribe to preprocessor topic (Pose2Dstamped)
  *! Subscribe to EKF topic
  *
  * TODO later
+ * Implement dynamic server reconfiguration, use class for main()
  *! Implement as small buffer for data as possible
  * Double check results for animation
- * Implement saving generated images to a video (code is there)
- * Implement saving generated images to a path
+ *P Implement saving generated images to a video (code is there)
+ *P Implement saving generated images to a path
  * Implement a duration parameter
  * Add references from node to topics and console colors, parse them properly (pycparse)
 '''
@@ -61,6 +64,7 @@ import gobject
 import roslib
 roslib.load_manifest('rollo')
 import rospy
+#from dynamic_reconfigure.server import Server as DynamicReconfigureServer # Not used right now
 
 ## Import messages for Rollo
 ## Import standard Pose2D
@@ -76,7 +80,7 @@ from rollo.msg import EKF
 ## Import Pose2DStamped message
 from rollo.msg import Pose2DStamped
 
-## Global variables
+# Global variables
 
 ## Node name using console codes
 NodeName = "VIS "
@@ -84,32 +88,35 @@ NodeName = "VIS "
 ## Visualize rate [Hz] == [fps]
 rate = 25 # 25 [Hz] = 25 [fps]
 
-#//D
-## Message for measurement data
-# MessageMeasurement = 0
-
-## Message for EKF data
-# MessageEKF = 0
-#*//D
+## Plot refresh period [1]
+plotRefreshPeriod = 100
 
 ## Loop counter
-LoopCounter = 0
-markerScale = 0
-plotRefreshRate = 100
+LoopCounter = 1
 
-## Plot components and parameters
-## Maximal coordinates - symmetrical
-# axl = -4 # Negative value used to mirror the current calibration setup of motion capture system and keep sanity with adjustments to the plot
-axl = 4 # Positive value used to represent the current calibration setup of motion capture system and keep sanity with adjustments to the plot
+## Marker scale
+markerScale = 20
+
+# Plot components and parameters
+
+## Maximal coordinates - symmetrical\n
+# Negative value used to mirror the current calibration setup of motion capture system and keep sanity with adjustments to the plot\n
+# Positive value used to represent the current calibration setup of motion capture system and keep sanity with adjustments to the plot
+axl = 4
+# axl = -4
+
+## X axis limit
 axlx = axl
+
+## Y axis limit
 axly = axl
 
-## Global flags
+# Global flags
 
-## Global flag 1
+## Global message flag 1 -- Motion capture data from preprocessor
 flagSubscriber1 = False
 
-## Global flag 2
+## Global message flag 2 -- Extended Kalman filter estimates and odometry modeled data from EKF node
 flagSubscriber2 = False
 
 
@@ -234,15 +241,21 @@ def generatePlot(initcond):
 
 class ProcessPlotter(object):
 	def __init__(self):
-		## Global variables used from callback
+		# Global variables used from callback
 		global samples
-		samples = 2 ##< Sufficient to connect markers
-		## Initialize samples with zeroes
+		samples = 2 # Sufficient to connect markers
+		# Initialize samples with zeroes
+		## X data from motion capture
 		self.x1 = np.zeros(samples)
+		## Y data from motion capture
 		self.y1 = np.zeros(samples)
+		## X data from odometry model
 		self.x2 = np.zeros(samples)
+		## Y data from odometry model
 		self.y2 = np.zeros(samples)
+		## X data from EKF estimates
 		self.x3 = np.zeros(samples)
+		## Y data from EKF estimates
 		self.y3 = np.zeros(samples)
 
 	def terminate(self):
@@ -253,14 +266,17 @@ class ProcessPlotter(object):
 		def call_back():
 			## Local variables
 			# global samples = 10
-			samples
-			## Orientation of the triangular marker
+			# samples
 			# ofd = - 90
 			# ofd = - 135
+			## Orientation of the triangular marker
 			ofd = 150
 
 			## Set plot limits
 			self.ax.axis([-axlx, axlx, -axly, axly])
+			## Set plot labels
+			# self.xlabel('x [m]')
+			# self.ylabel('y [m]')
 
 			## Main loop
 			while 1:
@@ -276,9 +292,9 @@ class ProcessPlotter(object):
 					self.terminate()
 					return False
 
-				## Proceed with processing
+				# Proceed with processing
 				else:
-					## Shift last samples
+					# Shift last samples
 					for i in range(samples - 1):
 						self.x1[i + 1] = self.x1[i]
 						self.y1[i + 1] = self.y1[i]
@@ -287,7 +303,7 @@ class ProcessPlotter(object):
 						self.x3[i + 1] = self.x3[i]
 						self.y3[i + 1] = self.y3[i]
 
-					## Assign data from pipe to local variables
+					# Assign data from pipe to local variables
 					self.x1[0] = data[1]
 					self.y1[0] = data[2]
 					self.x2[0] = data[4]
@@ -295,18 +311,18 @@ class ProcessPlotter(object):
 					self.x3[0] = data[7]
 					self.y3[0] = data[8]
 
-					## Correct and assign orientation of marker/robot
+					# Correct and assign orientation of marker/robot
 					of1 = np.rad2deg(data[3]) + ofd
 					of2 = np.rad2deg(data[6]) + ofd
 					of3 = np.rad2deg(data[9]) + ofd
 
-					## Plot n-samples
+					# Plot n-samples
 					## Red - Data from preprocessor
-					self.ax.plot(self.x1, self.y1, 'r', marker = (3, 0, of1), markersize = 20)
+					self.ax.plot(self.x1, self.y1, 'r', marker = (3, 0, of1), markersize = markerScale)
 					## Green - Data from odometry sent by EKF
-					self.ax.plot(self.x2, self.y2, 'g', marker = (3, 0, of2), markersize = 15)
+					self.ax.plot(self.x2, self.y2, 'g', marker = (3, 0, of2), markersize = markerScale * 0.8)
 					## Green - Data from EKF
-					self.ax.plot(self.x3, self.y3, 'b', marker = (3, 0, of3), markersize = 12)
+					self.ax.plot(self.x3, self.y3, 'b', marker = (3, 0, of3), markersize = markerScale * 0.6)
 
 					if data[0]: # Clear every so often
 						# rospy.loginfo("[Rollo][%s][ProcessPlotter] Clear and reinitalize plot @ loop: %d", NodeName, LoopCounter) # //VB
@@ -316,6 +332,9 @@ class ProcessPlotter(object):
 						## Reinitialize plot
 						# initPlot(self.ax)
 						self.ax.grid(1)
+						## Set plot labels
+						# self.xlabel('x [m]')
+						# self.ylabel('y [m]')
 						self.ax.axis([-axlx, axlx, -axly, axly])
 
 			self.fig.canvas.draw()
@@ -326,9 +345,11 @@ class ProcessPlotter(object):
 	def __call__(self, pipe):
 		rospy.loginfo("[Rollo][%s][ProcessPlotter] Loop: %d", NodeName, LoopCounter) # //VB
 
-		## Initialize plot skeleton
+		# Initialize plot skeleton
+		## Data transmission pipe between processes
 		self.pipe = pipe
 		self.fig, self.ax = plt.subplots()
+		self.fig.canvas.set_window_title('Rollo visualization node')
 		plt.grid(1)
 		self.gid = gobject.timeout_add(0, self.poll_draw())
 
@@ -337,20 +358,24 @@ class ProcessPlotter(object):
 		plt.show()
 
 class MultiProcessPlot(object):
+	## Initilization
 	def __init__(self):
 		self.plotpipe, PlotterPipe = Pipe()
+		## Called process for plotting
 		self.plotter = ProcessPlotter()
+		## Process holder
 		self.plotprocess = Process(target = self.plotter, args = (PlotterPipe, ))
 		self.plotprocess.daemon = True
 		self.plotprocess.start()
 
+	## Plot function
 	def plot(self, finished=False):
 		send = self.plotpipe.send
 
 		if finished:
 			send(None)
 		else:
-			if not LoopCounter % plotRefreshRate:
+			if not LoopCounter % plotRefreshPeriod:
 				reset = 1
 			else:
 				reset = 0
@@ -369,9 +394,8 @@ class MultiProcessPlot(object):
 			flagSubscriber2 = False
 
 
-## Node main function
-
-def main():
+## Node class function
+def RolloVisualization():
 	""" Node main function
 
 		More details
@@ -384,6 +408,19 @@ def main():
 	## - Initialize rospy
 	# roscpp_initialize(sys.argv)
 	rospy.init_node('rollo_visualization', anonymous=True)
+
+	# Get node parameters
+	global rate
+	rate = float(rospy.get_param('~rate', '25'))
+	global plotRefreshPeriod
+	plotRefreshPeriod = float(rospy.get_param('~plotrefreshperiod', '100'))
+	global markerScale
+	markerScale = float(rospy.get_param('~ms', '20'))
+	# saveim = string(rospy.get_param('~saveim', '.'))
+	# savevid = string(rospy.get_param('~savevid', '.'))
+	# imtype = string(rospy.get_param('~imtype', 'png'))
+	# imformat = int(rospy.get_param('~imformat', '512'))
+	# duration = float(rospy.get_param('~d', '0'))
 
 	## Set frequency rate for visualization node
 	rosrate = rospy.Rate(rate)
@@ -439,6 +476,6 @@ def main():
 ## Script run condition
 if __name__ == '__main__':
 	try:
-		main()
+		RolloVisualization()
 	except rospy.ROSInterruptException:
 		pass
