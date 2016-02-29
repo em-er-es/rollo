@@ -217,18 +217,12 @@ void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
 
 	//! Angular velocity limits
 	if ((LastTurn == LimitVelocityF) && (Turn < LimitVelocityF))
-	// else if (Turn == LimitVelocityF)
 		Turn = LimitTurnVelocityR;
 	else if ((LastTurn == LimitVelocityR) && (Turn > LimitVelocityR))
-	// else if (Turn == LimitVelocityR)
 		Turn = LimitTurnVelocityL;
 	else if (Turn > LimitTurnVelocityR)
-	// if (Turn > 0.55)
-			// Turn = LimitTurnVelocityR;
 			Turn = LimitVelocityF;
 	else if (Turn < LimitTurnVelocityL)
-	// if (Turn < -0.60)
-			// Turn = LimitTurnVelocityL;
 			Turn = LimitVelocityR;
 
 	LastTurn = Turn;
@@ -245,11 +239,10 @@ void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
  * 
  * \param rate Running frequency of the node <!10 [Hz]>
  * 
- * Publish to command velocity topic as specified in configuration header file according to format @p geometry_msgs::Twist
+ * Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @ref geometry_msgs::Twist
  * 
  * @return 0
  */
-//* Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @p geometry_msgs::Twist
 
 int main(int argc, char **argv)
 {
