@@ -18,7 +18,7 @@
  * publish it along with time stamp for modeling of odometry and
  * the measurement in Kalman filter.
  *
- * Project github repository.
+ * Project github repository
  *
  * @see https://github.com/em-er-es/rollo/
  *

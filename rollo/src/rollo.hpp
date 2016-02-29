@@ -2,27 +2,31 @@
  * @file rollo.hpp
  * @author Rabbia Asghar
  * @author Ernest Skrzypczyk
- * 
+ *
  * @date 20/2/16
- * 
+ *
  * @brief Header file holding Rollo specific parameters and global references for the ROS nodes
+ *
+ * Project github repository
+ *
+ * @see https://github.com/em-er-es/rollo/
  *
  */
 
 
-//! ## Rollo
+// ## Rollo
 
 //! Axle length
 #define ROLLO_AXLE_L 0.0205
-//! Wheel radius:
-//! - Left
+// ### Wheel radius
+//! Wheel left radius
 #define ROLLO_WHEEL_RADIUS_L 0.0076
-//! - Right
+//! Wheel right radius
 #define ROLLO_WHEEL_RADIUS_R 0.0076
 // Original values
-// //! - Left
+// //! Wheel left radius
 // #define ROLLO_WHEEL_RADIUS_L 0.020
-// //! - Right
+// //! Wheel right radius
 // #define ROLLO_WHEEL_RADIUS_R 0.020
 //! Number of wheels
 #define ROLLO_WHEEL_N 4
@@ -31,12 +35,12 @@
 //! Minimum speed [%]
 #define ROLLO_SPEED_MIN 6
 
-//! Mathematical constants
+// ## Mathematical constants
 
 //! Pi
 #define PI 3.1415926535
 
-//! Node names
+// ## Node names
 
 //! Communication
 #define CM "COMM"
@@ -54,12 +58,13 @@
 #define VS "VIS "
 
 
-//! ROS
+// ## ROS
 
 //! ROS package name
 #define PACKAGE "Rollo"
 
-//! ROS topics
+// ## ROS topics
+
 // Alternative destinations for topics, divided by node names
 // #define TOPIC_COMM_WS "/Rollo/communication/wheelspeed"
 // #define TOPIC_CTRL_CMD_VEL "/Rollo/control/cmd_vel"
@@ -78,7 +83,7 @@
 //! Topic for position and orientation, stamped
 #define TOPIC_PREP_P2DT "/Rollo/pose2dstamped"
 
-//! GNU/Linux terminal color codes
+// ## GNU/Linux terminal color codes
 
 //! Reset
 #define CR "\033[0m"

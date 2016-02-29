@@ -1,0 +1,6 @@
+<map id="rollo.hpp" name="rollo.hpp">
+<area shape="rect" id="node2" href="$rollo__comm_8cpp.html" title="Communication between ROS and Rollo. " alt="" coords="5,80,120,107"/>
+<area shape="rect" id="node3" href="$rollo__control_8cpp.html" title="Convert input from keyboard and publish control commands for Rollo. " alt="" coords="144,80,261,107"/>
+<area shape="rect" id="node4" href="$rollo__ekf_8cpp.html" title="EKF implementation for localisation of a robot. " alt="" coords="285,80,381,107"/>
+<area shape="rect" id="node5" href="$rollo__preprocessor_8cpp.html" title="Preprocessor for Rollo measurement using Mocap OptiTrack motion capture data. " alt="" coords="406,80,559,107"/>
+</map>

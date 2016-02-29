@@ -19,21 +19,20 @@
 # \param duration Duration of visualization <!0>
 #
 # \warning Not all parameters and functions are currently processed
+#
+# Project github repository
+#
+# @see https://github.com/em-er-es/rollo/
+#
 
 
 ''' TODO
- * Add parameters for refreshing plot, size
+ * Part of the Doxygen documentation still seems not to be respected
  * Make marker gradual transition from previous position to current
- * for EKF message use odompose2d and ekfpose2d
- * ADD & FIX DOXYGEN documentation format
  *C Implement proper animation for pseudo realtime display of measurements
- *! Subscribe to mocap topic (/Optitrack/ground_pose)
- *! Subscribe to preprocessor topic (Pose2Dstamped)
- *! Subscribe to EKF topic
  *
  * TODO later
  * Implement dynamic server reconfiguration, use class for main()
- *! Implement as small buffer for data as possible
  * Double check results for animation
  *P Implement saving generated images to a video (code is there)
  *P Implement saving generated images to a path
@@ -144,7 +143,9 @@ def subscriberCallbackEKF(msg):
 
 	return 0
 
-### Functions unused
+
+# FUNCTIONS UNUSED START
+
 # Animation
 ## Initialization function for animation
 def initAnimation():
@@ -239,6 +240,9 @@ def generatePlot(initcond):
 	flagSubscriber2 = False
 
 	return 0
+
+# FUNCTIONS UNUSED END
+
 
 class ProcessPlotter(object):
 	def __init__(self):
@@ -409,7 +413,7 @@ class MultiProcessPlot(object):
 def RolloVisualization():
 	""" Node main function
 
-		More details
+		Runs visualization based on provided position and orientation data
 	"""
 
 	##! Initiliaze:
@@ -427,11 +431,14 @@ def RolloVisualization():
 	plotRefreshPeriod = float(rospy.get_param('~plotrefreshperiod', '100'))
 	global markerScale
 	markerScale = float(rospy.get_param('~ms', '20'))
+
+	# PARAMETERS UNUSED START
 	# saveim = string(rospy.get_param('~saveim', '.'))
 	# savevid = string(rospy.get_param('~savevid', '.'))
 	# imtype = string(rospy.get_param('~imtype', 'png'))
 	# imformat = int(rospy.get_param('~imformat', '512'))
 	# duration = float(rospy.get_param('~d', '0'))
+	# PARAMETERS UNUSED END
 
 	## Set frequency rate for visualization node
 	rosrate = rospy.Rate(rate)
@@ -449,10 +456,13 @@ def RolloVisualization():
 	## Multiprocessing
 	## Start another process for plotting
 	mpp = MultiProcessPlot()
+
+	# CODE UNUSED START
 	# processPlotting = multiprocessing.Process(target = generatePlot(0), args=())
 	# processPlotting = Process(target = generatePlot(0), args=())
 	# processPlotting.daemon = True
 	# processPlotting.start()
+	# CODE UNUSED END
 
 
 	while not rospy.is_shutdown():
@@ -465,11 +475,14 @@ def RolloVisualization():
 		if (flagSubscriber1 == True) and (flagSubscriber2 == True):
 			# rospy.loginfo("[Rollo][%s][Main] Generate and update plot", NodeName) # //DB
 			mpp.plot()
+
+			# CODE UNUSED START
 			## Animation
 			# Pos, = plt.plot(MessageMeasurement.x, MessageMeasurement.y)
 			# global animatePlot
 			# anim = animation.FuncAnimation(figure, animate, frames = 10, interval = 4, blit = True)
 			# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+			# CODE UNUSED END
 
 		## Sleep to conform node frequency rate
 		rosrate.sleep()
@@ -478,6 +491,7 @@ def RolloVisualization():
 		LoopCounter = LoopCounter + 1
 
 		## Main loop end
+
 
 	## Wait for plotprocess to finish
 	mpp.plotprocess.join()

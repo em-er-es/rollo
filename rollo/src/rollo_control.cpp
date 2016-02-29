@@ -48,11 +48,13 @@
  * - * : stop
  * - <CTRL>-C : quit
  *
- * Python script available online used as reference.
+ * - - - - - - - - - - - - - - - - - - -
+ *
+ * Python script available online used as reference
  *
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
  *
- * Project github repository.
+ * Project github repository
  *
  * @see https://github.com/em-er-es/rollo/
  *
@@ -60,7 +62,7 @@
 
 
 /* TODO
- *
+ * FIX the twice occurence of the above part, fixed it once by deleting the whole html directory
  * TODO later
  * Values are not kept at their previous level, a linear decline might be better
  * Add digits as velocity set mechanism
@@ -115,7 +117,9 @@ const double RKeysAngularV = 1;
  * \param NONE
  *
  * @return 1 if a key is pressed on keyboard, otherwise 0.
+ *
  * @see https://github.com/sdipendra/ros-projects/blob/master/src/keyboard_non_blocking_input/src/keyboard_non_blocking_input_node.cpp
+ * 
  */
 
 //TODO doxygen documentation on what is being done
@@ -158,7 +162,9 @@ int kbhit(void)
  * \param &Turn Angular velocity
  *
  * @return NULL
+ *
  * @see https://github.com/ros-teleop/teleop_twist_keyboard/blob/master/teleop_twist_keyboard.py
+ * 
  */
 
 void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
@@ -244,7 +250,7 @@ void decodeKey (char character, double &Speed, double &Turn, double &LastTurn)
  *
  * \param rate Running frequency of the node <!10 [Hz]>
  *
- * Publish to command velocity topic as specified in configuration header @file rollo.hpp according to format @ref geometry_msgs::Twist
+ * Publish to command velocity topic as specified in configuration header @p rollo.hpp according to format @ref geometry_msgs::Twist
  *
  * @return 0
  */

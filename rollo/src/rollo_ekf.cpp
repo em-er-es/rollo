@@ -30,7 +30,7 @@
  *
  * @see http://wiki.ros.org/robot_pose_ekf
  *
- * Project github repository.
+ * Project github repository
  *
  * @see https://github.com/em-er-es/rollo/
  *

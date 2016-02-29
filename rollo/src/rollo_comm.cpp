@@ -23,13 +23,13 @@
  *
  * Provides basic communication structure between ROS holding nodes used for localization and Rollo.\n
  * Main aspects include:
- *  - decoding linear and angular velocities provided by control node
+ *  - decode linear and angular velocities provided by control node
  *  - translate and send message to Rollo
  *  - publish decoded velocities
  *  - square test or n-th order
  *  - emergency procedure
  *
- * Project github repository.
+ * Project github repository
  *
  * @see https://github.com/em-er-es/rollo/
  *
