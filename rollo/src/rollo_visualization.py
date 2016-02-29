@@ -281,8 +281,9 @@ class ProcessPlotter(object):
 			blue_marker = mpatches.Patch(color='blue', label='EKF')
 			self.ax.legend(handles = [red_marker, green_marker, blue_marker], bbox_to_anchor = (0.0, 1.02, 1.0, 0.102), loc = 8, ncol = 3, mode = "expand", borderaxespad = 0.0)
 			## Set plot labels
-			# self.xlabel('x [m]')
-			# self.ylabel('y [m]')
+			self.ax.set_xlabel('x [m]')
+			self.ax.set_ylabel('y [m]')
+			self.ax.yaxis.set_label('y [m]')
 
 			## Main loop
 			while 1:
@@ -339,9 +340,10 @@ class ProcessPlotter(object):
 						# initPlot(self.ax)
 						self.ax.grid(1)
 						## Set plot labels
-						# self.xlabel('x [m]')
-						# self.ylabel('y [m]')
+						self.ax.set_xlabel('x [m]')
+						self.ax.set_ylabel('y [m]')
 						self.ax.axis([-axlx, axlx, -axly, axly])
+						# self.ax.yaxis.set_label('y [m]')
 						# self.ax.legend([red_marker, green_marker, blue_marker], ["Motion capture", "Odometry", "EKF"], bbox_to_anchor = (1.0, 1.02, 0.0, 0.102), loc = 3, ncol = 3, mode = "expand", borderaxespad = 0.0)
 						self.ax.legend(handles = [red_marker, green_marker, blue_marker], bbox_to_anchor = (0.0, 1.02, 1.0, 0.102), loc = 8, ncol = 3, mode = "expand", borderaxespad = 0.0)
 
