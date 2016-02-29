@@ -56,3 +56,43 @@ Scripts/Matlab/modelRolloRotation.m -- Script for analysing on spot rotation and
 Scripts/Matlab/my_ekf_node.m -- Preparing function for EKF to implement it in ROS node
 Scripts/Matlab/my_ekf_v1.m -- Matlab function for computing EKF
 Scripts/Matlab/rollo_ekf.m -- Function for computing EKF - Same as my_ekf_v1.m, outdated version
+
+# Videos
+# Videos documentating process of work with Rollo and ROS
+Videos/VID-20160217-WA0003.3gp -- Documentation of erratic behaviour of Rollo with velocity for the right wheel set to 12%, 3rd byte set to 0x12
+
+# Videos of with running ROS environment and Rollo side by side
+Videos/01-Rollo-Circle.mp4
+Videos/02-Rollo-Circle.mp4
+Videos/03-Rollo-Eight.mp4
+Videos/04-Rollo-Back-and-forth.mp4
+Videos/05-Rollo-Zigzag.mp4
+Videos/06-Rollo-Random.mp4
+Videos/07-Rollo-Square-N=2.mp4
+Videos/08-Rollo-Square-N=1.mp4
+Videos/09-ROS-startup.mp4
+Videos/10-ROS-startup-launcher.mp4
+
+# Videos of running ROS environment with all nodes to the corresponding movement -- Not included in the repo
+Videos/ffmpeg-280216--062255-circle.mkv
+Videos/ffmpeg-280216--064010-circle.mkv
+Videos/ffmpeg-280216--064631-eight.mkv
+Videos/ffmpeg-280216--065240-backandforth.mkv
+Videos/ffmpeg-280216--065547-zigzag.mkv
+Videos/ffmpeg-280216--065916-random.mkv
+Videos/ffmpeg-280216--070248-squaren=2.mkv
+Videos/ffmpeg-280216--070525-squaren=2.mkv
+Videos/ffmpeg-280216--090901-squaren=1.mkv
+Videos/ffmpeg-280216--091059-squaren=1.mkv
+Videos/ffmpeg-280216--091944-squaren=1.mkv
+Videos/ffmpeg-290216--034551-startup.mkv
+Videos/ffmpeg-290216--035023-startup.mkv
+Videos/ffmpeg-290216--035549-startup-launcher.mkv
+# Videos of running Rollo -- Processed videos: Flipped --  Not included in the repo
+Videos/RolloBackandforth.mp4
+Videos/RolloCircle1.mp4
+Videos/RolloCircle2.mp4
+Videos/RolloEight1.mp4
+Videos/RolloRandom.mp4
+Videos/RolloSquareN=1.mp4
+Videos/RolloZigzag.mp4
