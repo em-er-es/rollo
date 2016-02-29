@@ -11,23 +11,26 @@
  * @param rate: Sampling frequency of the node <!10 [Hz]>
  *
  * Based on control input from communication node in form of control commands and measurement from preprocessor node,
- * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance. 
+ * extended Kalman filter implementation estimates of states for localization and publishes estimated states with covariance.
  * Additional information in form of odometry based state estimate are also published for easier analysis of the filter results.
  * Kalman filter equations were first implemented in MATLAB, then translated into C++, compared and verified with test values.
  *
  * Localization of the robot consists of 3 states:
  *  - Position (x, y)
  *  - Orientation (Theta)
- * 
+ *
  * For initial state estimate the node uses robots position and orientation taken from Pose2D message from preprocessor node before running EKF iterations.
  * Initial state covariance matrix is taken as an identity matrix.
- * 
+ *
  * Timing for EKF update is inspired from @ref Robot Pose EKF (robot/pose/ekf) package available for ROS:\n
  * Timings and data at those specific time instants are synchronized in such a manner, that the latest
  * measurements with newer timestamps are interpolated to one and the same timestamp, when all necessary
  * data is available. This allows for a relative comparison of available data, even though an additional
  * error is introduced through interpolating.
+ *
  * @see http://wiki.ros.org/robot_pose_ekf
+ *
+ * Project github repository.
  *
  * @see https://github.com/em-er-es/rollo/
  *
@@ -51,26 +54,23 @@
 
 
 /* TODO
- * 
+ *
  * TODO LATER
  * Create appropriate comment switches
 // */
 
 
-/**
- * @brief Global variables updated in the SubscriberCallback functions.
- *
- * Initialize custom defined messages for meaurement and odometry.
- * Measurement message includes Pose2D along with timestamp.
- * Odometry message includes timestamp and angular velocities for left and right wheel.
- * Initialize variables that save timestamps from both measurement and odometry
- * subscribers in double (float64 in message format).
- */
+// Global variables updated in the SubscriberCallback functions.
 
+// Initialize custom defined messages for meaurement and odometry
+//! Measurement message includes Pose2D along with timestamp.
 rollo::Pose2DStamped zPose2DStamped;
+//! Initialize variable that save timestamps from both measurement subscriber in double (float64 in message format).
 double zTimeSecs = 0;
 
+//! Odometry message includes timestamp and angular velocities for left and right wheel.
 rollo::WheelSpeed Odometry;
+//! Initialize variable that save timestamps from odometry subscriber in double (float64 in message format).
 double OdometryTimeSecs = 0;
 
 //! Node name using console codes
@@ -140,8 +140,8 @@ void subscriberCallbackControlInput(const rollo::WheelSpeed msg) {
 	// RightWheelAngularVelocity = msg.wheelspeedright;
 	// LeftWheelAngularVelocity = msg.wheelspeedleft;
 
-//	ROS_INFO("[Rollo][%s][Sub][R_AngVelocity, L_AngVelocity]: %f, %f", NodeName, Odometry.wheelspeedright, Odometry.wheelspeedright);
-	//ROS_INFO("[Rollo][%s][Sub][OdomSeq, OdomStamp]: %d, %f", NodeName, OdometrySeq, OdometryTimeSecs);
+// ROS_INFO("[Rollo][%s][Sub][R_AngVelocity, L_AngVelocity]: %f, %f", NodeName, Odometry.wheelspeedright, Odometry.wheelspeedright); //DB
+// ROS_INFO("[Rollo][%s][Sub][OdomSeq, OdomStamp]: %d, %f", NodeName, OdometrySeq, OdometryTimeSecs); //DB
 
 }
 
@@ -165,7 +165,6 @@ rollo::WheelSpeed interpolateOdometry( rollo::WheelSpeed OdometryPrev, rollo::Wh
 	double OdometryPrevTimeSecs = OdometryPrev.header.stamp.toSec();
 	double OdometryCurrentTimeSecs = OdometryCurrent.header.stamp.toSec();
 
-	//TODO Maybe you could use temporary variables for more readability? This is more direct and simple. It might be more direct, but certainly not more simple for someone from the outside looking at the code for the first time. Leave it at that.
 	//y = y0 + ((y1 - y0) / (t1 - t0)) * (t - t0)
 	interpolated.wheelspeedright = OdometryPrev.wheelspeedright + ((OdometryCurrent.wheelspeedright - OdometryPrev.wheelspeedright) * (EKFfilterTimeSecs - OdometryPrevTimeSecs)) / (OdometryCurrentTimeSecs - OdometryPrevTimeSecs);
 	interpolated.wheelspeedleft = OdometryPrev.wheelspeedleft + ((OdometryCurrent.wheelspeedleft - OdometryPrev.wheelspeedleft) * (EKFfilterTimeSecs - OdometryPrevTimeSecs)) / (OdometryCurrentTimeSecs - OdometryPrevTimeSecs);
@@ -211,7 +210,7 @@ rollo::Pose2DStamped interpolateMeasurement( rollo::Pose2DStamped zPrev, rollo::
 
 /**
  * @brief Nonlinear state equation function f(x_k-1, u_k-1)
- * 
+ *
  * This is part of time update (or prediction update) of EKF. Given a priori state estimate x_k-1|k-1
  * and u_k-1, it computes predicted value for state x_k|k-1.
  *
@@ -231,7 +230,7 @@ Eigen::Vector3d FSTATE(Eigen::Vector3d x_pp, Eigen::Vector2d u) {
 /**
  * @brief Linearization of f(x_k-1, u_k-1)
  *
- * This is part of time update(or prediction update) of EKF. This computes Jacobian matrix by taking the partial derivatives of f(x_k-1,u_k-1) with respect to x, 
+ * This is part of time update(or prediction update) of EKF. This computes Jacobian matrix by taking the partial derivatives of f(x_k-1,u_k-1) with respect to x,
  * evaluated at the last state estimate x_k-1|k-1.
  *
  * @param x_pp contains a priori state estimate x_k-1|k-1
@@ -322,9 +321,23 @@ int loopcondition = 1;
 
 //! - Initialize variables involved in computation of EKF:
 //!   - Define number of states
+//!   - Initialize process noise covariance matrix
+//!   - Initialize measurement noise covariance matrix
+//!   - Initialize vector for control input u and variables involved in its computation
+//!   - Initialize state estimate vector a priori
+//!   - Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for given system
+//!   - Initialize E_pp: a priori estimated state covariance, E_k-1|k-1 (p refers to k-1)
+//!   - Initialize variables involved in the prediction update of EKF
+//!   - Initialize variables involved in the innovation update of EKF
+//!   - Initialize state estimate vector and state covariance matrix a posteriori
+//!   - Variables involved in odometry update alone
+//!   - Variables for determining EKF time step
+//!   - Variables involved in interpolation of odometry and  measurement data
+//!   - Control input and measurement variables used in EKF update
+
 int nstates = 3; // Number of states: 3 = (position) (x, y) (orientation) (Theta)
 
-//!   - Initialize process noise covariance matrix
+// Initialize process noise covariance matrix
 double q = 0.1; // Standard deviation of process noise
 
 Eigen::Matrix3d Q = Eigen::Matrix3d::Identity();
@@ -333,7 +346,7 @@ Q(0, 0) = q * q;
 Q(1, 1) = q * q;
 Q(2, 2) = q * q;
 
-//!   - Initialize measurement noise covariance matrix
+// Initialize measurement noise covariance matrix
 double r = 0.1; // Standard deviation of measurement noise
 
 Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
@@ -344,7 +357,7 @@ R(2, 2) = r * r;
 
 std::cout << "Q:\n" << Q << "\nR:\n" << R << "\n" << std::endl; //VB
 
-//!   - Initialize vector for control input u and variables involved in its computation
+// Initialize vector for control input u and variables involved in its computation
 Eigen::Vector2d u(0, 0);
 
 double SL = 0;
@@ -355,41 +368,41 @@ double nR = 1;
 double deltaTheta;
 double deltaS;
 
-//!   - Initialize state estimate vector a priori 
+// Initialize state estimate vector a priori
 Eigen::Vector3d x_pp(0, 0, 0);
 
-//!   - Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for given system
+// Initialize Jacobian matrix with the partial derivatives of h(x_k) with respect to x, identity for given system
 Eigen::Matrix3d Jh = Eigen::Matrix3d::Identity();
 
-//!   - Initialize E_pp: a priori estimated state covariance, E_k-1|k-1 (p refers to k-1)
+// Initialize E_pp: a priori estimated state covariance, E_k-1|k-1 (p refers to k-1)
 Eigen::Matrix3d E_pp = Eigen::Matrix3d::Identity(); // Initial state covariance matrix
 
-//!   - Initialize variables involved in the prediction update of EKF
+// Initialize variables involved in the prediction update of EKF
 Eigen::Vector3d x_cp; // State prediction, x_k|k-1
 Eigen::Matrix3d Jf;
 Eigen::Matrix3d E_cp; // E_k|k-1
 
-//!   - Initialize variables involved in the innovation update of EKF
+// Initialize variables involved in the innovation update of EKF
 Eigen::Vector3d z_estimate;
 Eigen::Matrix3d P12;
 Eigen::Matrix3d S_inv;
 Eigen::Matrix3d H;
 Eigen::Matrix3d U;
 
-//!   - Initialize state estimate vector and state covariance matrix a posteriori
+// Initialize state estimate vector and state covariance matrix a posteriori
 Eigen::Vector3d x_cc;
 Eigen::Matrix3d E_cc;
 
-//!   - Variables involved in odometry update alone
+// Variables involved in odometry update alone
 Eigen::Vector3d x_pp_odom(0, 0, 0);
 Eigen::Vector3d x_cc_odom(0, 0, 0);
 
-//!   - Variables for determining EKF time step
+// Variables for determining EKF time step
 char flagSensorsDataAvailable = 0;
 double prevOdometrySecs = 0;
 double prevMeasurementSecs = 0;
 
-//!   - Variables involved in interpolation of odometry and  measurement data
+// Variables involved in interpolation of odometry and  measurement data
 rollo::WheelSpeed prevOdometry;
 rollo::WheelSpeed InterpolatedOdometry;
 rollo::Pose2DStamped prevzPose2DStamped;
@@ -398,7 +411,7 @@ rollo::Pose2DStamped InterpolatedMeasurement;
 double EKFfilterTimeSecs;
 double PreviousEKFfilterTimeSecs;
 
-//!   - Control input and measurement variables used in EKF update
+// Control input and measurement variables used in EKF update
 double wheelspeedleft_EKF;
 double wheelspeedright_EKF;
 Eigen::Vector3d z_EKF(0, 0, 0);
@@ -412,24 +425,27 @@ std::cout << "Initializing: waiting for sensor data from both the subscribers \n
 while (initialize == 1 && ros::ok()) {
 
 	//! - Check if data is available from measurement (motion capture)
+	//!   - Initialize @p prevzPose2DStamped, @p prevMeasurementSecs and @p PreviousEKFfilterTimeSecs
 	if (zTimeSecs > 0 ){
-		//!  - Initialize @p prevzPose2DStamped, @p prevMeasurementSecs and @p PreviousEKFfilterTimeSecs
+		// Initialize @p prevzPose2DStamped, @p prevMeasurementSecs and @p PreviousEKFfilterTimeSecs
 		prevzPose2DStamped = zPose2DStamped;
 		prevMeasurementSecs = zTimeSecs;
 		PreviousEKFfilterTimeSecs = zTimeSecs;
 	}
 
 	//! - Check if data is available from odometry (control input)
+	//!   - Initialize @p prevOdometry, @p prevOdometrySecs and @p PreviousEKFfilterTimeSecs
 	if (OdometryTimeSecs > 0 ){
-		//!  - Initialize @p prevOdometry, @p prevOdometrySecs and @p PreviousEKFfilterTimeSecs
+		// Initialize @p prevOdometry, @p prevOdometrySecs and @p PreviousEKFfilterTimeSecs
 		prevOdometry = Odometry;
 		prevOdometrySecs = OdometryTimeSecs;
 		PreviousEKFfilterTimeSecs = OdometryTimeSecs;
 	}
 
 	//! - Check if new data has been read from  both measurement (motion capture) and odometry (control input)
+	//!   - Initialize initial state estimate @p x_pp
 	if (prevMeasurementSecs > 0 && prevOdometrySecs > 0){
-		//!  - Initialize initial state estimate @p x_pp
+		// Initialize initial state estimate @p x_pp
 		initialize = 0;
 		x_pp(0) = zPose2DStamped.pose2d.x;
 		x_pp(1) = zPose2DStamped.pose2d.y;
@@ -454,18 +470,27 @@ do {
 	std::cout << "Wait for new data from all sensors (motion captutre and odometry) for next EKF iteration. \n" << std::endl; //DB
 
 	//! - Check if new data is available from measurement (motion capture) and odometry (control input)
+	//!   - If new data is available and measurement data is for timestamp later than odometry's, perform interpolation for measurement
+	//! - Update timestamp
+	//! - Interpolate measurements
+	//! - Update measurement and control input for EKF update
+	//! - If new data is available and odometry data is for time stamp later than measurement's, perform interpolation for odometry
+	//!   - Update timestamp
+	//!   - Interpolate odometry
+	//!   - Update measurement and control input for EKF update
+	//! - Update @p prevOdometry and @p prevzPose2DStamped for next loop
 	if (OdometryTimeSecs > prevOdometrySecs && zTimeSecs > prevMeasurementSecs) {
 		flagSensorsDataAvailable = 1;
 		prevOdometrySecs = OdometryTimeSecs;
 		prevMeasurementSecs = zTimeSecs;
 
-		//!   - If new data is available and measurement data is for timestamp later than odometry's, perform interpolation for measurement
+		// If new data is available and measurement data is for timestamp later than odometry's, perform interpolation for measurement
 		if (zTimeSecs > OdometryTimeSecs) {
-			//! - Update timestamp
+			// Update timestamp
 			EKFfilterTimeSecs = OdometryTimeSecs;
-			//! - Interpolate measurements
+			// Interpolate measurements
 			InterpolatedMeasurement = interpolateMeasurement(prevzPose2DStamped, zPose2DStamped, EKFfilterTimeSecs);
-			//! - Update measurement and control input for EKF update
+			// Update measurement and control input for EKF update
 			z_EKF(0) = InterpolatedMeasurement.pose2d.x;
 			z_EKF(1) = InterpolatedMeasurement.pose2d.y;
 			z_EKF(2) = InterpolatedMeasurement.pose2d.theta;
@@ -478,14 +503,14 @@ do {
 		std::cout << "Odometry: Wheelspeed: L: " << wheelspeedleft_EKF << " R: " << wheelspeedright_EKF << "\n" << std::endl; //DB
 
 		} else {
-			//! - If new data is available and odometry data is for time stamp later than measurement's, perform interpolation for odometry
-			//!   - Update timestamp
+			// If new data is available and odometry data is for time stamp later than measurement's, perform interpolation for odometry
+			// Update timestamp
 			EKFfilterTimeSecs = zTimeSecs;
 
-			//!   - Interpolate odometry
+			// Interpolate odometry
 			InterpolatedOdometry = interpolateOdometry(prevOdometry, Odometry, EKFfilterTimeSecs);
 
-			//!   - Update measurement and control input for EKF update
+			// Update measurement and control input for EKF update
 			z_EKF(0) = zPose2DStamped.pose2d.x;
 			z_EKF(1) = zPose2DStamped.pose2d.y;
 			z_EKF(2) = zPose2DStamped.pose2d.theta;
@@ -499,7 +524,7 @@ do {
 
 		}
 
-	//! - Update @p prevOdometry and @p prevzPose2DStamped for next loop
+	// Update @p prevOdometry and @p prevzPose2DStamped for next loop
 	prevOdometry = Odometry;
 	prevzPose2DStamped = zPose2DStamped;
 
@@ -529,7 +554,7 @@ do {
 		std::cout << "SL: " << SL << " SR: " << SR << "\n" << std::endl; //DB
 		std::cout << "deltaTheta: " << deltaTheta << " deltaS: " << deltaS << "\n" << std::endl; //DB
 		std::cout << "u:\n" << u << "\n" << std::endl; //DB
-		
+
 		//! - Prediction update
 		//! - Update state prediction based on a priori state estimate and control input
 		x_cp = FSTATE(x_pp, u); // f_xu; // State prediction, x_k|k-1
