@@ -1,0 +1,48 @@
+1
+00:00:00,000 --> 00:00:05,000
+ROS environment startup using launcher
+Realtime speed
+
+2
+00:00:05,000 --> 00:00:10,000
+Using the launcher approach to start all nodes.
+
+3
+00:00:10,000 --> 00:00:15,000
+This includes running the mocap_optitrack node as a dependency.
+
+4
+00:00:15,000 --> 00:00:20,000
+All output is to the screen. Using "output=log" in the launcher would prevent that.
+
+5
+00:00:25,000 --> 00:00:30,000
+All nodes are color coded for easier recognition by user.
+
+6
+00:00:30,000 --> 00:00:35,000
+The publish.sh script is being used to read logs and publish the data within using rostopic.
+
+7
+00:00:35,000 --> 00:00:40,000
+Once the data is available the position from motion capture and EKF are updated, but not the odometry model.
+
+8
+00:01:10,000 --> 00:01:15,000
+Command ros-jade loads the environment for that particular version of ROS.
+
+9
+00:01:15,000 --> 00:01:20,000
+Control node is not critical to operation of the system. It starts running in this terminal and the one started by launcher is killed.
+
+10
+00:01:40,000 --> 00:01:45,000
+Communication node is critical however. So after starting it in another terminal the one from launcher will be killed.
+
+11
+00:01:45,000 --> 00:01:50,000
+This terminates the whole launcher. All nodes exit, except the external ones.
+
+12
+00:01:50,000 --> 00:01:55,000
+The reason for the delay was that visualization node starts another process to omit plt.show() commands restrictions. This prevent from clean exit. User interaction is needed.

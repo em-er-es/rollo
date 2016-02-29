@@ -1,0 +1,76 @@
+1
+00:00:00,000 --> 00:00:05,000
+ROS environment startup
+Realtime speed
+
+2
+00:00:05,000 --> 00:00:10,000
+Using the manual approach where all nodes have to be started manually.
+
+3
+00:00:10,000 --> 00:00:15,000
+Only motion capture mocap_optitrack node is executed using launcher.
+
+4
+00:00:15,000 --> 00:00:20,000
+All nodes accept parameters. They are specific to the function of the node.
+
+5
+00:00:25,000 --> 00:00:30,000
+Communication node is started first.
+
+6
+00:00:30,000 --> 00:00:35,000
+Since there is connection to control node, the emergency procedure is executed.
+
+7
+00:00:35,000 --> 00:00:40,000
+Once the connection is established communication node continues to run in normal operation mode.
+
+8
+00:00:40,000 --> 00:00:45,000
+Preprocesser node is started. Notice that there is no output. This is due to lacking data from motion capture node.
+
+9
+00:00:50,000 --> 00:00:55,000
+Extended Kalman filter node is started. Since there is no input data, the estimates stay at a specific value.
+
+10
+00:00:55,000 --> 00:01:00,000
+The publish.sh script will be used to read logs and publish the data within using rostopic.
+
+11
+00:01:00,000 --> 00:01:05,000
+Start of visualization node.
+
+12
+00:01:05,000 --> 00:01:10,000
+Rollo is at origin of the coordinate system of motion capture.
+
+13
+00:01:10,000 --> 00:01:15,000
+Script for publishing is started. Preprocessor node receives data from mocap_optitrack node.
+
+14
+00:01:15,000 --> 00:01:20,000
+The actual position of Rollo is displayed. The odometry model has not been updated. The EKF node would have to be restarted for that.
+
+15
+00:01:40,000 --> 00:01:45,000
+Demonstration of different possibilities of the visualization node.
+
+16
+00:01:45,000 --> 00:01:50,000
+Different marker scale and frequency rate of visualization node are used.
+
+17
+00:02:20,000 --> 00:02:25,000
+Different refresh period of the plot is being used. Here movements can be tracked more easily at the cost of performance of the node.
+
+18
+00:03:30,000 --> 00:03:35,000
+Demonstration of the control node. Pay attention to the output of communication node in the top right terminal.
+
+19
+00:04:25,000 --> 00:04:30,000
+Again display of the emergency procedure of the communication node.

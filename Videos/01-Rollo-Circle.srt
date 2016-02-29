@@ -1,0 +1,21 @@
+1
+00:00:00,000 --> 00:00:05,000
+Rollo run test 01: Circle 01
+Realtime speed
+
+2
+00:00:05,000 --> 00:00:10,000
+Movement mode: Forward
+Velocities: L 19% R 12%
+
+3
+00:00:10,000 --> 00:00:15,000
+Motion capture: Red marker; Extended Kalman filter: Blue marker; Odometry model: Green marker
+
+4
+00:00:20,000 --> 00:00:25,000
+Odometry model was incorrect, since the velocities were switched for left and right wheel.
+
+5
+00:00:25,000 --> 00:00:30,000
+This resulted in movement of odometry into another direction.

@@ -1,0 +1,104 @@
+1
+00:00:00,000 --> 00:00:05,000
+Rollo run test 07: Square test N=2
+Realtime speed
+
+2
+00:00:05,000 --> 00:00:10,000
+01. Forward movement
+
+3
+00:00:10,000 --> 00:00:15,000
+Motion capture: Red marker; Extended Kalman filter: Blue marker; Odometry model: Green marker
+
+4
+00:00:15,000 --> 00:00:20,000
+Movement is done according to a specified time value, since direct odometry readings are not available.
+
+5
+00:00:45,000 --> 00:00:50,000
+02. Turning 90°clockwise
+
+6
+00:00:55,000 --> 00:01:00,000
+03. Forward movement
+
+7
+00:01:40,000 --> 00:01:45,000
+04. Turning 90°clockwise
+
+8
+00:01:45,000 --> 00:01:50,000
+05. Forward movement
+
+9
+00:02:35,000 --> 00:02:40,000
+06. Turning 90°clockwise
+
+10
+00:02:40,000 --> 00:02:45,000
+07. Forward movement
+
+11
+00:02:45,000 --> 00:02:50,000
+This turn was the worst so far. Often it is the result of uneven surface of the laboratory.
+
+12
+00:03:35,000 --> 00:03:40,000
+08. Turning 90°clockwise
+
+13
+00:03:40,000 --> 00:03:45,000
+Square run 1 is finished. Square run 2 starts.
+
+14
+00:03:45,000 --> 00:03:50,000
+09. Turning around
+
+15
+00:03:50,000 --> 00:03:55,000
+10. Forward movement
+
+16
+00:03:55,000 --> 00:04:00,000
+Motion capture lost the Rollo again. There was a recent recalibration of the whole motion capture system.
+
+17
+00:04:40,000 --> 00:04:45,000
+11. Turning 90°counterclockwise
+
+18
+00:04:45,000 --> 00:04:50,000
+12. Forward movement
+
+19
+00:05:25,000 --> 00:05:30,000
+Motion capture data available again.
+
+20
+00:05:35,000 --> 00:05:40,000
+13. Turning 90°counterclockwise
+
+21
+00:05:40,000 --> 00:05:45,000
+14. Forward movement
+
+22
+00:06:30,000 --> 00:06:35,000
+15. Turning 90°counterclockwise
+
+23
+00:06:35,000 --> 00:06:40,000
+16. Forward movement
+
+24
+00:07:25,000 --> 00:07:30,000
+17. Turning 90°counterclockwise
+
+25
+00:07:30,000 --> 00:07:35,000
+18. Full stop
+
+26
+00:07:35,000 --> 00:07:40,000
+Square run 2 is finished. The initial position indicated by the blue marker. Offset is approximately by 3 m.
