@@ -279,7 +279,7 @@ int EstimateFeedbackVelocities(int VelocityL, int VelocityR, double &LeftVelocit
 	//! - Combination of different movement speeds -- L19% & R12%
 	} else if (VelocityL == 19 && VelocityR == 12) {
 		LeftVelocityEstimate = 11.97782072;
-		RighttVelocityEstimate = 11.7195477;
+		RightVelocityEstimate = 11.7195477;
 	//! - Combination of different movement speeds -- L31% & R38%
 	} else if (VelocityL == 31 && VelocityR == 38) {
 		LeftVelocityEstimate = 27.97425271;
