@@ -108,7 +108,7 @@
 %	\newcommand{\Inkscape}{"C:/Program Files (x86)/Inkscape/inkscape.exe" }
 %}
 
-% Include SVG withing scalebox
+% Include SVG-LaTeX withing scalebox
 %\includesvga[0.75]{Graphics/10-odometry--right-turn}
 %\includesvga[scalebox]{input-files-w/o-ext}
 \newcommand{\includesvgsb}[2][1]{
@@ -117,7 +117,7 @@
 	\scalebox{#1}{\input{#2.pdf_tex}}
 }
 
-% Include SVG as figure
+% Include SVG-LaTeX as figure
 %\includesvg[0.75]{a}{Automated includesvg pdf\label{f:f4b}}
 %\includesvg[scale]{input-files-w/o-ext}{caption\label{f:id}}
 \newcommand{\includesvg}[3][1]{
@@ -1046,7 +1046,7 @@ z_{k} &= h\left(x_{k}\right) + v_{k-1}
 where $w_{k} \sim N\left(0,Q_k\right)$ and  $v_{k} \sim
 N\left(0,R_k\right)$.
 
-We will proceed with the assumption that f(), h(), Q and R are constant for our non linear system.
+We will proceed with the assumption that f(), h(), Q and R are time invariant for our non linear system.
 f() and h() are  linearized about the prior best estimates of the states at each instant of time by finite difference method as,in order to compute covariance.
 Given initial state estimate, $\hat{x}_{0|0}$ and initial state covariance matrix, $\Sigma_{0|0}$ the Extended Filter can be computed using following set of equations.
 
@@ -1281,6 +1281,77 @@ where $CholsekyDecomposition (X)$ produces an upper triangular matrix $U$ from t
 %U=P12*inv(R)                    %K=U/R'; Faster because of back substitution
 %x_cc = x_cp + U*(inv(R')*(z-z_estimate))         %Back substitution to get state update
 %E_cc = E_cp - U*U'                   %Covariance update, U*U'=P12/R/R'*P12'=K*P12.
+
+\subsection{ROS documentation}
+
+Robot Operating System (ROS) is a collection of software frameworks for robot software development, it works as middleware for work with complex robotic problems. It uses the publisher subscriber software architecture model for nodes. The presented problem of localization of a humanoid robot using extended Kalman filter, which has been described in detail in previous section [ref section], has been solved using ROS.
+[Number of nodes] nodes have been developed respecting the aspects of modularity and exchangebility of software:
+\begin{itemize}
+	\item Preprocessor node
+	\item Control node
+	\item Communication node
+	\item Extended Kalman filter node
+	\item Visualization
+	\item [Analysis]
+\end{itemize}
+
+Each node is supposed to fulfill one function, however there are several aspects that have been merged into nodes, that might be contraintuitive. Functionalities of the nodes are distributed the following way:
+\begin{enumerate}
+	\item Preprocessor node:
+	\item Control node:
+	\begin{enumerate}
+		\item Translate input from keyboard into linear and angular velocities within unitary limits ($-100\% \div 100\%$)
+		\item Publish data
+	\end{enumerate}
+	\item Communication node:
+	\begin{enumerate}
+		\item Translate data from control node into a 3 byte message for Rollo
+		\item Send data continuosly at a given rate to Rollo
+		\item Perform emergency procedure if connection to control node is lost
+		\item [fix number, A for previous options, B for this one]
+		\item Square test of n-th order
+		\begin{enumerate}
+			\item Perform a cycle of forward movement and turn
+			\item For higher than 1 order square test, turn around between runs
+		\end{enumerate}
+	\end{enumerate}
+	\item Extented Kalman filter node:
+	\begin{enumerate}
+		\item Preprocessing of acquired data to make comparison of relevant information
+		\item Estimate of state using EKF
+		\item Odometry data calculation
+		\item Publish results
+	\end{enumerate}
+	\item Visualization node:
+	\begin{enumerate}
+		\item Visualize data from preprocessor and extended Kalman filter, which provides estimates of state and odometry data
+	\end{enumerate}
+\end{enumerate}
+
+Nodes have been written in C++ with the exception of visualization node, which is written in Python, because of easy access to the powerful Matplotlib [reference] library. There has been also a significant amount of testing and prototyping of software done in Matlab and Python, mainly for the odometry model and extended Kalman filter implementation and analysis. Additional scripts in Bash shell were also written, mostly for the purpose of easier repetition of tasks.
+
+The basic software architecture model implemented is publish-subscribe given the architecture ROS uses represented by [reference to diagram].
+
+More in depth documentation of the actual code and algorithms has been done using Doxygen in two formats: html version [reference to github] and local document form [reference to refman.pdf]. Only the most important points shall be described here.
+
+A few aspects have been addressed while developing the software. One of those aspects is safety of operation. Should the control node loose connection to the master and at the same time be sending other than full stop (linear and angular velocities equal to zero), then in normal case the communication node would continue sending data with last values received from control node. This is the reason a safety or emergency procedure has been implemented, so that after a period of time, which can be specified from the command line, a full stop command is being send for 10 [verify] times. Should the control node reestablish connection, the communication node will continue to work in normal procedure. Since the robot has been tested in laboratory conditions, the algorithm implemented is not very robust and could be further improved. For example, the stop command could be send conitnuosly, until control node is reconnected with ROS master or forcefully exited. Another improvement would be to send a special message that this event occured, so that the user is informed about it without delay.
+
+Next feature implemented into the communication node is the square test. In this particular test [provide more description] [provide reference]. The implemented algorithm lets the user specify the forward and turning times for the square test, which is necessary in case of not having access to odometry data. The square test can be performed in multiple runs, so that each cycle includes:
+
+\begin{enumerate}
+	\item Moving forward
+	\item Turning $90\deg$
+	\item Moving forward
+	\item Turning $90\deg$
+	\item Moving forward
+	\item Turning $90\deg$
+	\item Moving forward
+	\item Turning $90\deg$
+\end{enumerate}
+
+Should there be multiple runs specified, the robot would turn around, which is to rotate $180\deg$ and continue with step 1. It other case that would be the last run, ideally the robot would stop at exactly the same position it started with the initial orientation. Since there are systematic and random errors, this is only achieveable for a given tolerance.
+
+During tests runs it has been only confirmed, what the analysis of the logs performed for the extended Kalman filter node concluded, namely that the turning times differ significantly, which is most probably due to mechanical asymmetry. This makes the source code for this particular robot somewhat irrelevant. However it has been decided to leave the current implementation at this state, since it actually is sound from the theoretical point of view and most robots should have the similar turning speeds for both directions.
 
 
 % % % % CODE REFERENCE
