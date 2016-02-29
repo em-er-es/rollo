@@ -92,12 +92,11 @@ void subscriberCallback(const geometry_msgs::Pose2D::ConstPtr& msg) {
 	ROS_INFO("[Rollo][%s][Sub][X [mm], Y [mm], Theta [deg]]: %f, %f, %f", NodeName, x_mm, y_mm, theta_deg);
 }
 
-//FIX topic names
 /**
  * @brief Node main
  *
  * Initialize variables, nodehandle, subscribe to motion capture data from @ref mocap_optitrack node and publish position and orientation after processing with time stamp.
- * The position and orientation are published along with timestamp to topic /Rollo/preprocessor/pose2dstamped in format custom defined message, @ref rollo::Pose2DStamped.
+ * The position and orientation are published along with timestamp in custom defined message format @ref rollo::Pose2DStamped.
  * 
  * \param rate: Sampling frequency of the node <!25 [Hz]>
  * \param samplesize: Number of elements that are averaged/subsampled <!4 [1]>
@@ -161,9 +160,6 @@ PubRolloPositionPose2dStamped.header.frame_id = '1'; // Global frame
 
 //! - Loop counter holder
 unsigned int LoopCounter = 0;
-//! - Loop condition variable
-int loopcondition = 1; // For while(1) loop
-
 
 //! ## Main loop
 do {
@@ -202,17 +198,15 @@ do {
 		if (sampling == 0) frequency.sleep();
 	}
 
-
 	// ROS_INFO("[Rollo][%s][Debug][Counter]: %d", NodeName, LoopCounter); //DB
 	ros::spinOnce();
-	if (! ros::ok()) loopcondition = 0; //TEST seems unnecessary
 
 	//! For averaging sleep for time defined by rate before reading states from the subscriberCallback()
 	if (sampling != 0) frequency.sleep();
 	//! - Increase loop counter
 	LoopCounter++;
 
-} while (loopcondition);
+} while (ros::ok());
 //! ## Main loop end
 
 return 0;
