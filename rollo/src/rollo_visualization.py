@@ -392,8 +392,8 @@ class MultiProcessPlot(object):
 				reset = 0
 
 			## Compose data for pipe
-			data = [reset, 
-					MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y, MessageMeasurement.pose2d.theta, 
+			data = [reset,
+					MessageMeasurement.pose2d.x, MessageMeasurement.pose2d.y, MessageMeasurement.pose2d.theta,
 					MessageEKF.odompose2d.x, MessageEKF.odompose2d.y, MessageEKF.odompose2d.theta,
 					MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta]
 			# print(MessageEKF.ekfpose2d.x, MessageEKF.ekfpose2d.y, MessageEKF.ekfpose2d.theta) # //VB
