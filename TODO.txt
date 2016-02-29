@@ -2,7 +2,8 @@
 [P] - Fix doxygen documentation
 [ ] - Finish local documentation
 [ ] - Document scripts in the LaTeX file, provide description
-[ ] - Add dynamic reconfigure dependency
+[C] - Add dynamic reconfigure dependency
+[P] - Add media descriptions in documentation and locally
 [ ] - Add a readme file for the repository
 [ ] - Add a readme file specifically for Professor Mastrogiovanni
 [ ] - Add dynamic reconfigure dependency
