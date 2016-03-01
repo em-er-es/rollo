@@ -48,3 +48,4 @@ rollo/ -- ROS workspace tree - Includes source code for nodes and configuration 
 ROS/ -- ROS specific files for launchers and packages in general
 Scripts/ -- Various scripts developed to aid the progess in project
 Logs/ -- Various logs in different formats with corresponding scripts for offline analysis
+20*.log -- Work logs, almost complete
