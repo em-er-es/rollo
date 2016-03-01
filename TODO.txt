@@ -1,11 +1,12 @@
 [P] - Add analysis node with psuedo real time plotting
 [D] - Fix doxygen documentation
-[ ] - Finish local documentation
-[ ] - Document scripts in the LaTeX file, provide description
+[P] - Redraw odometry model figures
+[P] - Finish local documentation
+[P] - Document scripts in the LaTeX file, provide description
 [C] - Add dynamic reconfigure dependency
 [D] - Add media descriptions in documentation and locally
-[ ] - Add a readme file for the repository
-[ ] - Add a readme file specifically for Professor Mastrogiovanni
+[D] - Add a readme file for the repository
+[D] - Add a readme file specifically for Professor Mastrogiovanni
 [C] - Add dynamic reconfigure dependency
 [D] - Add a file list for relevant files with description
 [D] - Improve current rollo.launch
