@@ -48,5 +48,7 @@ Videos/ -- Videos of Rollo under operation in the motion capture environment and
 rollo/ -- ROS workspace tree - Includes source code for nodes and configuration files
 ROS/ -- ROS specific files for launchers and packages in general
 Scripts/ -- Various scripts developed to aid the progess in project
+Applications/cruderollo/cruderollo.sh -- Cruderollo control script using the independent wheel control protocol
+Scripts/Python/compute_position.py -- Odometry model for Rollo - Latest version of Python script (standalone)
 Logs/ -- Various logs in different formats with corresponding scripts for offline analysis
 20*.log -- Work logs, almost complete
