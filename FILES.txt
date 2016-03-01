@@ -4,7 +4,7 @@
 # Rabbia Asghar, Ernest Skrzypczyk
 
 
-# Project relevant files
+### FILES -- Project relevant files
 
 # File location/name -- Description
 
@@ -97,3 +97,65 @@ Videos/RolloEight1.mp4
 Videos/RolloRandom.mp4
 Videos/RolloSquareN=1.mp4
 Videos/RolloZigzag.mp4
+
+
+# Images
+# Screenshots
+Graphics/Images/2016-02-29-030503_1366x768_scrot.png
+Graphics/Images/2016-02-29-030513_1366x768_scrot.png
+Graphics/Images/2016-02-29-123043_1366x768_scrot.png
+Graphics/Images/2016-02-29-123056_1366x768_scrot.png
+Graphics/Images/2016-02-29-220534_1366x768_scrot.png
+Graphics/Images/2016-02-29-221844_1366x768_scrot.png
+
+# Electrical changes to Rollo
+Graphics/Images/DSC03888.JPG
+Graphics/Images/DSC03889.JPG
+Graphics/Images/DSC03890.JPG
+Graphics/Images/DSC03891.JPG
+Graphics/Images/DSC03892.JPG
+Graphics/Images/DSC03893.JPG
+Graphics/Images/DSC03894.JPG
+Graphics/Images/DSC03895.JPG
+Graphics/Images/DSC03896.JPG
+Graphics/Images/DSC03897.JPG
+Graphics/Images/DSC03898.JPG
+
+# Electrical and mechanical changes to Rollo -- Process of implementation
+Graphics/Images/IMG_20151221_124822.jpg
+Graphics/Images/IMG_20151221_124829.jpg
+Graphics/Images/IMG_20151221_124836.jpg
+Graphics/Images/IMG_20151221_124841.jpg
+Graphics/Images/IMG_20151221_124921.jpg
+Graphics/Images/IMG_20151221_180806.jpg
+Graphics/Images/IMG_20151221_180811.jpg
+Graphics/Images/IMG_20151221_180817.jpg
+Graphics/Images/IMG_20151221_181040.jpg
+Graphics/Images/IMG_20151221_181047.jpg
+Graphics/Images/IMG_20151221_181055.jpg
+Graphics/Images/IMG_20151221_181102.jpg
+Graphics/Images/IMG_20151221_181120.jpg
+Graphics/Images/IMG_20151221_181129.jpg
+Graphics/Images/IMG_20151221_181133.jpg
+Graphics/Images/IMG_20151224_143831.jpg
+Graphics/Images/IMG_20151224_143833.jpg
+Graphics/Images/IMG_20151224_143838.jpg
+Graphics/Images/IMG_20151224_143843.jpg
+Graphics/Images/IMG_20151224_143849.jpg
+Graphics/Images/IMG_20151224_143856.jpg
+Graphics/Images/IMG_20151224_143905.jpg
+Graphics/Images/IMG_20151224_143917.jpg
+Graphics/Images/IMG_20151224_143924.jpg
+Graphics/Images/IMG_20151231_140958.jpg
+Graphics/Images/IMG_20151231_141004.jpg
+Graphics/Images/IMG_20151231_141010.jpg
+Graphics/Images/IMG_20151231_141040.jpg
+Graphics/Images/IMG_20151231_141042.jpg
+Graphics/Images/IMG_20151231_141045.jpg
+Graphics/Images/IMG_20151231_141052.jpg
+Graphics/Images/IMG_20151231_141057.jpg
+Graphics/Images/IMG_20151231_141111.jpg
+Graphics/Images/IMG_20151231_141114.jpg
+Graphics/Images/IMG_20160107_175427_1.jpg
+Graphics/Images/IMG_20160107_175445.jpg
+Graphics/Images/IMG_20160107_175448.jpg
