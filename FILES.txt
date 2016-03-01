@@ -14,16 +14,16 @@ NOTES.txt - Global notes
 TODO.txt - A global TODO list
 FILES.txt - This file
 
+
 # ROS nodes
 rollo/src/rollo_comm.cpp -- Communication node
 rollo/src/rollo_control.cpp -- Control node
 rollo/src/rollo_ekf.cpp -- Extended Kalman filter for estimating position and orientation node
-rollo/src/rollo_localization.cpp -- //D
-rollo/src/rollo_odometry.cpp -- //D
 rollo/src/rollo_preprocessor.cpp -- Preprocessing motion capture data node
-rollo/src/rollo_template.cpp -- //D
 rollo/src/rollo_visualization.cpp -- Visualization node
 
+
+# Scripts
 # Bash scripts
 Applications/cruderollo/cruderollo.sh -- Cruderollo control script using the independent wheel control protocol
 Logs/average-samples.sh -- Script skeleton for averaging samples using awk - Not implemented
@@ -56,6 +56,7 @@ Scripts/Matlab/modelRolloRotation.m -- Script for analysing on spot rotation and
 Scripts/Matlab/my_ekf_node.m -- Preparing function for EKF to implement it in ROS node
 Scripts/Matlab/my_ekf_v1.m -- Matlab function for computing EKF
 Scripts/Matlab/rollo_ekf.m -- Function for computing EKF - Same as my_ekf_v1.m, outdated version
+
 
 # Videos
 # Videos documentating process of work with Rollo and ROS
