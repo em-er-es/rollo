@@ -22,7 +22,8 @@ Tasks performed for the localization of Rollo using a ROS environment with the h
 * Developing all necessary nodes to control and communicate with Rollo using ROS
 * Developing nodes for visualization and preprocessing of motion capture data
 
-The localization has been successfully implemented. There is still room for improvement, especially with the odometry model, but that requires more intesive testing on the robot. Furthermore the ROS nodes could be improved:
+The extended Kalman filter for localization has been successfully implemented. There is still room for improvement, especially with the odometry model, but that requires more intesive testing on the robot. Furthermore the ROS nodes could be improved:
+* Add process and measurement covariance matrices into the header file rollo.hpp
 * Visualization node could also provide analysis of the EKF performance
 * Visualization node could be greatly expanded for media purposes by fully utilizing already provided code like saving animations and screenshots
 * EKF node could reinitialize the odometry model at a given refresh period, should the model be incomplete
