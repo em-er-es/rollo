@@ -27,7 +27,10 @@ The localization has been successfully implemented. There is still room for impr
 * Visualization node could be greatly expanded for media purposes by fully utilizing already provided code like saving animations and screenshots
 * EKF node could reinitialize the odometry model at a given refresh period, should the model be incomplete
 * Implementation of dynamic reconfiguration server into the ROS nodes, would greatly improve work with prototypes and changing environments
-* Use of better connectors in the power circuits is necessary, even though the whole electrical system has been greatly improved already
+
+Further changes on the Rollo should include:
+* Use of better connectors in the power circuits is necessary, even though wire connections have been greatly improved already
+* Provide at least a basic shortage protection circuit: This can be done using diodes, like 1N4007, on the input and output of the voltage regulators; One in series to rectify and one in parallel to protect in case of opposite polarities
 * Exchange and calibration of wheels is necessary
 * A different material for the wheel surface might be an asset
 
