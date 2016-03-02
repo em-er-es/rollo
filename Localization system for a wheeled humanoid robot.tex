@@ -65,12 +65,13 @@
 
 % % % Command definitions
 % % References
+\newcommand{\aref}[1]{\autoref{#1}}
 \newcommand{\bref}[1]{(\ref{#1})}
 \newcommand{\cref}[1]{(\afig\ref{#1})}
 %\renewcommand{\eqref}[1]{(\ref{eq:#1})}
 \newcommand{\eref}[1]{(\ref{#1})}
 \newcommand{\fref}[1]{(\ref{f:#1})}
-\newcommand{\sref}[1]{\ref{#1}}
+\newcommand{\sref}[1]{\ref{s:#1}}
 % % Symbols
 \newcommand{\dlsh}{\reflectbox{\rotatebox[origin=c]{180}{$\Lsh$}}}
 \newcommand{\drsh}{\reflectbox{\rotatebox[origin=c]{180}{$\Rsh$}}}
@@ -313,8 +314,8 @@
 % % % % CLEAN UP
 % % % Title page
 \title{\vspace{2in}\textmd{\textbf{\Code:\ 
-\Title\ifthenelse{\equal{\SubTitle}{}}{}{\\\SubTitle}}}\\\normalsize\vspace{0.1in}\small{Date:\ 
-\Time,\ \Date}\\\vspace{0.1in}\large{\textit{\Recipient}}\vspace{3in}}
+\Title\ifthenelse{\equal{\SubTitle}{}}{}{\\\SubTitle}}} \\\normalsize\vspace{0.1in}\small{Date:\ 
+\Time,\ \Date} \\\vspace{0.1in}\large{\textit{\Recipient}}\vspace{3in}}
 \date{}
 \author{\textbf{\Author}}
 % % % % CLEAN UP
@@ -384,7 +385,7 @@ A differential drive robot runs straight when the linear speed of both the left 
 First the case is considered, when the speed of left wheel is greater than the right and the robot will run in clockwise direction. Both right and left wheel will rotate around the same center of a circle. %TODO How about making the origin of the circles in the drawings and refer to them?
 
 $P_i$ represents the initial position of the robot defined by the center of the line joining two wheels, while $l$ represents wheel base, ergo distance between or axle length of two wheels. $S_L$ and $S_R$ represent the distance travelled by left and right wheel respectively.
-$\Delta\Theta$ represents the angle of travel for both the wheels and $r$ is the radius of travel from the center of robot. 
+$\Delta \Theta$ represents the angle of travel for both the wheels and $r$ is the radius of travel from the center of robot. 
 With encoder feedback from left and right wheel, $S_L$ and $S_R$ can simply be computed using equations \eref{e:SL} and \eref{e:SR}
 
 \begin{equation}\label{e:SL}
@@ -398,17 +399,17 @@ With encoder feedback from left and right wheel, $S_L$ and $S_R$ can simply be c
 where $n_L$ and $n_R$ are the revolutions per minute ($[rpm]$) of left and right wheel, $r_L$ and $r_R$ are the radii of the two wheels and $t$ is time step in seconds. %TODO Legend table might be better, but leave it as it
 
 
-$S_L$ and $S_R$ can be related to $r$ and $\Delta\Theta$ using formulas \eref{e:SL=rtheta} and \eref{e:SR=rtheta}
+$S_L$ and $S_R$ can be related to $r$ and $\Delta \Theta$ using formulas \eref{e:SL=rtheta} and \eref{e:SR=rtheta}
 
 \begin{equation}\label{e:SL=rtheta}
-	S_L = (r + \frac{l}{2}) \Delta\Theta
+	S_L = (r + \frac{l}{2}) \Delta \Theta
 \end{equation}
 
 \begin{equation}\label{e:SR=rtheta}
-	S_R = (r - \frac{l}{2}) \Delta\Theta 
+	S_R = (r - \frac{l}{2}) \Delta \Theta 
 \end{equation}
 
-The equations \eref{e:SL=rtheta} and \eref{e:SR=rtheta} \vpageref[above]{e:SL=rtheta} can be solved simultaneously to compute $\Delta\Theta$ defined in \eref{e:thetaCW}.
+The equations \eref{e:SL=rtheta} and \eref{e:SR=rtheta} \vpageref[above]{e:SL=rtheta} can be solved simultaneously to compute $\Delta \Theta$ defined in \eref{e:thetaCW}.
 
 
 %\begin{equation}\label{e:r}
@@ -416,7 +417,7 @@ The equations \eref{e:SL=rtheta} and \eref{e:SR=rtheta} \vpageref[above]{e:SL=rt
 %\end{equation}
 
 \begin{equation}\label{e:thetaCW}
-	\Delta\Theta = \frac{S_L - S_R}{l} % Travel angle
+	\Delta \Theta = \frac{S_L - S_R}{l} % Travel angle
 \end{equation}
 
 The length between initial position $P_i$ and final position $P_f$ can be approximated by taking average of $S_L$ and $S_R$ . %\eref{e:delS}.
@@ -433,22 +434,22 @@ Final position of the robot and its orientation can then be derived using basic 
 \begin{IEEEeqnarray}{CCC}\label{e:P_fCW}
 	P_f  & = & 
 	\begin{bmatrix}
-		P_{ix} + \Delta S ( \cos(\Theta_i - \frac{\Delta\Theta}{2}) ), & P_{iy} + \Delta S ( \sin(\Theta_i - \frac{\Delta\Theta}{2}) )
+		P_{ix} + \Delta S ( \cos(\Theta_i - \frac{\Delta \Theta}{2}) ), & P_{iy} + \Delta S ( \sin(\Theta_i - \frac{\Delta \Theta}{2}) )
 	\end{bmatrix}
 \end{IEEEeqnarray}
 \nopagebreak %TODO doesn't seem to work. Layout will change with graphics, so don't bother now. \mbox and \makebox don't compile
 \begin{equation*}\label{e:finalorientationCW}
-	\mathrm{\Theta_f = \Theta_i - \Delta\Theta}\nonumber %TODO This technique of seperation of equations is unfortunate, since it allows page breaks between them and the number is not centered. There are other approaches to have one equation number for multiple equations. Another possibility would be to use cleverref. Going to leave it as it is, too time consuming for now. http://stackoverflow.com/questions/3328806/latex-multiple-equation-references-in-one
+	\mathrm{\Theta_f = \Theta_i - \Delta \Theta}\nonumber %TODO This technique of seperation of equations is unfortunate, since it allows page breaks between them and the number is not centered. There are other approaches to have one equation number for multiple equations. Another possibility would be to use cleverref. Going to leave it as it is, too time consuming for now. http://stackoverflow.com/questions/3328806/latex-multiple-equation-references-in-one
 \end{equation*}
 %TODO Don't fully understand your mathrm approach here. What is the purpose? Theta is another variable, so it changes. Parameters in equations that don't change should be straight, those that do change should be italic. So the normal approach is correct. Assume you wanted \Theta straightforward for cosmetic reasons. Leave it as it is.
 where $\Theta_f$ and $\Theta_i$ are the final and initial orientation respectively.
 
 \subsection{Counterclockwise direction}\label{s:10-odometry--ccw}
 \indent\indent
-Similar derivation of the robot can be derived for counterclockwise rotation, when the revolutions per minute of right wheel are higher than that of the left wheel. $\Delta\Theta$ can be computed as shown in \eref{e:thetaCCW}
+Similar derivation of the robot can be derived for counterclockwise rotation, when the revolutions per minute of right wheel are higher than that of the left wheel. $\Delta \Theta$ can be computed as shown in \eref{e:thetaCCW}
 
 \begin{equation}\label{e:thetaCCW}
-\Delta\Theta = \frac{S_R - S_L}{l} % Travel angle
+\Delta \Theta = \frac{S_R - S_L}{l} % Travel angle
 \end{equation}
 
 The relations for final position and rotation are as follows \eref{e:P_fCCW}.
@@ -456,11 +457,11 @@ The relations for final position and rotation are as follows \eref{e:P_fCCW}.
 \begin{IEEEeqnarray}{CCC}\label{e:P_fCCW}
 	P_f  & = & 
 	\begin{bmatrix}
-		P_{ix} + \Delta S ( \cos(\Theta_i + \frac{\Delta\Theta}{2}) ), & P_{iy} + \Delta S ( \sin(\Theta_i + \frac{\Delta\Theta}{2}) )
+		P_{ix} + \Delta S ( \cos(\Theta_i + \frac{\Delta \Theta}{2}) ), & P_{iy} + \Delta S ( \sin(\Theta_i + \frac{\Delta \Theta}{2}) )
 	\end{bmatrix}\end{IEEEeqnarray}
 \nopagebreak %TODO doesn't seem to work. Layout will change with graphics, so don't bother now
 \begin{equation*}\label{e:finalorientationCCW}
-	\mathrm{\Theta_f = \Theta_i + \Delta\Theta}\nonumber
+	\mathrm{\Theta_f = \Theta_i + \Delta \Theta}\nonumber
 \end{equation*}
 
 where $\Theta_f$ and $\Theta_i$ are the final and initial orientation respectively.
@@ -491,7 +492,7 @@ With the derivation of formulas understood for all three cases, for the ease of 
 The equations selected for this model are as follows.
 
 \begin{equation}\label{e:thetaCWfinal}
-	\Delta\Theta = \frac{S_L - S_R}{l} % Travel angle
+	\Delta \Theta = \frac{S_L - S_R}{l} % Travel angle
 \end{equation}
 
 \begin{equation}\label{e:delSfinal}
@@ -501,12 +502,12 @@ The equations selected for this model are as follows.
 \begin{IEEEeqnarray}{CCC}\label{e:P_fCWfinal}
 	P_f  & = & 
 	\begin{bmatrix}
-		P_{ix} + \Delta S ( \cos(\Theta_i - \frac{\Delta\Theta}{2}) ), & P_{iy} + \Delta S ( \sin(\Theta_i - \frac{\Delta\Theta}{2}) )
+		P_{ix} + \Delta S ( \cos(\Theta_i - \frac{\Delta \Theta}{2}) ), & P_{iy} + \Delta S ( \sin(\Theta_i - \frac{\Delta \Theta}{2}) )
 	\end{bmatrix}
 \end{IEEEeqnarray}
 
 \begin{equation}\label{e:finalorientationCWfinal}
-\mathrm{\Theta_f = \Theta_i - \Delta\Theta}\nonumber
+\mathrm{\Theta_f = \Theta_i - \Delta \Theta}\nonumber
 \end{equation}
 
 %TODO CHECKED
@@ -672,142 +673,159 @@ Possible examples of non-systematic errors are:
 \indent\indent
 University of Michigan Benchmark test (UMBmark) procedure was supposed to be used to determine odometry errors and calibrate the provided system. This procedure was developed by Johann Borenstein and Liqiang Feng around 1995 at the University of Michigan’s Advanced Technologies Laboratories. Further details of the test can be found in the research paper \link[UMBmark: A Benchmark Test for Measuring Odometry Errors in Mobile Robots]{http://www.johnloomis.org/ece445/topics/odometry/borenstein/paper60.pdf}. %TODO Is this link ok as referance like that?
 
-As discussed in \ref{s:10-odometry--errors--systematic} \nameref{s:10-odometry--errors--systematic} \vref{s:10-odometry--errors--systematic}, there are two dominant sources of systematic errors in odometry: unequal wheel diameters and the uncertainty about the effective wheelbase.
+As discussed in \nameref{s:10-odometry--errors--systematic} \vref{s:10-odometry--errors--systematic}, there are two dominant sources of systematic errors in odometry: unequal wheel diameters and the uncertainty about the effective wheelbase. %TODO Can't seem to \ref section number
+%As discussed in \ref{s:10-odometry--errors--systematic} \nameref{s:10-odometry--errors--systematic} \vref{s:10-odometry--errors--systematic}, there are two dominant sources of systematic errors in odometry: unequal wheel diameters and the uncertainty about the effective wheelbase. %TODO Can't seem to \ref section
 
-Unfortunately, due to unavailability of encoder feedback estimations of $S_L$ and $S_R$ are undertaken using the command given to the robot, so the control input. This means, that equations \eref{e:SL} and \eref{e:SR} are not used in the modified model. %TODO I think it's a good point to state, so I uncommented it
-Even if we are able to determine the error in the relative size of the wheels and error due to the uncertainty in effective wheelbase, they can not be corrected or calibrated in the current model. However, the details of the procedure to determine effective wheelbase is described in this section.
-Should it be possible to determine the error in the relative size of the wheels and error due to the uncertainty in effective wheelbase, they can not be corrected or calibrated in the current model. However, the details of the procedure to determine effective wheelbase is described in this section.
+Unfortunately, due to unavailability of encoder feedback estimations of $S_L$ and $S_R$ are done using the command given to the robot, so the control input. This means, that equations \eref{e:SL} and \eref{e:SR} are not used in the modified model. %TODO I think it's a good point to state, so I uncommented it
+
+Even if it should be possible to determine the error in the relative size of the wheels and the error due to the uncertainty in effective wheelbase, those can not be corrected or calibrated in the current model. However, the details of the procedure to determine effective wheelbase are described in this section.
 
 %An incorrect wheelbase value will result in incorrect computation of angle of travel, $\Delta\theta$ refer to \eref{e:thetaCWfinal}.
-As can be seen in the equation \eref{e:thetaCWfinal}, incorrect wheelbase value will result in incorrect computation of angle of travel $\Delta \Theta$.
-This error, $E_b$ is directly proportional to the effective wheelbase divided by the nominal wheelbase $l$:
+As can be seen in the equation \eref{e:thetaCWfinal}, incorrect wheelbase value will introduce a significant error in computation of angle of travel $\Delta \Theta$.
+This error $E_b$, is directly proportional to the effective wheelbase in relation to the nominal wheelbase $l$: %TODO division is a relation and is somewhat more descriptive here. Alternatively one could write it's also inversly proportional to nominal wheelbase
 
 \begin{equation}\label{e:E_b}
-	E_b = \frac{effective wheelbase}{l}
+%	E_b = \frac{l_e}{l}
+%	E_b = \frac{b_e}{l}
+	E_b = \frac{effective wheelbase}{l} %TODO I suggest introducing l_e or like you choose b_e as effective wheelbase and then writing what the symbol stands for
 \end{equation}
 
-After computing this error, we can replace the nominal wheelbase in equation \eref{e:thetaCWfinal} by effective wheelbase.
-Thus, we can correct for this error by multiplying the nominal wheelbase (bn) by the error factor to give us the effective wheelbase (be):
+After computing error $E_b$, the nominal wheelbase in equation \eref{e:thetaCWfinal} can be replaced by effective wheelbase. Thus, this error can be corrected by multiplying the nominal wheelbase $b_n$ with the error factor $E_b$ resulting in the effective wheelbase $b_e$: %TODO What is "this error" and "error factor" referring to? Both seem to refer to E_b, which makes the sentence confusing. Double check if meaning is correct. Maybe writing the process would be better. Nominal wheelbase would be l here, yet you use b_n. It's somewhat confusing
 
 \begin{equation}\label{e:thetacalibrated}
-	\Delta\Theta = \frac{S_L - S_R}{E_b \cdot l} % Travel angle
+	\Delta \Theta = \frac{S_L - S_R}{E_b \cdot l} % Travel angle
 \end{equation}
 
+The error $E_b$ can be determined using UMBmark square test procedure, whose summary for Rollo is as follows: %TODO simplified a little
 
-$E_b$ is determined using UMBmark square test procedure. The summary of the UMBmark setup for Rollo is as follows:
-
-%The summary of the UMBmark setup for measuring odometry errors in Rollo is as follows:
-\begin{enumerate}
-	\item At the beginning of the run, measure the absolute position and orientation of the robot using motion capture system and initialize to that position the starting point of the vehicle's odometry program.
-	\item Run the vehicle through a $2 \verb|x| 2\ m$ square path in clockwise direction making sure to:
-	\begin{enumerate}
-		\item stop after each $2 m$ straight leg,
+\begin{enumerate} %TODO I changed the text to differentiate at least a little from the source
+	\item At the beginning of or before the actual run, measurements of the absolute position and orientation of Rollo using motion capture system are performed along with initialization of vehicle's odometry program to the starting point.
+	\item Running the vehicle through a $2 \times 2 \ m$ square path in clockwise direction while making sure to:
+	\begin{enumerate} %TODO I know it's a pain with units, but ISO states there must be a space between value and unit, except for degree, minute and second symbols (°,','')
+		\item stop after each $2 \ m$ straight segment,
 		\item make a total of four $90\degree$-turns on the spot,
 		\item run the vehicle slowly to avoid slippage.
 	\end{enumerate}
-	\item Upon return to the starting area, measure the absolute position and orientation of the robot using motion capture system.
-	\item Compare the absolute position to the robot's calculated position using equations \eref{e:x_error}, \eref{e:y_error} and \eref{e:orientation_error}.
+	\item After returning to the starting area, again measurements of the absolute position and orientation of Rollo are performed using motion capture system.
+	\item Comparing between the absolute position and robot's calculated position using equations \eref{e:x_error}, \eref{e:y_error} and \eref{e:orientation_error}.
 
-\begin{equation}\label{e:x_error}
-		\epsilon x = x_abs - x_calc
-\end{equation}
-
-\begin{equation}\label{e:y_error}
-	\epsilon y = y_abs - y_calc
-\end{equation}
-
-\begin{equation}\label{e:orientation_error}
-	\epsilon \theta = \theta_abs - \theta_calc
-\end{equation}	
-	\item Repeat steps 1-4 for four more times (i.e., a total of five runs).
-	\item Repeat steps 1-5 in ccw direction.
-	\item Compute coordinates of center of gravity for each cluster in cw and ccw direction using equations \eref{e:cog_x} and \eref{e:cog_y}  where n is 5.
+	\begin{equation}\label{e:x_error} %TODO We are dealing here with errors, those should be additive, so maybe we should take a squareroot of difference of square of abs and calc values
+			\epsilon x = x_{abs} - x_{calc}
+	\end{equation}
 	
-\begin{equation}\label{e:cog_x}
-	x_{c.g.,cw/ccw} = \frac{1}{n}\sum_{i=1}^{n} \epsilon x_{i,cw/ccw} 
-\end{equation}
-
-\begin{equation}\label{e:cog_y}
-	y_{c.g.,cw/ccw} = \frac{1}{n}\sum_{i=1}^{n} \epsilon y_{i,cw/ccw}
-\end{equation}
-
-	\item Compute $E_b$ using equations \eref{e:E_b_alpha},\eref{e:alpha_x} and \eref{e:alpha_y}
+	\begin{equation}\label{e:y_error}
+		\epsilon y = y_{abs} - y_{calc}
+	\end{equation}
 	
+	\begin{equation}\label{e:orientation_error}
+		\epsilon \theta = \theta_{abs} - \theta_{calc}
+	\end{equation}
+
+%TODO Added description from paper just to make it more clear, comment out if you think it's unnecessary
+	\begin{description}
+		\centering
+		\item[$\epsilon x$, $\epsilon y$, $\epsilon \theta$] -- Position and orientation errors due to odometry model
+		\item[$x_{abs}$, $y_{abs}$, $\theta_{abs}$] -- Absolute position and orientation of Rollo
+			\item[$x_{calc}$, $y_{calc}$, $\theta_{calc}$] -- Calculated position and orientation of Rollo using odometry model
+	\end{description}
+
+	\item Repetition of steps $1 \div 4$ for four more times, giving a total of five runs.
+	\item Repetition of steps $1 \div 5$ in counterclockwise direction.
+	\item Computation of center of gravity coordinates for each cluster in clockwise and counterclockwise directions using equations \eref{e:cog_x} and \eref{e:cog_y}, where $n$ is the number of runs, so $n = 5$ in the proposed scenario.
+
+%TODO Don't see the point of using exactly the same indices. Here the problem with negative errors is really apparent. We cannot have positive and negative errors, they always add up.
+	\begin{equation}\label{e:cog_x}
+%		x_{c.g., cw/ccw} = \frac{1}{n}\sum_{i=1}^{n} \epsilon x_{i, cw/ccw} 
+		x_{cg, cw/ccw} = \frac{1}{n}\sum_{i=1}^{n} \epsilon x_{i, cw/ccw} 
+	\end{equation}
+
+	\begin{equation}\label{e:cog_y}
+%		y_{c.g., cw/ccw} = \frac{1}{n}\sum_{i=1}^{n} \epsilon y_{i, cw/ccw}
+		y_{cg, cw/ccw} = \frac{1}{n}\sum_{i=1}^{n} \epsilon y_{i, cw/ccw}
+	\end{equation}
+
+	\item Computation of $E_b$ using equations \eref{e:E_b_alpha},\eref{e:alpha_x} and \eref{e:alpha_y}
+
 	%	\item Use Eqs. (2) and (3) to express the experimental results quantitatively as the measure of odometric accuracy for systematic errors, Emax,syst.
 	
 	%	\item If an estimate for the vehicle’s susceptibility to non-systematic errors is needed, then perform steps 1-6 again, this time placing a round
 	%	10 mm diameter object (for example, an electrical household cable) under the inside wheel of the robot. The object must be placed there	10 times, during the first leg of the square path.
 	%	\item Compute the average absolute orientation error
-\end{enumerate}
+	%TODO I can add the equation 3 from paper and complete this part. Just tell me
 
+	\begin{equation}\label{e:E_b_alpha}
+		E_b = \frac{90\degree}{90\degree - \alpha}
+	\end{equation}
 
+	where $\alpha$ can be defined as 
 
+	\begin{equation}\label{e:alpha_x}
+		\alpha =  \frac{x_{cg, cw} + x_{cg, ccw}}{-4L} \frac{180\degree}{\pi}
+	\end{equation}
 
-\begin{equation}\label{e:E_b_alpha}
-	E_b = \frac{90\degree}{90\degree - \alpha}
-\end{equation}
+	or
 
-where $\alpha$ can be computed as 
-\begin{equation}\label{e:alpha_x}
-	\alpha =  \frac{x_{c.g.,cw} + x_{c.g.,ccw}}{-4L} \frac{180\degree}{\pi}
-\end{equation}
+	\begin{equation}\label{e:alpha_y}
+		\alpha =  \frac{y_{cg, cw} - y_{cg, ccw}}{-4L} \frac{180\degree}{\pi}
+	\end{equation}
 
-or
-\begin{equation}\label{e:alpha_y}
-	\alpha =  \frac{y_{c.g.,cw} - y_{c.g.,ccw}}{-4L} \frac{180\degree}{\pi}
-\end{equation}
+	and $L$ represents the side of square segment, for the given test area conditions in case of Rollo $L = 2 \ m$.
 
-and L represents the side of square  pathi.i.e. 2m.
+\end{enumerate} %TODO This is all part of the enumeration, so I've put it here
+
+%TODO CHECKED
 
 \section{System and measurements model}\label{s:20-system-and-measurement-model}
 %[REFERENCE] http://www.negenborn.net/kal_loc/	
 %http://www.negenborn.net/kal_loc/thesis.pdf
+%TODO How do you propose to make the reference? A footnote like before?
 \subsection{System model}\label{s:20-system-and-measurement-model--system-model}
 \indent\indent
-In order to implement Kalman Filter, the previously described model must be first represented in state space.
+In order to implement Kalman filter, the previously described model must be first represented in state space.
+%TODO I know he uses Kalman Filter instead of Kalman filter
+Location of the robot can be defined at instant $k$ using state variables \eref{eq:xk localistion}, which include position in $x$ and $y$ coordinates and orientation $\theta$. %TODO Inconsistency with previous \Theta, but leave as is
 
-We can define the location of the robot at instant $k$ using state variables, \eref{eq:xk localistion}. This will include position in x and y coordinates and orientation.
-\begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:xk localistion}
+\begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:xk localistion} %TODO All labels must not have whitespaces and special symbols in them. Correct later
 	x_k & = & 
 	\begin{bmatrix}
-		x_{[x],k}\\
-		x_{[y],k}\\
-		x_{[\theta],k}\\
+		x_{[x], k} \\
+		x_{[y], k} \\
+		x_{[\theta], k} \\
 	\end{bmatrix}
 \end{IEEEeqnarray}
 
-The control input provided to robot is the speed of left and right wheel. This defines the distance covered by both the wheels in unit time. The relative displacement of the robot at instant $k$ can be notated by $d_k$. Using equations \eref{e:P_fCW}, \eref{e:P_fCCW} and \eref{e:P_fSt}, derived on page \vpageref{e:P_fCW}, relative displacement can be expressed in terms of $\Delta S$ and $\theta$. Thus, control input $u_k$ can be expressed as a function of relative displacement.
+The control input provided to robot consists of left and right wheel speeds. This defines the distance covered by both the wheels in a given unit of time. The relative displacement of the robot at instant $k$ can be notated by $d_k$. Using equations \eref{e:P_fCW}, \eref{e:P_fCCW} and \eref{e:P_fSt}, derived on page \vpageref{e:P_fCW}, relative displacement can be expressed in terms of $\Delta S$ and $\Delta \Theta$. Thus, control input $u_k$ can be expressed as a function of relative displacement $d_k$. %TODO consists or includes. Now the problem with inconsistent naming of theta comes up. I suggest using one for the whole document. Simply regex replace the whole thing *inside* document environment, not for the whole file.
 
 \begin{equation} \label{eq:uk displacmenet}
 	u_k  =  j(d_k)
 \end{equation}
-% 
-\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:uk displacement2}
+
+\begin{IEEEeqnarray*}{CCCCCCCCC}\label{eq:uk displacement2}
 	u_k & = & 
 	\begin{bmatrix}
-		u_{[\Delta S],k}\\
-		u_{[\Delta \theta],k}\\
+		u_{[\Delta S], k} \\
+		u_{[\Delta \theta], k} \\
 	\end{bmatrix}
-\end{IEEEeqnarray*} 
+\end{IEEEeqnarray*}
 
-Given $x_{k-1}$ and $u_{k-1}$, the next location of the robot, $x_k$ can be computed.  
-\begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:xk function}
+Given $x_{k-1}$ and $u_{k-1}$, the next location of the robot $x_k$ can be computed.
+\begin{IEEEeqnarray}{CCCCCCCCC}\label{eq:xk function}
 	x_k & = & f(x_{k-1}, u_{k-1}) & = & 
 	\begin{bmatrix}
 		f_x(x_{k-1}, u_{k-1})\\
 		f_y(x_{k-1}, u_{k-1})\\
 		f_\theta(x_{k-1}, u_{k-1})\\
 	\end{bmatrix}
-\end{IEEEeqnarray} 
+\end{IEEEeqnarray}
 
-In the above derivation of the system model it was assumed that there are no noise sources. In the next section, we model the noise in the system.
+In the above derivation of the system model it was assumed that there are no noise sources. In the next section, noise  has been modelled into the system.
 
 \subsection{System model with noise}\label{s:20-system-and-measurement-model--system-model-with-noise}
 \indent\indent
-First, we will add noise to the relative displacement with the assumption that it can be modelled by a random noise vector $q_k$ such that the noise is Gaussian distribution with zero mean $\hat{q_k}$ and covariance matrix $U_k$.
+First, noise was added to the relative displacement with the assumption, that it can be modelled by a random noise vector $q_k$ such that, the noise is a Gaussian distribution with zero mean $\hat{q_k}$ and covariance matrix $U_k$.
 
 \begin{equation} \label{eq: Noise Model}
-	q_k \sim   N(\hat{q_k} , U_k) 
+	q_k \sim   N(\hat{q_k} , U_k)
 \end{equation}
 
 where
@@ -818,7 +836,7 @@ where
 		0\\
 		0\\
 	\end{bmatrix}
-\end{IEEEeqnarray*} 
+\end{IEEEeqnarray*}
 
 and 
 
@@ -826,19 +844,18 @@ and
 	U_k = \mathrm{E}(q_k - \hat{q_k}) (q_k - \hat{q_k})^T  
 \end{equation*}
 
-
 \begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Uk covariance}
 	U_k & = &  
 	\begin{bmatrix}
-		{\sigma}^2_{q[\Delta S],k} & {\sigma}_{q[\Delta\theta],k} {\sigma}_{q[\Delta S],k}\\
-		{\sigma}_{q[\Delta\theta],k} {\sigma}_{q[\Delta S],k} & {\sigma}^2_{q[\Delta\theta],k}\\
+		{\sigma}^2_{q[\Delta S], k} & {\sigma}_{q[\Delta\theta], k} {\sigma}_{q[\Delta S], k} \\
+		{\sigma}_{q[\Delta\theta], k} {\sigma}_{q[\Delta S], k} & {\sigma}^2_{q[\Delta\theta], k} \\
 	\end{bmatrix}
-\end{IEEEeqnarray*} 
+\end{IEEEeqnarray*}
 
-With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix, $U_k$ are equal to zero.
-%The computation of variances $ {\sigma}^2_{q[\Delta S],k}  $ and ${\sigma}^2_{q[\theta],k} $ for the model is discussed in section.
- 
- The control input, or relative displacement can now be expressed as shown in \eref{eq: Uk + noise}.
+With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix $U_k$ are equal to zero.
+%The computation of variances $ {\sigma}^2_{q[\Delta S], k}  $ and ${\sigma}^2_{q[\theta], k} $ for the model is discussed in section.
+
+The control input, or relative displacement, can be expressed as shown in \eref{eq: Uk + noise}.
 
 \begin{equation} \label{eq: Uk + noise}
 	u_k = j(d_k) + q_k
@@ -847,26 +864,26 @@ With the assumption that the noise sources are independent, the off-diagonal ele
 \begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Uk + noise2}
 	u_k & = & 
 	\begin{bmatrix}
-		u_{[\Delta S],k}\\
-		u_{[\Delta \theta],k}\\
+		u_{[\Delta S], k} \\
+		u_{[\Delta \theta], k} \\
 	\end{bmatrix}
 	& + &
 	\begin{bmatrix}
-		q_{[\Delta S],k}\\
-		q_{[\Delta \theta],k}\\
+		q_{[\Delta S], k} \\
+		q_{[\Delta \theta], k} \\
 	\end{bmatrix}	
 \end{IEEEeqnarray*} 
 
 This makes $u_k$ a random vector. Assuming, that $u_{[\Delta S], k}$ and $u_{[\theta], k}$ are deterministic, uncertainty in $ u_k $ equals the uncertainty in the noise term $q_k$.
 
-The system noise can similarly be modeled by a random noise vector $w_k$ such that the noise is Gaussian distribution with zero mean , $\hat{w_k}$ and covariance matrix, $Q_k$.
-This noise source is not directly related to the relative displacement but is inherent to the system. Modeling errors, odometry errors, discretization and approximations involved in the derivation of the model all play a part in this noise source. Noise vector,  $w_k$  is represented in equation \eref{eq: Noise Model w_k}
+The system noise can similarly be modelled by a random noise vector $w_k$ such that, the noise is a Gaussian distribution with zero mean $\hat{w_k}$ and covariance matrix $Q_k$.
+This noise source is not directly related to the relative displacement, however it is inherent to the system. Modelling errors, odometry errors, discretization and approximations involved in the derivation of the model all play a part in this noise source. Noise vector $w_k$ is represented in equation \eref{eq: Noise Model w_k}.
 
 \begin{equation} \label{eq: Noise Model w_k}
 	w_k \sim   N(\hat{w_k} , Q_k) 
 \end{equation}
 
-where
+where %TODO The problem of continuing statements like that, where you switch between equations and words is, that you should end the sentence with a period. This looks often out of place after the last equation, which is the reason I suggest using tables for legends and explanations. It's cleaner and faster to read. Leave it as is though.
 
 \begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:wk mean}
 	\hat{w_k} & = & 
@@ -885,20 +902,22 @@ and
 
 
 \begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Qk covariance}
-	Q_k & = &  
+	Q_k & = & 
 	\begin{bmatrix}
-		{\sigma}^2_{w[x],k} & {\sigma}_{w[y],k} {\sigma}_{w[x],k} &  {\sigma}_{w[\theta],k} {\sigma}_{w[x],k}\\
-		{\sigma}_{w[x],k} {\sigma}_{w[y],k} & {\sigma}^2_{w[y],k} & {\sigma}_{w[\theta],k} {\sigma}_{w[y],k}\\
-		{\sigma}_{w[x],k} {\sigma}_{w[\theta],k} & {\sigma}_{w[\theta],k} {\sigma}_{w[x],k} & {\sigma}^2_{w[\theta],k}\\
+		{\sigma}^2_{w[x], k} & {\sigma}_{w[y], k} {\sigma}_{w[x], k} &  {\sigma}_{w[\theta], k} {\sigma}_{w[x], k} \\
+		{\sigma}_{w[x], k} {\sigma}_{w[y], k} & {\sigma}^2_{w[y], k} & {\sigma}_{w[\theta], k} {\sigma}_{w[y], k} \\
+%		{\sigma}_{w[x], k} {\sigma}_{w[\theta], k} & {\sigma}_{w[\theta], k} {\sigma}_{w[x], k} & {\sigma}^2_{w[\theta], k} \\
+		{\sigma}_{w[x], k} {\sigma}_{w[\theta], k} & {\sigma}_{w[y], k} {\sigma}_{w[\theta], k} & {\sigma}^2_{w[\theta], k} \\ %TODO I think this should be correct, please doublecheck
 	\end{bmatrix}
-\end{IEEEeqnarray*} 
+\end{IEEEeqnarray*}
 
-With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix $Q_k$ are presumably zero. Determination of matrix $Q_k$ is discussed in section \nameref{s:30-kalman-filter--practical-implementation}.
-%The computation of variances $ {\sigma}^2_{w[x],k}  $ , $ {\sigma}^2_{w[y],k}  $ and ${\sigma}^2_{w[\theta],k} $ for the model is discussed in section.
+With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix $Q_k$ are presumably zero. Determination of matrix $Q_k$ is discussed in section \nameref{s:30-kalman-filter--implementation} \vpageref{s:30-kalman-filter--implementation}.
+%The computation of variances $ {\sigma}^2_{w[x], k}  $ , $ {\sigma}^2_{w[y], k}  $ and ${\sigma}^2_{w[\theta], k} $ for the model is discussed in section.
 
-The system can be expressed now as shown below.
+The system can be expressed as shown \vpageref[below]{eq: xk + wk}. %TODO Latex might actually push it elsewhere, so I used vref
+
 \begin{equation} \label{eq: xk + wk}
-	x_k = f(x_{k-1}, u_{k-1}) + w_k 
+	x_k = f(x_{k-1}, u_{k-1}) + w_k
 \end{equation}
 
 \begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:xk + noise function}
@@ -908,52 +927,48 @@ The system can be expressed now as shown below.
 		f_y(x_{k-1}, u_{k-1})\\
 		f_\theta(x_{k-1}, u_{k-1})\\
 	\end{bmatrix}
-	& + &
+	& + & 
 	\begin{bmatrix}
-		w_{[x],k-1}\\
-		w_{[y],k-1}\\
-		w_{[\theta],k-1}\\
-	\end{bmatrix}	
-\end{IEEEeqnarray} 
+		w_{[x], k-1} \\
+		w_{[y], k-1} \\
+		w_{[\theta], k-1} \\
+	\end{bmatrix}
+\end{IEEEeqnarray}
 
 %$w_k$ consists of noise sources that are not directly related to $u_k$. already discussed
-Now, $x_k$ is a random vector and with every time step the variance of system noise increases. Thus, the variance of the location grows with every time step. %assuming that $f_x$, $f_y$ and $f_\theta$ are deterministic, 
- 
-We have proposed the System Model so that we can implement Kalman Filter on it. Now, we need to prepare the Measurement Model.
+$x_k$ is a random vector and with every time step the variance of system noise increases. Therefore the variance of the location grows with every time step also. %assuming that $f_x$, $f_y$ and $f_\theta$ are deterministic, 
 
-
+The proposed system model was prepared for the implementation of Kalman filter, which requires as next step the preparation of the measurement model.
 
 \subsection{Measurement model with noise}\label{s:20-system-and-measurement-model--measurement-model-with-noise}
 \indent\indent
-Starting with the assumption that there is no noise in the measurement, $z_k$ is simply a vector containing for each state variable a variable that takes on the value of the corresponding state variable.
-The measurement vector, $z_k$ is 
+Starting with the assumption that there is no noise in the measurement, measurement vector $z_k$ simply consists of the corresponding state variables %TODO Could not have been expressed in a more complicated way
+and is defined by equation \eref{eq:zk}.
 
 \begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:zk}
 	z_k & = & 
 	\begin{bmatrix}
-		z_{[x],k}\\
-		z_{[y],k}\\
-		z_{[\theta],k}\\ 	
+		z_{[x], k} \\
+		z_{[y], k} \\
+		z_{[\theta], k} \\
 	\end{bmatrix}
-\end{IEEEeqnarray} 
+\end{IEEEeqnarray}
 
-
-In our system, we use the motion capture system available in the laboratory to localize the robot. The motion capture system acts as absolute sensor and provides us directly the position of the robot in x and y coordinates and its orientation. Thus, $z_k$ in this case is simply expressed as \eref{eq:zk 2}.
+In the proposed system, motion capture system available in the laboratory is used to localize Rollo. It acts as absolute sensor by providing directly the position in $x$ and $y$ coordinates and orientation $\theta$ of the robot. Thus, $z_k$ in this case is simply expressed as \eref{eq:zk 2}.
 
 \begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:zk 2}
 	z_k & = & 
 	\begin{bmatrix}
-		x_{[x],k}\\
-		x_{[y],k}\\
-		x_{[\theta],k}\\ 	
+		x_{[x], k} \\
+		x_{[y], k} \\
+		x_{[\theta], k} \\
 	\end{bmatrix}
-\end{IEEEeqnarray} 
+\end{IEEEeqnarray}
 
+Provided that the motion capture system is not noise free, this has been incorporated into the measurement model. With the assumption, that measurement noise can be modelled by a random noise vector $v_k$ such that, the noise is a Gaussian distribution with zero mean $\hat{v_k}$ and covariance matrix $R_k$. %TODO Made a reference to given motion capture system
 
-Now, we can add noise to the measurement model. We assume that the noise in the measurement can be modelled by a random noise vector $v_k$ such that the noise is Gaussian distribution with zero mean,$\hat{v_k}$ and covariance matrix,$R_k$ .
-
-\begin{equation} \label{eq: Noise Model vk}
-	v_k \sim   N(\hat{v_k} , R_k) 
+\begin{equation}\label{eq: Noise Model vk}
+	v_k \sim N(\hat{v_k}, R_k)
 \end{equation}
 
 where
@@ -975,119 +990,117 @@ and
 
 %
 \begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:Rk covariance}
-	R_k & = &  
+	R_k & = & 
 	\begin{bmatrix}
-		{\sigma}^2_{v[x],k} & {\sigma}_{v[y],k} {\sigma}_{v[x],k} &  {\sigma}_{v[\theta],k} {\sigma}_{v[x],k}\\
-		{\sigma}_{v[x],k} {\sigma}_{v[y],k} & {\sigma}^2_{v[y],k} & {\sigma}_{v[\theta],k} {\sigma}_{v[y],k}\\
-		{\sigma}_{v[x],k} {\sigma}_{v[\theta],k} & {\sigma}_{v[\theta],k} {\sigma}_{v[x],k} & {\sigma}^2_{v[\theta],k}\\
+		{\sigma}^2_{v[x], k} & {\sigma}_{v[y], k} {\sigma}_{v[x], k} &  {\sigma}_{v[\theta], k} {\sigma}_{v[x], k} \\
+		{\sigma}_{v[x], k} {\sigma}_{v[y], k} & {\sigma}^2_{v[y], k} & {\sigma}_{v[\theta], k} {\sigma}_{v[y], k} \\
+%		{\sigma}_{v[x], k} {\sigma}_{v[\theta], k} & {\sigma}_{v[\theta], k} {\sigma}_{v[x], k} & {\sigma}^2_{v[\theta], k} \\
+		{\sigma}_{v[x], k} {\sigma}_{v[\theta], k} & {\sigma}_{v[y], k} {\sigma}_{v[\theta], k} & {\sigma}^2_{v[\theta], k} \\ %TODO Same as with Q, please double check
 	\end{bmatrix}
-\end{IEEEeqnarray*} 
+\end{IEEEeqnarray*}
 
-With the assumption that the noise sources are independent, the off-diagonal elements of the covariance matrix $R_k$ are presumably zero.
+Again, assuming that the noise sources are independent, the off-diagonal elements of the covariance matrix $R_k$ are presumably zero.
 
-The measurement model can be expressed now as shown in \eref{eq:zk + noise2}.
-\begin{equation} \label{eq: zk + noise}
-z_k = x_k + v_k  
+The final measurement model can be expressed as shown in \eref{eq:zk + noise2}.
+\begin{equation} \label{eq: zk + noise} %TODO Shouldn't this be expressed in a analog way to x_k as g(x_k-1, u_k-1) + v_k? Just a formatting and consistency issue
+z_k = x_k + v_k
 \end{equation}
 
-\begin{IEEEeqnarray*}{CCCCCCCCC} \label{eq:zk + noise2}
+\begin{IEEEeqnarray}{CCCCCCCCC}\label{eq:zk + noise2}
 	z_k & = & 
 	\begin{bmatrix}
-		x_{[x],k}\\
-		x_{[y],k}\\
-		x_{[\theta],k}\\ 
+		x_{[x], k} \\
+		x_{[y], k} \\
+		x_{[\theta], k} \\
 	\end{bmatrix}
-	& + &
+	& + & 
 	\begin{bmatrix}
-		v_{[x],k-1}\\
-		v_{[y],k-1}\\
-		v_{[\theta],k-1}\\
-	\end{bmatrix}	
-\end{IEEEeqnarray*} 
+		v_{[x], k-1} \\
+		v_{[y], k-1} \\
+		v_{[\theta], k-1} \\
+	\end{bmatrix}
+\end{IEEEeqnarray}
 
-Since the measurement noise $v_k$ is a Gaussian vector, this makes $z_k$ a random vector.
+%Since the measurement noise $v_k$ is a Gaussian vector, this makes $z_k$ a random vector.
+Since the measurement noise $v_k$ is a Gaussian random vector, this makes $z_k$ a random vector. %TODO I think you mean Gaussian random vector, but that name might be problematic: http://www.math.utah.edu/~davar/math6010/2011/GaussianRandomVectors.pdf
 
+%TODO CHECKED
 
 \section{Kalman filter}\label{s:30-kalman-filter}
 \indent\indent
-Kalman filter is an algorithm that uses a series of measurements observed over time, containing statistical noise and other inaccuracies, and produces estimates of unknown variables that tend to be more precise than those based on a single measurement alone.(WIKI REFERENCE).
-%TODO
+Kalman filter is an algorithm that uses a series of measurements observed over time, containing statistical noise and other inaccuracies, and produces estimates of unknown variables that tend to be more precise than those based on a single measurement alone\footnote{e-Study Guide for: Introduction to Probability Theory and Stochastic Processes}. %Cram101 Textbook Reviews - e-Study Guide for: Introduction to Probability Theory and Stochastic Processes
+%TODO Okay, so this should be either bibliography, which I don't like doing right now or a footnote maybe. If it should be a link, where should it point to?
 %Provide an actual link, and not only to the wikipage, to the actual source
 %It is from a book but i cant find which. wiki doesnt tell
 %https://books.google.it/books?id=uRwkAgAAQBAJ&pg=PT274&lpg=PT274&dq=series+of+measurements+observed+over+time,+containing+statistical+noise+and+other+inaccuracies,+and+produces+estimates+of+unknown+variables+that+tend+to+be+more+precise+than+those+based+on+a+single+measurement+alone&source=bl&ots=xHmg3SPxnk&sig=JjRBDfNfG6IlBbWWBZT68JKXh_g&hl=en&sa=X&ved=0ahUKEwiL_qaSs6DLAhVEtg8KHYUICa0Q6AEIIjAB#v=onepage&q=series%20of%20measurements%20observed%20over%20time%2C%20containing%20statistical%20noise%20and%20other%20inaccuracies%2C%20and%20produces%20estimates%20of%20unknown%20variables%20that%20tend%20to%20be%20more%20precise%20than%20those%20based%20on%20a%20single%20measurement%20alone&f=false
 %TODO
 
-A physical system is driven by a set of external inputs or controls and its outputs are evaluated by sensors, such that the knowledge on the system’s behavior is solely given by the inputs and the observed outputs. For example, in our case, the physical system is a mobile robot and we are given the problem of localizing it. The control or the input is defined by the velocity command given to the right and left wheel which determines the relative displacement of the robot. The observed output is its position and orientation measured from the  motion capture system. The observations convey the errors and uncertainties in the process, namely the sensor noise and the system errors. Based on the available information (control inputs and observations), Kalman filter computes an estimate of the system’s state by minimizing the variance of the estimation error. From a theoretical standpoint, the main assumption of the Kalman filter is that the underlying system is a linear dynamical system and that all error terms and measurements have a Gaussian distribution.  
+A physical system is driven by a set of external inputs or controls. Its outputs are evaluated by sensors such that, the knowledge on the system's behaviour is solely given by the inputs and the observed outputs. For example, in case of Rollo, the physical system is a mobile robot and given is the problem of localizing it. The control, or the input, is defined by the velocity command given to the left and right wheels, which determines the relative displacement of Rollo. The observed output is the position and orientation of Rollo measured from the motion capture system. The observations convey the errors and uncertainties in the process, namely the sensor noise and the system errors. Based on the available information (control inputs and observations), Kalman filter computes an estimate of the system's state by minimizing the variance of the estimation error. From a theoretical standpoint, the main assumptions of the Kalman filter are that the underlying system is a linear dynamical system and that all error terms and measurements have a Gaussian distribution. %TODO Not sure about "such that," anymore.
 
-Kalman filtering is a recursive analytical technique involving 2 main steps: prediction and innovation.
-Prediction is also known as 'Time update' and refers to prediction of state variables using previous state and control input. This step does not involve using measurement.
+Kalman filtering is a recursive analytical technique involving two main steps: prediction and innovation.
+
+Prediction is also known as \emph{time update} and refers to prediction of state variables using information from previous state and control input. This step does not involve using measurement.
+
 Innovation which is also known as \emph{correction} or \emph{measurement update} refers to estimation of state variable using measurement.
 
-Kalman filter is popularly used in the localization of the robot because of its efficiency and accuracy. Some of its characteristics are as follows:
+Kalman filter is broadly used in robotics for solving the localization problem, because of its efficiency and accuracy. Some of its characteristics are:
 
 \begin{enumerate}
 	\item Very easy implementation
-	\item Computationally efficient, update filter when adding new measurements to the existing data set
+	\item Computationally efficient, updates filter when providing new measurements to the existing data set
 	\item Uncertainty estimates are provided as part of the filter
-	\item Recursive Algorithm, that means it can be implemented in real time using only the present input measurements and the previously calculated state.
+	\item Recursive algorithm, which makes it suitable for real time applications using only the present input measurements and the previously calculated state.
 \end{enumerate}
 
-
- All members of Kalman family of filters e.g. extended Kalman filter and unscented kalman filter comply with a structured sequence of six steps per iteration The six steps are listed as follows.
+All members of Kalman family of filters like extended Kalman filter and unscented Kalman filter, comply with a structured sequence of six steps per iteration:
 
 \begin{enumerate}
-%TODO Don't use textbf here. It's better to define a command for this.
+%TODO Don't use textbf here. It's better to define a command for this: \emphb{}
 	\item \textbf{State estimate time update:} An updated state prediction $\hat{x}_{k|k-1}$ is made, based on a priori information and the system model.
 	\item \textbf{Error covariance time update:} The second step is to determine the predicted state-estimate error covariance matrix $\Sigma_{k|k-1}$ based on a priori information and the system model.
-	\item \textbf{Estimate system output:} The third step is to estimate the system’s output $\hat{z}_{k}$ corresponding to the timestamp of the most recently received measurement using present a priori information.
-	\item \textbf{Estimator gain matrix:} The fourth step is to compute the estimator gain matrix,$H_k$.
-	\item \textbf{State estimate measurement update:} The fifth step is to compute the a posteriori state estimate, $\hat{x}_{k|k}$ by updating the a priori estimate using the estimator gain and the output prediction error.
-	\item \textbf{Error covariance measurement update:} The final step computes the a posteriori error covariance matrix, $\Sigma_{k|k}$.
+	\item \textbf{Estimate system output:} The third step is to estimate the system's output $\hat{z}_{k}$ corresponding to the timestamp of the most recently received measurement using present a priori information.
+	\item \textbf{Estimator gain matrix:} The fourth step is to compute the estimator gain matrix $H_k$.
+	\item \textbf{State estimate measurement update:} The fifth step is to compute the a posteriori state estimate $\hat{x}_{k|k}$ by updating the a priori estimate using the estimator gain and the output prediction error.
+	\item \textbf{Error covariance measurement update:} The final step computes the a posteriori error covariance matrix $\Sigma_{k|k}$.
 \end{enumerate}
-
-
-
 
 \subsection{Kalman filter equations for linear system}\label{s:30-kalman-filter--equations-linear-system}
 \indent\indent
-In order to implement Kalman filter, we first represent our linear system as follows.
+In order to implement Kalman filter first represent the linear system as follows.
 
 \begin{align} %TODO Why do you use align here?
-	x_{k+1} &= A_{k}x_{k} + B_{k}u_{k} + w_{k} \notag\\
-	z_{k} &= C_{k}x_{k} + v_{k}
+	x_{k+1} & = A_{k}x_{k} + B_{k}u_{k} + w_{k} \notag \\
+	z_{k} & = C_{k}x_{k} + v_{k} %TODO We should at least mention that the direct transmission matrix D is omitted
 	\label{e:system} %TODO We agreed on e:label notation
 \end{align}
 
-where $w_{k} \sim N\left(0,Q_k\right)$ and  $v_{k} \sim
-N\left(0,R_k\right)$.
+%where $w_{k} \sim N\left(0, Q_k\right)$ and $v_{k} \sim N\left(0,R_k\right)$.
+where $w_{k} \sim N\left(0, Q_k\right)$ and $v_{k} \sim N\left(0,R_k\right)$ as described in  \nameref{s:20-system-and-measurement-model--system-model-with-noise} \vpageref{s:20-system-and-measurement-model--system-model-with-noise} and \nameref{s:20-system-and-measurement-model--measurement-model-with-noise} \vpageref{s:20-system-and-measurement-model--measurement-model-with-noise} respectively. %TODO doublecheck order
 
-%, and $x_{0} \sim
-%N\left(x_{0|-1},P_{0|-1}\right)$.
-%
-For Kalman filter, $A$, $B$, $C$, $Q$ and $R$ can be time variant. However, for simplicity, we will proceed with the assumption that $A$, $B$, $C$, $Q$ and $R$ are time invariant for provided system.
-Given initial state estimate, $\hat{x}_{0|0}$ and initial state covariance matrix, $\Sigma_{0|0}$ the Kalman Filter can be computed using following set of equations.
+%, and $x_{0} \sim N\left(x_{0|-1},P_{0|-1}\right)$.
+
+For Kalman filter $A$, $B$, $C$, $Q$ and $R$ can be time variant. However, for simplicity it is assumed that they are time invariant for the provided system.
+Given initial state estimate $\hat{x}_{0|0}$ and initial state covariance matrix $\Sigma_{0|0}$ the Kalman filter can be computed using following set of equations.
 
 %\subsubsection{Prediction or Time update:}\label{s:30-kalman-filter--equations-linear-system--prediction}
-\subsubsection{Prediction/time update:}\label{s:30-kalman-filter--equations-linear-system--prediction}
+\subsubsection{Prediction (time update)}\label{s:30-kalman-filter--equations-linear-system--prediction}
 %\indent\indent
-\begin{align}
-	\hat{x}_{k|k-1} &=  A\hat{x}_{k-1|k-1} + Bu_{k-1} \notag\\
-	\Sigma_{k|k-1} &= A \Sigma_{k-1|k-1} A^T + Q
+\begin{align} %TODO To align equations IEEEarray should be used, that would also take care of the number being centered, but leave it as is
+	\hat{x}_{k|k-1} & =  A\hat{x}_{k-1|k-1} + Bu_{k-1} \notag \\
+	\Sigma_{k|k-1} & = A \Sigma_{k-1|k-1} A^T + Q
 	\label{e:predictionLinear}
 \end{align}
 
 %\subsubsection{Innovation or measurement update}\label{s:30-kalman-filter--equations-linear-system--innovation}
-\subsubsection{Innovation/measurement update}\label{s:30-kalman-filter--equations-linear-system--innovation}
+\subsubsection{Innovation (measurement update)}\label{s:30-kalman-filter--equations-linear-system--innovation}
 %\indent\indent
 \begin{align}
-	H_k &=  \Sigma_{k|k-1} C^T {(C \Sigma_{k|k-1} C^T + R)}^{-1}\notag\\
-	\hat{x}_{k|k} &=  \hat{x}_{k|k-1} + H_k [z_{k} - C\hat{x}_{k|k-1}]\notag\\
-	\Sigma_{k|k} &= [I - H_k C]\Sigma_{k|k-1}
+	H_k & =  \Sigma_{k|k-1} C^T {(C \Sigma_{k|k-1} C^T + R)}^{-1}\notag \\
+	\hat{x}_{k|k} & =  \hat{x}_{k|k-1} + H_k [z_{k} - C\hat{x}_{k|k-1}]\notag \\
+	\Sigma_{k|k} & = [I - H_k C]\Sigma_{k|k-1}
 	\label{e:innovationLinear}
 \end{align}
 
-
-%
 % Note that $x \sim
 % N\left(\mu,\Sigma\right)$ means
 %\begin{equation}
@@ -1098,147 +1111,147 @@ Given initial state estimate, $\hat{x}_{0|0}$ and initial state covariance matri
 %
 %We will use the following notation:
 %\begin{align}
-%\hat{x}_{t|t} &= E\left[x_{t}|y_{0\colon t}\right]\notag\\
-%P_{t|t} &= E\left[\left(x_{t} - \hat{x}_{t|t}\right)\left(x_{t} - \hat{x}_{t|t}\right)\trans|y_{0\colon t}\right]\notag\\
-%\hat{x}_{t+1|t} &= E\left[x_{t+1}|y_{0\colon t}\right]\notag\\
-%P_{t+1|t} &= E\left[\left(x_{t+1} - \hat{x}_{t+1|t}\right)\left(x_{t+1} - \hat{x}_{t+1|t}\right)\trans|y_{0\colon t}\right]\notag
+%\hat{x}_{t|t} & = E\left[x_{t}|y_{0\colon t}\right]\notag \\
+%P_{t|t} & = E\left[\left(x_{t} - \hat{x}_{t|t}\right)\left(x_{t} - \hat{x}_{t|t}\right)\trans|y_{0\colon t}\right]\notag \\
+%\hat{x}_{t+1|t} & = E\left[x_{t+1}|y_{0\colon t}\right]\notag \\
+%P_{t+1|t} & = E\left[\left(x_{t+1} - \hat{x}_{t+1|t}\right)\left(x_{t+1} - \hat{x}_{t+1|t}\right)\trans|y_{0\colon t}\right]\notag
 %\end{align}
 %
 %%Note that because $x_{t|\cdot}$ is a Gaussian random variable, it is
 %sufficient to only keep track of the mean and covariance.  We can do
 %so by the following computations at each time $t$:
 %\begin{align}
-%\hat{x}_{t+1|t} &= A\hat{x}_{t|t} + Bu_{t}\notag\\
-%P_{t+1|t} &= AP_{t|t}A\trans +\Sigma_{w}\notag\\
-%\hat{x}_{t+1|t+1} &= \hat{x}_{t+1|t} + K_{t+1}\left(y_{t+1}-C\hat{x}_{t+1|t}\right)\notag\\
-%K_{t+1} &= P_{t+1|t}C\trans\left(CP_{t+1|t}C\trans + \Sigma_{v}\right)^{-1}\notag\\
-%P_{t+1|t+1} &= P_{t+1|t} - P_{t+1|t}C\trans\left(CP_{t+1|t}C\trans + \Sigma_{v}\right)^{-1}CP_{t+1|t}
+%\hat{x}_{t+1|t} & = A\hat{x}_{t|t} + Bu_{t}\notag \\
+%P_{t+1|t} & = AP_{t|t}A\trans +\Sigma_{w}\notag \\
+%\hat{x}_{t+1|t+1} & = \hat{x}_{t+1|t} + K_{t+1}\left(y_{t+1}-C\hat{x}_{t+1|t}\right)\notag \\
+%K_{t+1} & = P_{t+1|t}C\trans\left(CP_{t+1|t}C\trans + \Sigma_{v}\right)^{-1}\notag \\
+%P_{t+1|t+1} & = P_{t+1|t} - P_{t+1|t}C\trans\left(CP_{t+1|t}C\trans + \Sigma_{v}\right)^{-1}CP_{t+1|t}
 %\end{align}
+
 
 \subsection{Kalman filter equations for non-linear system}\label{s:30-kalman-filter--equations-non-linear-system}
 \indent\indent
-Now we consider a non-linear extension to the Kalman filter, \emph{Extended Kalman Filter (EKF)}. The EKF implements Kalman filter for a non-linear system dynamics that results from the linearization of the original non-linear filter dynamics around the previous state estimates. %TODO Do not use bold or any other font style to make a point. Manual search and change of occurences is a PIA
+Now we consider a non-linear extension to the Kalman filter, \emph{Extended Kalman Filter (EKF)}. The EKF implements Kalman filter for non-linear system dynamics that result from the linearization of the original non-linear filter dynamics around the previous state estimates. %TODO Do not use bold or any other font style to make a point. Manual search and change of occurences is a PIA
 
 A non linear system can be represented as follows.
+
 \begin{align}
-	x_{k} &= f\left(x_{k-1},u_{k-1}\right)+w_{k-1} \notag \\
-	z_{k} &= h\left(x_{k}\right) + v_{k-1}
+	x_{k} & = f\left( x_{k-1}, u_{k-1} \right) + w_{k-1} \notag \\
+	z_{k} & = h\left( x_{k} \right) + v_{k-1}
 	\label{e:nonlinearsystem}
 \end{align}
-where $w_{k} \sim N\left(0,Q_k\right)$ and  $v_{k} \sim
-N\left(0,R_k\right)$.
 
-We will proceed with the assumption that $f(\cdot)$, $h(\cdot)$, $Q$ and $R$ are time invariant for our non linear system.
-$f(\cdot)$ and $h(\cdot)$ are linearized about the prior best estimates of the states at each instant of time by finite difference method in order to compute covariances.
-Given initial state estimate, $\hat{x}_{0|0}$ and initial state covariance matrix, $\Sigma_{0|0}$ the Extended Filter can be computed using following set of equations.
+where $w_{k} \sim N\left(0, Q_k\right)$ and  $v_{k} \sim N\left(0, R_k\right)$.
 
+Another assumption is that $f(\cdot)$, $h(\cdot)$, $Q$ and $R$ are time invariant for the provided non-linear system. $f(\cdot)$ and $h(\cdot)$ are linearized about the prior best estimate of the states at each instant of time by finite difference method in order to compute covariances.
+Given initial state estimate $\hat{x}_{0|0}$ and initial state covariance matrix $\Sigma_{0|0}$ the extended Kalman filter can be computed using following set of equations.
 
 %\subsubsection{Prediction or time update}\label{s:30-kalman-filter--equations-non-linear-system--prediction}
-\subsubsection{Prediction/time update}\label{s:30-kalman-filter--equations-non-linear-system--prediction}
+\subsubsection{Prediction (time update)}\label{s:30-kalman-filter--equations-non-linear-system--prediction}
 %\indent\indent
 \begin{align}
-	\hat{x}_{k|k-1} &=  f\left(\hat{x}_{k-1|k-1},u_{k-1}\right) \notag\\
-	\Sigma_{k|k-1} &= J_f \Sigma_{k-1|k-1} J_f^T + Q 
+	\hat{x}_{k|k-1} & =  f\left( \hat{x}_{k-1|k-1}, u_{k-1} \right) \notag \\
+	\Sigma_{k|k-1} & = J_f \Sigma_{k-1|k-1} J_f^T + Q
 	\label{e:predictionnonLinear}
 \end{align}
 
-\subsubsection{Innovation/measurement update}\label{s:30-kalman-filter--equations-non-linear-system--innovation}
+\subsubsection{Innovation (measurement update)}\label{s:30-kalman-filter--equations-non-linear-system--innovation}
 %\indent\indent
 \begin{align}
-	H_k &=  \Sigma_{k|k-1} J_h^T {(J_h \Sigma_{k|k-1} J_h^T + R)}^{-1}\notag\\
-	\hat{x}_{k|k} &=  \hat{x}_{k|k-1} + H_k [z_{k} - h\left(\hat{x}_{k|k-1}\right)]\notag\\
-	\Sigma_{k|k} &= [I - H_kJ_h]\Sigma_{k|k-1}
+	H_k & =  \Sigma_{k|k-1} J_h^T {(J_h \Sigma_{k|k-1} J_h^T + R)}^{-1} \notag \\
+	\hat{x}_{k|k} & =  \hat{x}_{k|k-1} + H_k [z_{k} - h\left( \hat{x}_{k|k-1} \right)] \notag \\
+	\Sigma_{k|k} & = [I - H_kJ_h] \Sigma_{k|k-1}
 	\label{e:innovationnonLinear}
 \end{align}
 
 where $J_f$ and $J_h$ are the jacobian matrices.
 
-$J_f$ is the jacobian matrix containing the partial derivative of the system function $f(\cdot, \cdot)$ with respect to the state $x$, evaluated at the last state estimate $\hat{x}_{k-1|k-1}$ and control input $u_{k-1}$.
+$J_f$ is the jacobian matrix containing the partial derivative of the system function $f(\cdot)$ with respect to the state $x$, evaluated at the last state estimate $\hat{x}_{k-1|k-1}$ and control input $u_{k-1}$. %TODO doublecheck f(\cdot), because if bots dots correspond to state and input, then the previous use should be also checked
 
-$J_h$ is the jacobian matrix containing partial derivatives of the measurement
-function $h(\cdot)$ with respect to the state $x$, evaluated at the prior state
-estimate $\hat{x}_{k|k-1}$.
+$J_h$ is the jacobian matrix containing partial derivatives of the measurement function $h(\cdot)$ with respect to the state $x$, evaluated at the prior state estimate $\hat{x}_{k|k-1}$.
 
 \subsection{Extended Kalman filter equations for odometry}\label{s:30-kalman-filter--equations-odometry}
 \indent\indent
-After deriving model of our system for \nameref{s:10-odometry} and understanding the extended Kalman filter in previous section \nameref{s:20-KalmanFilter--nonlinear}, we will now prepare the extended Kalman filter equations for odometry.
+After deriving physical model of the provided system for \nameref{s:10-odometry} and understanding the extended Kalman filter in \nameref{s:30-kalman-filter--equations-non-linear-system}, preparation for the EKF equations for odometry can be done.
 
- \begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:KFxk + noise function}
- 	\begin{bmatrix}
- 		x_{[x],k}\\
- 		x_{[y],k}\\
- 		x_{[\theta],k}\\
- 	\end{bmatrix}
- 	 & = & 
- 	\begin{bmatrix}
- 		f_x(x_{k-1}, u_{k-1})\\
- 		f_y(x_{k-1}, u_{k-1})\\
- 		f_\theta(x_{k-1}, u_{k-1})\\
- 	\end{bmatrix}
- 	& + &
- 	\begin{bmatrix}
- 		w_{[x],k-1})\\
- 		w_{[y],k-1})\\
- 		w_{[\theta],k-1})\\
- 	\end{bmatrix}	
- \end{IEEEeqnarray} 
- 
-  \begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:KFSysEq}
-  	\begin{bmatrix}
-  		x_{[x],k}\\
-  		x_{[y],k}\\
-  		x_{[\theta],k}\\
-  	\end{bmatrix}
-  	& = & 
-  	\begin{bmatrix}
-  		x_{[x],k-1} + u_{[\Delta] S,k-1} \cdot \cos(x_{[\Theta],k-1} - \frac{u_{[\Delta\Theta],k-1}}{2}) \\
-  		x_{[y],k-1} + u_{[\Delta] S,k-1} \cdot \sin(x_{[\Theta],k-1} - \frac{u_{[\Delta\Theta],k-1}}{2}) \\
-  		x_{[\theta],k-1} - u_{[\Delta\Theta],k-1})\\
-  	\end{bmatrix}
-  	& + &
-  	\begin{bmatrix}
-  		w_{[x],k-1})\\
-  		w_{[y],k-1})\\
-  		w_{[\theta],k-1})\\
-  	\end{bmatrix}	
-  \end{IEEEeqnarray} 
-
-%\subsubsection{Prediction or Time update:}\label{s:30-kalman-filter--equations-odometry}
-\subsubsection{Prediction/time update:}\label{s:30-kalman-filter--equations-odometry--prediction}
-%\indent\indent
-
-\begin{IEEEeqnarray}{CCCCC} \label{eq:KFprediction1Odometry}
+\begin{IEEEeqnarray}{CCCCCCCCC}\label{eq:KFxk + noise function} %TODO Optimally there would be references to all previous partial steps how these equations were derived, but this alone is very good without.
 	\begin{bmatrix}
-		\hat{x}_{[x],k|k-1}\\
-		\hat{x}_{[y],k|k-1}\\
-		\hat{x}_{[\theta],k|k-1}\\
+		x_{[x], k} \\
+		x_{[y], k} \\
+		x_{[\theta], k} \\
 	\end{bmatrix}
-	& = & 
+ & = & 
 	\begin{bmatrix}
-		\hat{x}_{[x],k-1|k-1} + u_{[\Delta] S,k-1} \cdot \cos(\hat{x}_{[\Theta],k-1|k-1} - \frac{u_{[\Delta\Theta],k-1}}{2}) \\
-		\hat{x}_{[y],k-1} + u_{[\Delta] S,k-1} \cdot \sin(\hat{x}_{[\Theta],k-1|k-1} - \frac{u_{[\Delta\Theta],k-1}}{2}) \\
-		\hat{x}_{[\theta],k-1|k-1} - u_{[\Delta\Theta],k-1})\\
+		f_x(x_{k-1}, u_{k-1})\\
+		f_y(x_{k-1}, u_{k-1})\\
+		f_\theta(x_{k-1}, u_{k-1})\\
+	\end{bmatrix}
+	& + & 
+	\begin{bmatrix}
+		w_{[x], k-1})\\
+		w_{[y], k-1})\\
+		w_{[\theta], k-1})\\
 	\end{bmatrix}
 \end{IEEEeqnarray} 
 
+\begin{IEEEeqnarray}{CCCCCCCCC}\label{eq:KFSysEq}
+	\begin{bmatrix}
+		x_{[x], k} \\
+		x_{[y], k} \\
+		x_{[\theta], k} \\
+	\end{bmatrix}
+	& = & 
+	\begin{bmatrix}
+		x_{[x], k-1} + u_{[\Delta] S, k-1} \cdot \cos(x_{[\Theta], k-1} - \frac{u_{[\Delta \Theta], k-1}}{2}) \\
+		x_{[y], k-1} + u_{[\Delta] S, k-1} \cdot \sin(x_{[\Theta], k-1} - \frac{u_{[\Delta \Theta], k-1}}{2}) \\
+		x_{[\theta], k-1} - u_{[\Delta \Theta], k-1})\\
+	\end{bmatrix}
+	& + & 
+	\begin{bmatrix}
+		w_{[x], k-1})\\
+		w_{[y], k-1})\\
+		w_{[\theta], k-1})\\
+	\end{bmatrix}
+\end{IEEEeqnarray}
+
+%\subsubsection{Prediction or Time update:}\label{s:30-kalman-filter--equations-odometry}
+\subsubsection{Prediction (time update)}\label{s:30-kalman-filter--equations-odometry--prediction}
+%\indent\indent
+
+\begin{IEEEeqnarray}{CCCCC}\label{eq:KFprediction1Odometry}
+	\begin{bmatrix}
+		\hat{x}_{[x], k|k-1} \\
+		\hat{x}_{[y], k|k-1} \\
+		\hat{x}_{[\theta], k|k-1} \\
+	\end{bmatrix}
+	& = & 
+	\begin{bmatrix}
+		\hat{x}_{[x], k-1|k-1} + u_{[\Delta] S, k-1} \cdot \cos(\hat{x}_{[\Theta], k-1|k-1} - \frac{u_{[\Delta \Theta], k-1}}{2}) \\
+		\hat{x}_{[y], k-1} + u_{[\Delta] S, k-1} \cdot \sin(\hat{x}_{[\Theta], k-1|k-1} - \frac{u_{[\Delta \Theta], k-1}}{2}) \\
+		\hat{x}_{[\theta], k-1|k-1} - u_{[\Delta \Theta], k-1})\\
+	\end{bmatrix}
+\end{IEEEeqnarray}
+
 \begin{align}
-	J_{f,k}  &=  \frac{\partial f(x)}{\partial x}\Bigr|_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag\\
-	&=  	\begin{bmatrix}
-		\frac{\partial f_x}{\partial x_{[x]}} & \frac{\partial f_x}{\partial x_{[y]}} & \frac{\partial f_x}{\partial x_{[\theta]}}\\
-		\frac{\partial f_y}{\partial x_{[x]}} & \frac{\partial f_y}{\partial x_{[y]}} & \frac{\partial f_y}{\partial x_{[\theta]}}\\
-		\frac{\partial f_\theta}{\partial x_{[x]}} & \frac{\partial f_\theta}{\partial x_{[y]}} & \frac{\partial f_\theta}{\partial x_{[\theta]}}\\
-	\end{bmatrix}_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag\\
-	&=  	\begin{bmatrix}
-		1 & 0 & - u_{[\Delta] S} \cdot \sin(x_{[\Theta]} - \frac{u_{[\Delta\Theta]}}{2})\\
-		0 & 1 & + u_{[\Delta] S} \cdot \cos(x_{[\Theta]} - \frac{u_{[\Delta\Theta]}}{2}) \\
+	J_{f, k} & =  \frac{\partial f(x)}{\partial x}\Bigr|_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag \\
+	& = 
+	\begin{bmatrix}
+		\frac{\partial f_x}{\partial x_{[x]}} & \frac{\partial f_x}{\partial x_{[y]}} & \frac{\partial f_x}{\partial x_{[\theta]}} \\
+		\frac{\partial f_y}{\partial x_{[x]}} & \frac{\partial f_y}{\partial x_{[y]}} & \frac{\partial f_y}{\partial x_{[\theta]}} \\
+		\frac{\partial f_\theta}{\partial x_{[x]}} & \frac{\partial f_\theta}{\partial x_{[y]}} & \frac{\partial f_\theta}{\partial x_{[\theta]}} \\
+	\end{bmatrix}_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag \\
+	& = 
+	\begin{bmatrix}
+		1 & 0 & - u_{[\Delta] S} \cdot \sin(x_{[\Theta]} - \frac{u_{[\Delta \Theta]}}{2})\\
+		0 & 1 & + u_{[\Delta] S} \cdot \cos(x_{[\Theta]} - \frac{u_{[\Delta \Theta]}}{2}) \\
 		0 & 0 & 1\\
-	\end{bmatrix}_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag\\
+	\end{bmatrix}_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag \\
 	\label{e:JacobfOdometry}
 \end{align}
 
 \begin{align}
-	%\hat{x}_{k|k-1} &=  f\left(\hat{x}_{k-1|k-1},u_{k-1}\right) \notag\\
-	\Sigma_{[x],k|k-1} &= J_f \Sigma_{[x],k-1|k-1} J_f^T + Q 
+	%\hat{x}_{k|k-1} & =  f\left(\hat{x}_{k-1|k-1},u_{k-1}\right) \notag \\
+	\Sigma_{[x], k|k-1} & = J_f \Sigma_{[x], k-1|k-1} J_f^T + Q 
 	\label{e:predictionOdometry}
 \end{align}
 
@@ -1247,161 +1260,171 @@ After deriving model of our system for \nameref{s:10-odometry} and understanding
 %
 %\begin{IEEEeqnarray}{CCCCC} \label{eq:KFprediction2Odometry}
 %	\begin{bmatrix}
-%		\Sigma_{[x][x],k|k-1} & \Sigma_{[x][y],k|k-1} & \Sigma_{[x][\theta],k|k-1} \\
-%		\Sigma_{[y][x],k|k-1} & \Sigma_{[y][y],k|k-1} & \Sigma_{[y][\theta],k|k-1} \\
-%		\Sigma_{[\theta][x],k|k-1} & \Sigma_{[\theta][x],k|k-1} & \Sigma_{[\theta][\theta],k|k-1} \\
+%		\Sigma_{[x][x], k|k-1} & \Sigma_{[x][y], k|k-1} & \Sigma_{[x][\theta], k|k-1} \\
+%		\Sigma_{[y][x], k|k-1} & \Sigma_{[y][y], k|k-1} & \Sigma_{[y][\theta], k|k-1} \\
+%		\Sigma_{[\theta][x], k|k-1} & \Sigma_{[\theta][x], k|k-1} & \Sigma_{[\theta][\theta], k|k-1} \\
 %	\end{bmatrix}
 %	& = & 
 %	\begin{bmatrix}
-%		1 & 0 & - u_{[\Delta] S} \cdot \sin(x_{[\Theta]} - \frac{u_{[\Delta\Theta]}}{2})\\
-%		0 & 1 & + u_{[\Delta] S} \cdot \cos(x_{[\Theta]} - \frac{u_{[\Delta\Theta]}}{2}) \\
+%		1 & 0 & - u_{[\Delta] S} \cdot \sin(x_{[\Theta]} - \frac{u_{[\Delta \Theta]}}{2})\\
+%		0 & 1 & + u_{[\Delta] S} \cdot \cos(x_{[\Theta]} - \frac{u_{[\Delta \Theta]}}{2}) \\
 %		0 & 0 & 1\\
-%	\end{bmatrix}_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag\\
+%	\end{bmatrix}_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag \\
 %	\begin{bmatrix}
-%			\Sigma_{[x][x],k|k-1} & \Sigma_{[x][y],k|k-1} & \Sigma_{[x][\theta],k|k-1} \\
-%			\Sigma_{[y][x],k|k-1} & \Sigma_{[y][y],k|k-1} & \Sigma_{[y][\theta],k|k-1} \\
-%			\Sigma_{[\theta][x],k|k-1} & \Sigma_{[\theta][x],k|k-1} & \Sigma_{[\theta][\theta],k|k-1} \\
+%			\Sigma_{[x][x], k|k-1} & \Sigma_{[x][y], k|k-1} & \Sigma_{[x][\theta], k|k-1} \\
+%			\Sigma_{[y][x], k|k-1} & \Sigma_{[y][y], k|k-1} & \Sigma_{[y][\theta], k|k-1} \\
+%			\Sigma_{[\theta][x], k|k-1} & \Sigma_{[\theta][x], k|k-1} & \Sigma_{[\theta][\theta], k|k-1} \\
 %	\end{bmatrix}
 %		\begin{bmatrix}
-%			1 & 0 & - u_{[\Delta] S} \cdot \sin(x_{[\Theta]} - \frac{u_{[\Delta\Theta]}}{2})\\
-%			0 & 1 & + u_{[\Delta] S} \cdot \cos(x_{[\Theta]} - \frac{u_{[\Delta\Theta]}}{2}) \\
+%			1 & 0 & - u_{[\Delta] S} \cdot \sin(x_{[\Theta]} - \frac{u_{[\Delta \Theta]}}{2})\\
+%			0 & 1 & + u_{[\Delta] S} \cdot \cos(x_{[\Theta]} - \frac{u_{[\Delta \Theta]}}{2}) \\
 %			0 & 0 & 1\\
-%		\end{bmatrix}^T_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag\\
-%%	J_f \Sigma_{[x],k-1|k-1} J_f^T 
+%		\end{bmatrix}^T_{x = \hat{x}_{k-1|k-1}, u = u_{k-1}} \notag \\
+%%	J_f \Sigma_{[x], k-1|k-1} J_f^T 
 %	& + &
 %	\begin{bmatrix}
-%			{\sigma}^2_{w[x],k} & 0 &  0\\
-%			0 & {\sigma}^2_{w[y],k} & 0\\
-%			0 & 0 & {\sigma}^2_{w[\theta],k}\\
+%			{\sigma}^2_{w[x], k} & 0 &  0\\
+%			0 & {\sigma}^2_{w[y], k} & 0\\
+%			0 & 0 & {\sigma}^2_{w[\theta], k} \\
 %	\end{bmatrix} 
 %\end{IEEEeqnarray} 
 
 %\subsubsection{Innovation or Measurement update:}\label{s:30-kalman-filter--equations-odometry--innovation}
-\subsubsection{Innovation/measurement update}\label{s:30-kalman-filter--equations-odometry--innovation}
+\subsubsection{Innovation (measurement update)}\label{s:30-kalman-filter--equations-odometry--innovation}
 %\indent\indent
+
 \begin{align}
-	J_{h,k}  &=  \frac{\partial h(x)}{\partial x}\Bigr|_{x = \hat{x}_{k|k-1}} \notag\\
-	&=  	\begin{bmatrix}
-		\frac{\partial h_x}{\partial x_{[x]}} & \frac{\partial h_x}{\partial x_{[y]}} & \frac{\partial h_x}{\partial x_{[\theta]}}\\
-		\frac{\partial h_y}{\partial x_{[x]}} & \frac{\partial h_y}{\partial x_{[y]}} & \frac{\partial h_y}{\partial x_{[\theta]}}\\
-		\frac{\partial h_\theta}{\partial x_{[x]}} & \frac{\partial h_\theta}{\partial x_{[y]}} & \frac{\partial h_\theta}{\partial x_{[\theta]}}\\
-	\end{bmatrix}_{x = \hat{x}_{k|k-1}, u = u_{k-1}} \notag\\
-	&=  	\begin{bmatrix}
+	J_{h, k}  & =  \frac{\partial h(x)}{\partial x}\Bigr|_{x = \hat{x}_{k|k-1}} \notag \\
+	& =  	\begin{bmatrix}
+		\frac{\partial h_x}{\partial x_{[x]}} & \frac{\partial h_x}{\partial x_{[y]}} & \frac{\partial h_x}{\partial x_{[\theta]}} \\
+		\frac{\partial h_y}{\partial x_{[x]}} & \frac{\partial h_y}{\partial x_{[y]}} & \frac{\partial h_y}{\partial x_{[\theta]}} \\
+		\frac{\partial h_\theta}{\partial x_{[x]}} & \frac{\partial h_\theta}{\partial x_{[y]}} & \frac{\partial h_\theta}{\partial x_{[\theta]}} \\
+	\end{bmatrix}_{x = \hat{x}_{k|k-1}, u = u_{k-1}} \notag \\
+	& =  	\begin{bmatrix}
 		1 & 0 & 0 \\
 		0 & 1 & 0 \\
 		0 & 0 & 1\\
-	\end{bmatrix}_{x = \hat{x}_{k|k-1}, u = u_{k-1}} \notag\\
+	\end{bmatrix}_{x = \hat{x}_{k|k-1}, u = u_{k-1}} \notag \\
 	\label{e:JacobhOdometry}
 \end{align}
 
-Using the above derived jacobian matrix \eref{e:JacobhOdometry} for computation of Kalman gain matrix, $H_k$, aposteriori state estimate and aposteriori error covariance matrix, we get following equations.
+Using the above derived jacobian matrix \eref{e:JacobhOdometry} for computation of Kalman gain matrix $H_k$, a posteriori state estimate and a posteriori error covariance matrix following concludes.
 
 \begin{align}
-	H_k &=  \Sigma_{k|k-1}  {( \Sigma_{k|k-1} + R)}^{-1}\notag\\
-	\hat{x}_{k|k} &=  \hat{x}_{k|k-1} + H_k [z_{k} - \hat{x}_{k|k-1}]\notag\\
-	\Sigma_{k|k} &= [I - H_kJ_h]\Sigma_{k|k-1}
+	H_k & =  \Sigma_{k|k-1}  {( \Sigma_{k|k-1} + R)}^{-1}\notag \\
+	\hat{x}_{k|k} & =  \hat{x}_{k|k-1} + H_k [z_{k} - \hat{x}_{k|k-1}]\notag \\
+	\Sigma_{k|k} & = [I - H_kJ_h]\Sigma_{k|k-1}
 	\label{e:innovationnonLinearmodel}
 \end{align}
 
 
 \subsection{Practical implementation of extended Kalman filter}\label{s:30-kalman-filter--implementation}
 \indent\indent
-Proceeding with the EKF model for odometry, we need initializing of the model before we can practically implement it. Following components need to be initialized.
+Proceeding with the EKF model for odometry, initialization of the model is necessary before practical implementation, which requires following components to be initialized:
 
 \begin{enumerate}
-	\item Initial state estimate, $\hat{x}_{0|0}$ 
-	\item Initial state covariance matrix, $\Sigma_{0|0}$
-	\item Process covariance matrix, Q
-	\item Measurement covariance matrix, R
+	\item Initial state estimate $\hat{x}_{0|0}$,
+	\item Initial state covariance matrix $\Sigma_{0|0}$,
+	\item Process covariance matrix $Q$,
+	\item Measurement covariance matrix $R$.
 \end{enumerate}
 
-
-\subsubsection{Initial state estimate $\hat{x}_{0|0}$}\label{s:30-kalman-filter--implementation--initial-state-estimate} %TODO Never use special signs in labels
+\subsubsection{Initial state estimate $\hat{x}_{0|0}$}\label{s:30-kalman-filter--implementation--initial-state-estimate} %TODO Never use special signs or whitespaces in labels, can cleanup at the end, don't worry now
 \indent\indent
-This is the initial estimate of the state vector required for the first iteration of the EKF. 
-In our system, Optitrack motion capture system is used for measurement. Optitrack provides ground truth and positional accuracy of up to sub-millimeter. 
-For our testing, we simply used the measurement sensor reading to determine  $\hat{x}_{0|0}$.
+This is the initial estimate of the state vector required for the first iteration of the EKF. In the provided system, Optitrack Motion Capture system is used for measurement. Optitrack provides ground truth and positional accuracy of up to sub-millimeter range. For performed tests the measurement sensor readings were used to determine  $\hat{x}_{0|0}$.
 
 \subsubsection{Initial state covariance matrix $\Sigma_{0|0}$}\label{s:30-kalman-filter--implementation--initial-state-covariance}
 \indent\indent
-Initial state covariance matrix is based on the initialization error of the state. If the initial state estimate is very close to the actual state, this matrix will contain very small values. With the assumption that noise sources for different state elements are independent, the off diagonal elements of the covariance matrix can be taken to be zero.
+Initial state covariance matrix is based on the initialization error of the state. If the initial state estimate is very close to the actual state, this matrix will contain very small values. With the assumption that noise sources for different state elements are independent, the off diagonal elements of the covariance matrix can be assumed to equal zero.
 
-Usually if this matrix is unknown, we can use identity matrix since this matrix is updated in every iteration of EKF. For a stable EKF, this matrix should be converging.
-A better initial estimate will offer faster convergence of the Kalman filter.
+Usually if this matrix is unknown identity matrix is used, since state covariance matrix is updated in every iteration of EKF. For a stable EKF this matrix should be converging over time. An initial estimate closer to the actual state will offer faster convergence of the Kalman filter. %TODO "better" exchanged
 
-For our testing, since we determine the initial state from the motion capture system, initial state covariance matrix can be taken as zero. However, since we are simulating a sensor not as accurate as motion capture, the matrix is taken as identity.
+Since the initial state is determined from the motion capture system, initial state covariance matrix could be assumed to be zero. However, since the chosen procedure simulates a sensor not as accurate as motion capture, the initial state covariance matrix is taken as identity.
 
 \subsubsection{Process covariance matrix Q}\label{s:30-kalman-filter--implementation--process-covariance-q}
 \indent\indent
-This is the error covariance matrix of the process and gives an estimate of uncertainty in the state equations. The uncertainty in the process could be in result of various sources of error include modeling errors, odometry errors, discretization, approximations involved in the derivation of the model.
+This is the error covariance matrix of the process and gives an estimate of uncertainty in the state equations. The uncertainty in the process could be a result of various sources of error, including modeling errors, odometry errors, discretization and approximations involved in the derivation of the model.
 
-In order to get a feel of error in the model, we computed error based on odometry model from log files.
-%and could understand not much about it
+In order to get a better understanding of error in the model, computation of error based on odometry model from log files and analysis were performed.
+% but without any further detailed insights.
+%In order to get a feel of error in the model, we computed error based on odometry model from log files.
+%TODO and could understand not much about it -- Genius!
 
-For testing, we tried different range of values for Q to understand the behaviour of the EKF.  
-
+For testing a different range of values for $Q$ was chosen in order to understand the behaviour of the EKF better. %TODO in the provided system?
 
 \subsubsection{Measurement covariance matrix R}\label{s:30-kalman-filter--equations-odometry--measuremenet-covariance-r}
 \indent\indent
-This is the error covariance matrix of measurement sensor and gives a measure of how uncertain is measurement. As discussed earlier, Optitrack motion capture system is used for measurement and it provides ground truth. 
-For the case when the measurement is very accurate, matrix R will carry very small variances and can be zero. However, in order to simulate EKF for a system whose measurement sensor is not as accurate, we tried different range of values for covariance matrix.
+This is the error covariance matrix of measurement sensor and provides a measure of how uncertain the measurement is. As discussed earlier, Optitrack Motion Capture system is used for measurement and it provides ground truth. For the case when the measurement is very accurate, matrix $R$ will carry very small variances and can be approximated to zero. However, in order to simulate EKF for a system, whose measurement sensor is not as accurate, different range of values for the measurement covariance matrix $R$ was used.
+
+%TODO CHECKED
 
 \subsection{Divergence of state covariance matrix $\Sigma_{k|k}$}\label{s:30-kalman-filter--divergence-of-state-covariance-matrix}
 \indent\indent
-Proceeding with initialization of EKF as discussed above, it was observed that the filter behaved well for some time after initialization. However, after some time the state covariance matrix started diverging very fast, resulting in failure of the filter. 
+Proceeding with initialization of EKF as discussed above, it was observed that the filter behaved well for a specific period of time after initialization. However, after a certain amount of time the state covariance matrix started diverging very fast, resulting in failure of the filter.
 
-It was understood that a possible reason behind this could be lack of input excitation that results in growing values of state covariance matrix and large spread of eigen values. In order to cater this issue, different techniques can be used to stabilize estimation and prevent windup of state estimation and covariance matrix.
+It was understood that a possible reason behind this could be lack of input excitation that results in growing values of state covariance matrix and large spread of eigenvalues. In order to solve this issue, different techniques can be used to stabilize estimation and prevent windup of state estimation and covariance matrix.
 
-We resolved this issue by performing Cholesky decompostion in the computation of Kalman gain matrix.  Cholesky factorization is a decomposition of a Hermitian, positive-definite matrix into the product of a lower triangular matrix (or an upper triangular matrix)and its conjugate transpose. Cholesky decomposition offers numerical stability to the system.
+The issue has been solved by performing \link[Cholesky decompostion]{https://en.wikipedia.org/wiki/Cholesky_decomposition} in the computation of Kalman gain matrix. Cholesky factorization is a decomposition of a Hermitian, a positive-definite matrix, into the product of a lower triangular matrix, or alternatively an upper triangular matrix, and its conjugate transpose. Cholesky decomposition offers numerical stability to the system, which is the main reason it was chosen.
 
-We implemented this based on the assumption that the state covariance matrix is symmetrical $\Sigma_{k|k}$. This resulted in good behavior of the filter, however, it slowed down the performance of EKF. With Cholesky decomposition, the innovation update of EKF can be written as shown in \eref{e:choleskynonLinear}
+Implementation was based on the assumption that the state covariance matrix $\Sigma_{k|k}$ is symmetrical. This resulted in acceptable behaviour of the filter, however, it slowed down the performance of EKF. With Cholesky decomposition, the innovation update of EKF can be written as shown in \eref{e:choleskynonLinear}
 
 \begin{align}
-	U &= CholsekyDecomposition (J_h \Sigma_{k|k-1} J_h^T + R)\notag\\
-	\hat{x}_{k|k} &=  \hat{x}_{k|k-1} +  [\Sigma_{k|k-1} {U}^{-1}]{U^T}^{-1} [z_{k} - h\left(\hat{x}_{k|k-1}\right)]\notag\\
-	\Sigma_{k|k} &= \Sigma_{k|k-1} - [\Sigma_{k|k-1} {U}^{-1}][\Sigma_{k|k-1} {U}^{-1}]^T
+	U & = CholsekyDecomposition (J_h \Sigma_{k|k-1} J_h^T + R)\notag \\ %TODO Suggest to use an operator for Cholesky decomposition defined before, but leave it as is
+	\hat{x}_{k|k} & =  \hat{x}_{k|k-1} +  [\Sigma_{k|k-1} {U}^{-1}]{U^T}^{-1} [z_{k} - h\left(\hat{x}_{k|k-1}\right)]\notag \\
+	\Sigma_{k|k} & = \Sigma_{k|k-1} - [\Sigma_{k|k-1} {U}^{-1}][\Sigma_{k|k-1} {U}^{-1}]^T
 	\label{e:choleskynonLinear}
 \end{align}
 
-where $CholsekyDecomposition (X)$ produces an upper triangular matrix $U$ from the diagonal and upper triangle of matrix $X$, satisfying the equation $U^TU=X$.
+where $CholsekyDecomposition (X)$ produces an upper triangular matrix $U$ from the diagonal and upper triangle of matrix $X$, thus satisfying the equation $U^TU=X$.
 
+%TODO CHECKED
 
-\section{Robot Operating System (ROS)}\label{s:40-ros} %TODO I have yet to go through this
+\section{Robot Operating System (ROS)}\label{s:40-ros} %TODO Could you take a quick look?
 \indent\indent
-Robot Operating System (ROS) is a collection of software frameworks for robot software development, it works as middleware for work with complex robotic problems. It uses the publisher subscriber software architecture model for nodes. The presented problem of localization of a humanoid robot using extended Kalman filter, which has been described in detail in previous section [ref section], has been solved using ROS.
-[Number of nodes] nodes have been developed respecting the aspects of modularity and exchangebility of software:
+\link[Robot Operating System (ROS)]{http://wiki.ros.org/} is a collection of software frameworks for robot software development, it works as middleware for work with complex robotic problems. ROS uses the publisher-subscriber software architecture model for communication between nodes. The presented problem of localization of a humanoid robot using extended Kalman filter, which has been described in detail in \nameref{s:30-kalman-filter}, has been solved using ROS.
+Five nodes have been developed respecting the aspects of modularity and interchangeability of software:
 
 \begin{itemize}
 	\item Preprocessor node
 	\item Control node
 	\item Communication node
 	\item Extended Kalman filter node
-	\item Visualization
-	\item [Analysis]
+	\item Visualization node
+%	\item [Analysis node] :(
 \end{itemize}
 
-Each node is supposed to fulfill one function, however there are several aspects that have been merged into nodes, that might be contraintuitive. Functionalities of the nodes are distributed the following way:
-\begin{enumerate}
+Each node is supposed to fulfil one specific function, so that the software can be used for different tasks and in different environments. However there are several aspects that have been merged into same nodes, that might be contra-intuitive. Functionalities of the nodes are distributed the following way:
+
+\begin{itemize}
 	\item Preprocessor node:
+	\begin{enumerate}
+		\item Filter the raw data from motion capture system
+		\item Publish filtered data along with timestamp for modelling of odometry and the measurement in Kalman filter
+	\end{enumerate}
 	\item Control node:
 	\begin{enumerate}
 		\item Translate input from keyboard into linear and angular velocities within unitary limits ($-100\% \div 100\%$)
-		\item Publish data
+		\item Publish data as Twist message for further processing
 	\end{enumerate}
 	\item Communication node:
 	\begin{enumerate}
-		\item Translate data from control node into a 3 byte message for Rollo
-		\item Send data continuosly at a given rate to Rollo
-		\item Perform emergency procedure if connection to control node is lost
-		\item [fix number, A for previous options, B for this one]
-		\item Square test of n-th order
+		\renewcommand{\theenumi}{\Alph{enumi}}
+		\item Normal operation mode
 		\begin{enumerate}
-			\item Perform a cycle of forward movement and turn
-			\item For higher than 1 order square test, turn around between runs
+			\item Translate data from control node into a three byte message for Rollo
+			\item Publish decoded velocities
+			\item Send commands continuously at a given rate to Rollo
+			\item Perform emergency procedure if connection to control node is lost
+		\end{enumerate}
+		\item Square test of n-th order based on the UMBmark test procedure describer in detail in \nameref{s:10-odometry--measuring-odometry-errors}
+		\begin{enumerate}
+			\item Perform a cycle of forward movement and turns to move the robot along a square
+			\item For higher than first order square test turn around between runs
 		\end{enumerate}
 	\end{enumerate}
 	\item Extented Kalman filter node:
 	\begin{enumerate}
+		\item Initialize EKF
 		\item Preprocessing of acquired data to make comparison of relevant information
 		\item Estimate of state using EKF
 		\item Odometry data calculation
@@ -1409,53 +1432,58 @@ Each node is supposed to fulfill one function, however there are several aspects
 	\end{enumerate}
 	\item Visualization node:
 	\begin{enumerate}
-		\item Visualize data from preprocessor and extended Kalman filter, which provides estimates of state and odometry data
+		\item Visualize data holding position and orientation of robot, from preprocessor and extended Kalman filter, which provides estimates of state and odometry data
 	\end{enumerate}
-\end{enumerate}
+\end{itemize}
 
-Nodes have been written in C++ with the exception of visualization node, which is written in Python, because of easy access to the powerful Matplotlib [reference] library. There has been also a significant amount of testing and prototyping of software done in Matlab and Python, mainly for the odometry model and extended Kalman filter implementation and analysis. Additional scripts in Bash shell were also written, mostly for the purpose of easier repetition of tasks.
+Nodes have been written in C++ programming language with the exception of visualization node, which has been written in Python, mainly because of easy access to the powerful \link[Matplotlib library]{http://matplotlib.org/}. There has been also a significant amount of testing and prototyping of software done in Matlab and Python, mainly for the odometry model and extended Kalman filter implementation as well as analysis. Additional scripts in Bash shell were also written, mostly for the purpose of easier repetition of tasks. All of the significant files can be found in the \link[GitHub repository established for this project]{https://github.com/em-er-es/rollo}.
 
-The basic software architecture model implemented is publish-subscribe given the architecture ROS uses represented by [reference to diagram].
+The basic software architecture model implemented is publish-subscribe given the architecture ROS uses represented by \fref{40-ros--nodes-diagram} shows the correlation between individual nodes and environment.
 
-More in depth documentation of the actual code and algorithms has been done using Doxygen in two formats: html version [reference to github] and local document form [reference to refman.pdf]. Only the most important points shall be described here.
+%\scalefig{Graphics/40-ros--nodes-diagram.pdf}{0.75}{Basic structure of developed ROS nodes.\label{f:40-ros--nodes-diagram}}
 
-A few aspects have been addressed while developing the software. One of those aspects is safety of operation. Should the control node loose connection to the master and at the same time be sending other than full stop (linear and angular velocities equal to zero), then in normal case the communication node would continue sending data with last values received from control node. This is the reason a safety or emergency procedure has been implemented, so that after a period of time, which can be specified from the command line, a full stop command is being send for 10 [verify] times. Should the control node reestablish connection, the communication node will continue to work in normal procedure. Since the robot has been tested in laboratory conditions, the algorithm implemented is not very robust and could be further improved. For example, the stop command could be send conitnuosly, until control node is reconnected with ROS master or forcefully exited. Another improvement would be to send a special message that this event occured, so that the user is informed about it without delay.
+A few aspects have been addressed while developing the software. One of those aspects is safety of operation. Should the control node loose connection to the master and at the same time be sending commands other than full stop, where linear and angular velocities are equal to zero, then in normal case the communication node would continue sending data with last values received from control node and the robot would be uncontrollable. This is the reason a safety, or emergency, procedure has been implemented. After a period of time, which can be specified from the command line using the \verb|em| parameter, a full stop command is being send for ten times. Should the control node reestablish connection, the communication node will continue to work in normal procedure.
 
-Next feature implemented into the communication node is the square test. In this particular test [provide more description] [provide reference]. The implemented algorithm lets the user specify the forward and turning times for the square test, which is necessary in case of not having access to odometry data. The square test can be performed in multiple runs, so that each cycle includes:
+Since the robot has been tested in laboratory conditions, the algorithm implemented is sufficient for given condition. However it is not very robust and could be further improved. For example, the stop command could be send continuously, until control node is reconnected with ROS master or the communication node forcefully exited. Another improvement would be to send a special message that this event occurred, so that the user is informed about it without delay.
+
+Next feature implemented into the communication node is the square test. This particular test has been implemented in accordance to UMBmark test procedure described in \nameref{s:10-odometry--measuring-odometry-errors}. The implemented algorithm lets the user specify the forward and turning times for the square test, which is necessary in case of not having access to direct odometry data in form of encoder readings. The square test can be performed in multiple runs, so that each cycle includes:
 
 \begin{enumerate}
 	\item Moving forward
-	\item Turning $90\deg$
+	\item Turning $90\degree$
 	\item Moving forward
-	\item Turning $90\deg$
+	\item Turning $90\degree$
 	\item Moving forward
-	\item Turning $90\deg$
+	\item Turning $90\degree$
 	\item Moving forward
-	\item Turning $90\deg$
+	\item Turning $90\degree$
 \end{enumerate}
 
-Should there be multiple runs specified, the robot would turn around, which is to rotate $180\degree$ and continue with step 1. It other case that would be the last run, ideally the robot would stop at exactly the same position it started with the initial orientation. Since there are systematic and random errors, this is only achieveable for a given tolerance.
+Should there be multiple runs specified, the robot would turn around after each cycle, which is to rotate $180\degree$ and continue with step 1. In other case that would be the last or only run. Ideally the robot would stop at exactly the same position it started with the initial orientation. Since there are systematic and random errors, this is only achievable for a given tolerance. However in case of Rollo, the errors and mechanical structure differences are so great, that the test is basically not practical. During tests runs it has been only confirmed, what the analysis of the logs performed for the extended Kalman filter node concluded, namely that the turning times differ significantly, which is most probably due to mechanical asymmetry.
 
-During tests runs it has been only confirmed, what the analysis of the logs performed for the extended Kalman filter node concluded, namely that the turning times differ significantly, which is most probably due to mechanical asymmetry. This makes the source code for this particular robot somewhat irrelevant. However it has been decided to leave the current implementation at this state, since it actually is sound from the theoretical point of view and most robots should have the similar turning speeds for both directions.
+This makes the source code for this particular robot somewhat irrelevant. However it has been decided to leave the current implementation at this state, since it actually is sound from the theoretical point of view. It can be used with other robots should they have similar turning speeds for both directions.
 
+More in depth documentation of the actual code and algorithms has been done using Doxygen in two formats: \link[HTML version]{http://htmlpreview.github.io/?http://github.com/em-er-es/rollo/blob/master/Documentation/html/index.html} and \link[local LaTeX document form]{https://github.com/em-er-es/rollo/raw/master/Documentation/latex/refman.pdf}.
+
+%TODO CHECKED
 
 \section{Simulation and testing}\label{s:50-simulation-and-testing}
 \subsection{Simulation of extended Kalman filter}\label{s:50-simulation-and-testing--simulation-of-ekf}
 \indent\indent
-EKF algorithm was first simulated in MATLAB using logs from robot's test runs.				
-Measurement logs were collected for a simple robot's straight line test runs and initial value of measurement was set as the initial state estimate. EKF update was performed using this initial state estimate, control input for the given log and measurement for the log.
+EKF algorithm was first simulated in MATLAB using logs from Rollo's test runs.
+Measurement logs were collected for the robot's straight line test runs and initial value of measurement was set as the initial state estimate. EKF update was performed using this initial state estimate, control input for the given log and measurement for the log.
 
-Figure \ref{f:20-matlab-ekf-1} shows the results of EKF for a log file. x state[1] and x state[2] represent position of robot in x and y coordinates in meters respectively. x state[3] represents orientation of the robot in radians. The blue lines shows the state estimates updates with EKF while the red lines represent the measurement which is the true state.
+Figure \ref{f:20-matlab-ekf-1} shows the results of EKF based on one of a log file. \verb|x state[1]| and \verb|x state[2]| represent position of robot in $x$ and $y$ coordinates in meters respectively. \verb|x state[3]| represents orientation $\Theta$ of the robot in radians. The blue lines shows the state estimates updates with EKF, while the red lines represent the measurement which is the actual state.
 
-It can be observed from the plots that the state estimates are able to correct itself to measurement and generate a smooth transition.
+It can be observed from the plots that the EKF based state estimates are influenced by measurement and are able to converge to the varying values of measurement.
 
 %\includesvg[0.75]{Graphics/Results/ekfresult1}{Odometry model with the simplified 4 wheel configuration for the right turn.\label{f:10-odometry-rt-4w}}
 
-\scalefig{Graphics/Results/ekfresult1.pdf}{0.75}{Results of EKF simulation a log file.\label{f:20-matlab-ekf-1}}
+\scalefigcrop{Graphics/Results/ekfresult1.pdf}{0.75}{Results of EKF simulation based on a log file.\label{f:20-matlab-ekf-1}}{20}{200}{0}{200}
 
-\scalefig{Graphics/Results/ekfstability.pdf}{0.75}{Results of EKF simulation a log file.\label{f:20-matlab-ekf-stability}}
+\scalefigcrop{Graphics/Results/ekfstability.pdf}{0.75}{Results of EKF simulation based on a log file for longer iterations to verify stability.\label{f:20-matlab-ekf-stability}}{20}{200}{0}{200}
 
-Figure \ref{f:20-matlab-ekf-stability} shows the results of EKF update for longer iterations to verify the stability of EKF. If original EKF equations are directly used with the system, the state estimate and state covariance matrix starts to diverge after sometime, as discussed in previous section. This figure shows result of performing Cholesky decomposition for measurement update.
+Figure \ref{f:20-matlab-ekf-stability} shows the results of EKF update for longer iterations to verify the stability of EKF. If original EKF equations are directly used with the system, the state estimate and state covariance matrix starts to diverge after sometime, as discussed in section \nameref{s:30-kalman-filter--divergenceE_k|k}. This figure shows result of performing Cholesky decomposition for measurement update.
 
 
 \subsection{Testing of extended Kalman filter}\label{s:50-simulation-and-testing--testing-of-ekf}
@@ -1463,10 +1491,10 @@ Figure \ref{f:20-matlab-ekf-stability} shows the results of EKF update for longe
 \indent\indent
 In order to conduct the tests both battery packs were fully charged and five markers were placed on Rollo at different points so it could be reliably tracked by motion capture system.
 
-Motion capture system was calibrated so that the x-axis and y-axis for localization were defined according to Cartesian coordinate system. The Robot was placed in the arena with its orientation aligned to x-axis and then defined as a rigid body in the motion capture system. This ensured that the orientation of the robot was 0 radians when it was aligned to x-axis similar to the odometry model developed. 
+Motion capture system was calibrated so that the x-axis and y-axis for localization were defined according to Cartesian coordinate system. The Robot was placed in the arena with its orientation aligned to x-axis and then defined as a rigid body in the motion capture system. This ensured that the orientation of the robot was $0$ radians when it was aligned to x-axis similar to the odometry model developed. 
 
-The complete software that received localization from the motion capture system, controlled Rollo, process data to implement EKF and visualization  was developed in ROS framework.
-Rollo was manually controlled using the keyboard and communication with Rollo was done at 10Hz. The measurement node was updated 25 Hz. Hence, the EKF update was also performed at a rate of approximately 25Hz.
+The complete software that received localization from the motion capture system, controlled Rollo, processed data to implement EKF and visualization  was developed in ROS framework.
+Rollo was manually controlled using the keyboard and communication with Rollo was done at 10Hz. The measurement node was updated 25 Hz. Hence, the EKF update was also performed approximately at a rate of 25Hz.
 
 Unfortunately, the encoder feedback was unavailable for the test but the communication node was preprogrammed to send certain angular velocities for left at a given command. The complete range was not covered, only the command values shown in the table \ref{t:command-velocities-estimates}.
 were tested.
@@ -1475,14 +1503,15 @@ In the start of each test run, the robot position and orientation read from the 
 
 State prediction using the odometry based model alone was also studied for comparison with EKF based model. However, in the absence of encoder, this model was very crude. Moreover, the testing floor was uneven and had visible irregularities, which introduced non systematic errors that are not modelled in the odometry.
 
-Initial state for the odometry model was taken the same as for the EKF based model. The logs were collected sometime after the test was conducted and analyzed. This was due to lag in the system.%Detail?
-However, The videos of online visualization for the tests were recorded from the very start of the run. 
+Initial state for the odometry model was taken the same as for the EKF based model. The logs were collected sometime after the test was conducted and analyzed. This was due to lag in the system. %Detail?
+However, the videos of online visualization for the tests were recorded from the very start of the run. 
 
 \subsubsection{Testing variables}\label{s:50-simulation-and-testing--testing-of-ekf--testing-variables}
 \indent\indent
-We tested Rollo with different process covariance matrix,Q and measurement covariance matrix to analyze EKF. We define the two matrices here again. (For details, sections \ref{s:20-system-and-measurement-model--measurement-model-with-noise} and \ref{s:20-system-and-measurement-model--system-model-with-noise} can be referred again.) 
 
-For process noise covariance matrix, it was assumed that the noise sources were independent for the three states (position in x and y coordinates and the orientation) and the noise variances for all three states were taken equal and constant. Assigning the standard deviation for all states as q, the Q matrix can be written as shown in \eref{eq:Qk covariance test}.
+We tested Rollo with different process covariance matrix, $Q$ and measurement covariance matrix, $R$ to analyze EKF. We define the two matrices here again. (For details, sections \nameref{s:20-Model--MeasurementModel}, \nameref{s:20-Model--SysModeNoisel} and \nameref{s:30-kalmanfilter--divergenceE_k|k}can be referred again.) 
+
+For process noise covariance matrix, it was assumed that the noise sources were independent for the three states (position in x and y coordinates and the orientation) and the noise variances for all three states were taken equal and constant. Assigning the standard deviation for all states as $q$, the $Q$ matrix can be written as shown in \eref{eq:Qk covariance test}.
 
 \begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:Qk covariance test}
 	Q_k & = &  
@@ -1493,7 +1522,7 @@ For process noise covariance matrix, it was assumed that the noise sources were 
 	\end{bmatrix}
 \end{IEEEeqnarray}
 
-For measurement noise covariance matrix, it was assumed that the noise sources were independent for the three states (position in x and y coordinates and the orientation) and the noise variances for all three states were taken equal and constant. Assigning the standard deviation for the all states as r, the R matrix can be written as shown in \eref{eq:Rk covariance test}.
+For measurement noise covariance matrix, it was assumed that the noise sources were independent for the three states (position in x and y coordinates and the orientation) and the noise variances for all three states were taken equal and constant. Assigning the standard deviation for the all states as $r$, the $R$ matrix can be written as shown in \eref{eq:Rk covariance test}.
 
 \begin{IEEEeqnarray}{CCCCCCCCC} \label{eq:Rk covariance test}
 	R_k & = &  
@@ -1504,17 +1533,34 @@ For measurement noise covariance matrix, it was assumed that the noise sources w
 	\end{bmatrix}
 \end{IEEEeqnarray}
 
-Following combinations of \textbf{q} and \textbf{r} were tested.
-\begin{enumerate}
-	\item $q = 0.1$ and $r = 0.1$
-	\item $q = 0.1$ and $r = 1.0$
-	\item $q = 0.1$ and $r = 10.0$
-	\item $q = 1.0$ and $r = 10.0$
-	\item $q = 10.0$ and $r = 10.0$
-	\item $q = 100.0$ and $r = 10.0$
-	\item $q = 8.0$ and $r = 32.0$
-\end{enumerate}
-
+Table \ref{t:02qandr} enlists the combinations of \textbf{$q$} and \textbf{$r$} that were tested.
+%Following combinations of \textbf{q} and \textbf{r} were tested.
+%\begin{enumerate}
+%	\item $q = 0.1$ and $r = 0.1$
+%	\item $q = 0.1$ and $r = 1.0$
+%	\item $q = 0.1$ and $r = 10.0$
+%	\item $q = 1.0$ and $r = 10.0$
+%	\item $q = 10.0$ and $r = 10.0$
+%	\item $q = 100.0$ and $r = 10.0$
+%	\item $q = 8.0$ and $r = 32.0$
+%\end{enumerate}
+	\begin{table}
+		\centering
+		\begin{tabularx}{0.8\textwidth}{@{}|Y|Y|@{}}
+			\hline
+			\textbf{$q$} & \textbf{$r$} \\ \hline %TODO Add symbols here, descriptions are welcome
+			\hline
+			0.1 & 0.1 \\ \hline
+			0.1 & 1.0 \\ \hline
+			0.1 & 10.0 \\ \hline
+			1.0 & 10.0 \\ \hline
+			10.0 & 10.0 \\ \hline
+			100.0 & 10.0 \\ \hline
+			8.0 & 32.0 \\ \hline
+		\end{tabularx}
+		\caption{Predetermined wheels angular velocity based on test logs for given forward command.}
+		\label{t:02qandr}
+	\end{table}
 
 The EKF update rate was 10Hz for all test runs. For every test the initial state estimate was reassigned and the EKF node was restarted.
 
@@ -1527,52 +1573,52 @@ The EKF update rate was 10Hz for all test runs. For every test the initial state
 During on line testing the localization was studied using the visualization node. A snapshot of the real time visualization is shown in figure.
 
 
-\scalefig{Graphics/50-simulation-and-testing--visualization-node.png}{0.75}{Pseudo real time visualization: Localization of the robot based on EKF, odometry and the measurement from motion capture. \label{f:50-visualization-node}}
+\scalefig{Graphics/50-simulation-and-testing--visualization-node.png}{0.75}{Real time visualization: localization of the robot based on EKF, odometry alone and the measurement.\label{f:50-simulation-and-testing--visualization-node}}
 
-Logs were generated for off line and in depth analysis of the system. For every test run, two different plots were generated. One showing position of the robot computed according to odometry, EKF and motion capture system. Second plot displayed position and orientation of the robot with respect to time. Some plots of the test runs are shown in this section.
+Logs were generated for off line and in-depth analysis of the system. For every test run, two different plots were generated. One showed position of the robot computed according to odometry, EKF and motion capture system. Second plot displayed position and orientation of the robot with respect to time. Some plots of the test runs are shown in this section.
 
-\scalefig{Graphics/Results/01F19-EKF-q0-1-r0-1.pdf}{0.75}{Test 1, velocity command 19\% for both left and right wheels. q = 0.1, r = 0.1.\label{f:30-Test-1a}}
+\scalefigcrop{Graphics/Results/01F19-EKF-q0-1-r0-1.pdf}{0.75}{Test 1, velocity command 19\% for both left and right wheels. q = 0.1, r = 0.1.\label{f:30-Test-1a}}{20}{190}{0}{209}
 
-\scalefig{Graphics/Results/01F19-EKF-q0-1-r0-1wrttime.pdf}{0.75}{Test 1, velocity command 19\% for both left and right wheels. q = 0.1, r = 0.1. Figure shows all three states with respect to time.\label{f:32-Test-1b}}
+\scalefigcrop{Graphics/Results/01F19-EKF-q0-1-r0-1wrttime.pdf}{0.75}{Test 1, velocity command 19\% for both left and right wheels. q = 0.1, r = 0.1. Figure shows all three states with respect to time.\label{f:32-Test-1b}}{20}{190}{0}{210}
 
 Initial tests were conducted for $q = 0.1$ and $r = 0.1$. Figures \ref{f:30-Test-1a} and \ref{f:32-Test-1b} show a straight line run for 19\% velocity command. It can be observed from the plot that the state estimate is almost superimposed on measurement line. This shows EKF is able to estimate the state very well. Odometry results have however drifted far from actual position of the robot with time. Since this was only crudely modelled without encoders feedback, no efforts were made to improve it.
 
-The initial values of q and r involved in EKF yielded respectable performance. Further tests were performed by adding more noise to the measurement model by taking a larger $r$. 
+The initial values of $q$ and $r$ involved in EKF yielded respectable performance. Further tests were performed by adding more noise to the measurement model by taking a larger $r$. 
 
-\scalefig{Graphics/Results/02F12-EKF-q0-1-r1-0.pdf}{0.75}{Test 2, velocity command 12\% for both left and right wheels. q = 0.1, r = 1.0.\label{f:34-Test-2a}}
+\scalefigcrop{Graphics/Results/02F12-EKF-q0-1-r1-0.pdf}{0.75}{Test 2, velocity command 12\% for both left and right wheels. q = 0.1, r = 1.0.\label{f:34-Test-2a}}{20}{190}{0}{210}
 
-\scalefig{Graphics/Results/02F12-EKF-q0-1-r1-0wrttime.pdf}{0.75}{Test 2, velocity command 12\% for both left and right wheels. q = 0.1, r = 1.0. Figure shows all three states with respect to time.\label{f:36-Test-2b}}
+\scalefigcrop{Graphics/Results/02F12-EKF-q0-1-r1-0wrttime.pdf}{0.75}{Test 2, velocity command 12\% for both left and right wheels. q = 0.1, r = 1.0. Figure shows all three states with respect to time.\label{f:36-Test-2b}}{20}{190}{0}{210}
 
 By taking $q = 0.1$ and $r = 1.0$, the tracking ability of EKF was reduced. Figures \ref{f:34-Test-2a} and \ref{f:36-Test-2b} show a straight line run for 12\% velocity command. It can be observed from the plots that the state estimate is close to the measurement line but is unable to reach it. It remains at a varying offset to the measurement.
 
-\scalefig{Graphics/Results/04fL12R19-EKF-q0-1-r10.pdf}{0.75}{Test 3, velocity command 12\% for left wheel and 19\% for right wheel. q = 0.1, r = 10.\label{f:38-Test-3a}}
+\scalefigcrop{Graphics/Results/04fL12R19-EKF-q0-1-r10.pdf}{0.75}{Test 3, velocity command 12\% for left wheel and 19\% for right wheel. q = 0.1, r = 10.\label{f:38-Test-3a}}{20}{190}{0}{210}
 
-\scalefig{Graphics/Results/04fL12R19-EKF-q0-1-r10wrttime.pdf}{0.75}{Test 3, velocity command 12\% for left wheel and 19\% for right wheel. q = 0.1, r = 10. Figure shows all three states with respect to time.\label{f:40-Test-3b}}
+\scalefigcrop{Graphics/Results/04fL12R19-EKF-q0-1-r10wrttime.pdf}{0.75}{Test 3, velocity command 12\% for left wheel and 19\% for right wheel. q = 0.1, r = 10. Figure shows all three states with respect to time.\label{f:40-Test-3b}}{20}{190}{0}{210}
 
 We added further noise to the measurement model by taking  $q = 0.1$ and keeping $r = 10.0$. Figures \ref{f:38-Test-3a} and \ref{f:40-Test-3b} show plots of a counter clockwise rotation for 12\% left velocity command and 19\% right velocity command. State estimate is visibly drifted from the true position. With the increase in measurement noise, measurement loses its wightage in EKF. Further tests were conducted with keeping $r$ constant at 10.
 
-\scalefig{Graphics/Results/05fL19R12-EKF-q-1-0-r10.pdf}{0.75}{Test 4, velocity command 19\% for left wheel and 12\% for right wheel. q = 1.0, r = 10.\label{f:42-Test-4a}}
+\scalefigcrop{Graphics/Results/05fL19R12-EKF-q-1-0-r10.pdf}{0.75}{Test 4, velocity command 19\% for left wheel and 12\% for right wheel. q = 1.0, r = 10.\label{f:42-Test-4a}}{20}{190}{0}{210}
 
-\scalefig{Graphics/Results/05fL19R12-EKF-q-1-0-r10wrttime.pdf}{0.75}{Test 4, velocity command 19\% for left wheel and 12\% for right wheel. q = 1.0, r = 10. Figure shows all three states with respect to time.\label{f:44-Test-4b}}
+\scalefigcrop{Graphics/Results/05fL19R12-EKF-q-1-0-r10wrttime.pdf}{0.75}{Test 4, velocity command 19\% for left wheel and 12\% for right wheel. q = 1.0, r = 10. Figure shows all three states with respect to time.\label{f:44-Test-4b}}{20}{190}{0}{210}
 
 Figures \ref{f:42-Test-4a} and \ref{f:44-Test-4b} show another counter clockwise rotation at 12\% left velocity command and 19\% right velocity command for $q = 1.0$ and $r = 10.0$. Now, the EKF response is widely improved. By increasing the value of q, we are increasing the uncertainty in our process model. In comparison to the test anaylzed above, the measurement has gained its weightage here. However, it can be seen that there is still an error between the EKF based state estimate and the measurement.
 
-\scalefig{Graphics/Results/06fL12R19-EKF-q10-r10.pdf}{0.75}{Test 5, velocity command 12\% for left wheel and 19\% for right wheel. q = 10, r = 10.\label{f:46-Test-5a}}
+\scalefigcrop{Graphics/Results/06fL12R19-EKF-q10-r10.pdf}{0.75}{Test 5, velocity command 12\% for left wheel and 19\% for right wheel. q = 10, r = 10.\label{f:46-Test-5a}}{20}{190}{0}{210}
 
-\scalefig{Graphics/Results/06fL12R19-EKF-q10-r10wrttime.pdf}{0.75}{Test 5, velocity command 12\% for left wheel and 19\% for right wheel. q = 10, r = 10. Figure shows all three states with respect to time.\label{f:48-Test-5b}}
+\scalefigcrop{Graphics/Results/06fL12R19-EKF-q10-r10wrttime.pdf}{0.75}{Test 5, velocity command 12\% for left wheel and 19\% for right wheel. q = 10, r = 10. Figure shows all three states with respect to time.\label{f:48-Test-5b}}{20}{190}{0}{210}
 
 
 We further added more noise to the process model by increasing q.  Figures \ref{f:46-Test-5a} and \ref{f:48-Test-5b} show plots of a counter clockwise rotation at 12\% left velocity command and 19\% right velocity command for  $q = 10.0$ and $r = 10.0$. It can be observed that the EKF is able to track the localisation of the robot very well.The performance is comparable to results seen in figure 1 when the values for $q$ and $r$ are the same as $0.1$ and $0.1$. It can be understood that it is basically the relative ratio between Q and R matrices that determine the performance of EKF not the values of Q and R alone. 
 
-\scalefig{Graphics/Results/07fL19R12-EKF-q100-r10.pdf}{0.75}{Test 6, velocity command 19\% for left wheel and 12\% for right wheel. q = 100, r = 10.\label{f:50-Test-6a}}
+\scalefigcrop{Graphics/Results/07fL19R12-EKF-q100-r10.pdf}{0.75}{Test 6, velocity command 19\% for left wheel and 12\% for right wheel. q = 100, r = 10.\label{f:50-Test-6a}}{20}{190}{0}{210}
 
-\scalefig{Graphics/Results/07fL19R12-EKF-q100-r10wrttime.pdf}{0.75}{Test 6, velocity command 19\% for left wheel and 12\% for right wheel. q = 100, r = 10. Figure shows all three states with respect to time.\label{f:52--Test-6b}}
+\scalefigcrop{Graphics/Results/07fL19R12-EKF-q100-r10wrttime.pdf}{0.75}{Test 6, velocity command 19\% for left wheel and 12\% for right wheel. q = 100, r = 10. Figure shows all three states with respect to time.\label{f:52--Test-6b}}{20}{190}{0}{210}
 
 In figure \ref{f:50-Test-6a} and \ref{f:52--Test-6b}, we plot a clockwise rotation at 19\% left velocity command and 12\% right velocity command for  $q = 100.0$ and $r = 10.0$. By increasing the value of q, we are adding more noise to the process model, the measurement gains weightage in the EKF model. As can be observed in the figure, the EKF is able to localize the robot very well. It must be understood that this is because our measurement sensor provides very accurate localization of the robot.
 
-\scalefig{Graphics/Results/08fL12R19-EKF-q8-r32.pdf}{0.75}{Test 7, velocity command 12\% for left wheel and 19\% for right wheel. q = 8, r = 32.\label{f:54--Test-7a}}		
+\scalefigcrop{Graphics/Results/08fL12R19-EKF-q8-r32.pdf}{0.75}{Test 7, velocity command 12\% for left wheel and 19\% for right wheel. q = 8, r = 32.\label{f:54--Test-7a}}{20}{190}{0}{210}		
 
-\scalefig{Graphics/Results/08fL12R19-EKF-q8-r32wrttime.pdf}{0.75}{Test 8, velocity command 12\% for left wheel and 19\% for right wheel. q = 8, r = 32. Figure shows all three states with respect to time.\label{f:56--Test-7b}}
+\scalefigcrop{Graphics/Results/08fL12R19-EKF-q8-r32wrttime.pdf}{0.75}{Test 8, velocity command 12\% for left wheel and 19\% for right wheel. q = 8, r = 32. Figure shows all three states with respect to time.\label{f:56--Test-7b}}{20}{190}{0}{210}
 
 Final test was performed with values $q = 8.0$ and $r = 32.0$. Figures \ref{f:54--Test-7a} and \ref{f:56--Test-7b} show plots of a counter clockwise rotation at 12\% left velocity command and 19\% right velocity command. Since $r$ is greater than $q$, the measurement model has a lower weightage as compared to the process model. It can be observed from the plots that the EKF based state estimate is unable to localize the robot well and state estimate is visibly drifted from the true position especially when running a curve.
 
@@ -1582,9 +1628,9 @@ Final test was performed with values $q = 8.0$ and $r = 32.0$. Figures \ref{f:54
 Localization is the estimation of position and state of a system in the world frame of reference making use of limited information. Localization has been one of the primary challenges of working with mobile robots. It is very common in mobile robots to use odometry and inertial measurement unit (IMU) as relative position sensors and GPS as absolute position sensor to estimate state of the robot. Extended Kalman filter is a widely used filtering technique in estimating the localization of a robot that processes feedback from two or more sensors. 
 
 The presented project starts with preparing the odometry based physical model of Rollo, showing it's advantages and disadvantages with respect to the localization problem.
-Furthermore errors associated with odometry, divided into systematic and non systematic, were presented along with the UMBMark based square test technique to determine dominant odometry errors. 
+Furthermore errors associated with odometry, divided into systematic and non systematic, were presented along with the UMBmark based square test technique to determine dominant odometry errors. 
 
-Next the preparation of the system and measurement models was conducted and the equations for the implementation of EKF were defined. EKF was first simulated and verified in Matlab. The final tests were conducted on Rollo and the performance of EKF was analyzed by varying process covariance matrix, Q and noise covariance matrix, R. 
+Next the preparation of the system and measurement models was conducted and the equations for the implementation of EKF were defined. EKF was first simulated and verified in Matlab. The final tests were conducted on Rollo and the performance of EKF was analyzed by varying process covariance matrix, $Q$ and measurement covariance matrix, $R$. 
 
 For future work, it is proposed to first implement encoders feedback in the system and validate the EKF with working odometry. Even though the encoders feedback is currently unavailable in Rollo, the modeling of the system and software was designed for a swift and easy transition to odometry feedback. Next, another sensor should be introduced in the system since the motion capture system will be unavailable in field environment of the robot. 
 
@@ -1640,9 +1686,9 @@ In regards to the mechanical system of the robot, it is recommended that a diffe
 %\begin{IEEEeqnarray}{CCCCC} \label{e:4}
 %	F & = & 
 %	\begin{bmatrix}
-%		 f_{11}	& f_{12} & f_{13}\\
-%		 f_{21}	& f_{22} & f_{23}\\
-%		 f_{31} & f_{32} & f_{33}\\
+%		 f_{11}	& f_{12} & f_{13} \\
+%		 f_{21}	& f_{22} & f_{23} \\
+%		 f_{31} & f_{32} & f_{33} \\
 %	\end{bmatrix},
 %\end{IEEEeqnarray}
 %
