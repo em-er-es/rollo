@@ -74,7 +74,7 @@ rollo::WheelSpeed Odometry;
 double OdometryTimeSecs = 0;
 
 //! Node name using console codes
-char NodeName[20] = C1 KF CR; // The size is necessary for the GNU/Linux console codes //COLOR
+char NodeName[20] = C4 KF CR; // The size is necessary for the GNU/Linux console codes //COLOR
 // char NodeName[20] = KF; // The size is necessary for the GNU/Linux console codes //COLOR
 
 // Topics

@@ -83,7 +83,8 @@ from rollo.msg import Pose2DStamped
 # Global variables
 
 ## Node name using console codes
-NodeName = "VIS "
+NodeName = "\033[38;5;160mVIS \033[0m"
+# NodeName = "VIS "
 
 ## Visualize rate [Hz] == [fps]
 rate = 25 # 25 [Hz] = 25 [fps]
