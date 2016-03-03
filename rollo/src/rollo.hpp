@@ -88,21 +88,21 @@
 //! Reset
 #define CR "\033[0m"
 
-//! Color 1
+//! Color 1 - #5F5FFE
 #define C1 "\033[38;5;63m"
-//! Color 2
+//! Color 2 - #FFD700
 #define C2 "\033[38;5;220m"
-//! Color 3
+//! Color 3 - #5FFFFF
 #define C3 "\033[38;5;87m"
-//! Color 4
+//! Color 4 - #5FFF86
 #define C4 "\033[38;5;84m"
-//! Color 5
+//! Color 5 - #790303
 #define C5 "\033[38;5;160m"
-//! Color 6
+//! Color 6 - #D7005F
 #define C6 "\033[38;5;161m"
-//! Color 7
+//! Color 7 - #D70080
 #define C7 "\033[38;5;162m"
-//! Color 8
+//! Color 8 - #005F00
 #define C8 "\033[38;5;22m"
 
 //! Error
