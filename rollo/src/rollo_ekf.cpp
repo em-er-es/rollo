@@ -316,7 +316,7 @@ private_node_handle_.param("rate", rate_frequency, int(10));
 //! - Publishing rate [Hz]
 ros::Rate frequency(rate_frequency);
 
-//! - Loop condition variable
+//! - Loop condition and counter variable
 int loopcondition = 1;
 
 //! - Initialize variables involved in computation of EKF:
@@ -641,7 +641,8 @@ do {
 
 	ros::spinOnce();
 
-	// ROS_INFO("[Rollo][Debug][Counter]: %d", LoopCounter); //DB
+	ROS_INFO("[Rollo][%s][Counter]: %d", NodeName, loopcondition); //DB
+	loopcondition++;
 
 	if (! ros::ok()) loopcondition = 0;
 
