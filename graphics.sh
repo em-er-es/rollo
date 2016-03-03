@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 DIRG="Graphics";
 EXT1="svg";
 EXT2="pdf";
