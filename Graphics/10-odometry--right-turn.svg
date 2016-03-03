@@ -39,13 +39,13 @@
      inkscape:bbox-paths="true"
      inkscape:snap-bbox="true"
      inkscape:snap-page="true"
-     inkscape:current-layer="svg2"
+     inkscape:current-layer="layer9"
      inkscape:window-maximized="1"
      inkscape:window-y="38"
      inkscape:window-x="0"
-     inkscape:cy="500.17625"
-     inkscape:cx="407.19584"
-     inkscape:zoom="0.70710678"
+     inkscape:cy="594.55621"
+     inkscape:cx="850.67354"
+     inkscape:zoom="1"
      fit-margin-bottom="0"
      fit-margin-right="0"
      fit-margin-left="0"
@@ -54,7 +54,7 @@
      width="0px"
      showgrid="true"
      id="namedview6"
-     inkscape:window-height="672"
+     inkscape:window-height="692"
      inkscape:window-width="1366"
      inkscape:pageshadow="2"
      inkscape:pageopacity="1"
@@ -490,7 +490,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <dc:creator>
           <cc:Agent>
             <dc:title>Ernest Skrzypczyk</dc:title>
@@ -506,8 +506,7 @@
      inkscape:groupmode="layer"
      id="layer15"
      inkscape:label="CW"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <g
        inkscape:groupmode="layer"
        id="layer4"
@@ -841,7 +840,7 @@
                d="m 491.91,422.89 -0.02,0.94 -0.06,0.94 -0.11,0.91 -0.15,0.91 -0.18,0.88 -0.23,0.87 -0.26,0.85 -0.3,0.83 -0.34,0.81 -0.37,0.79 -0.4,0.76 -0.43,0.74 -0.47,0.71 -0.49,0.69 -0.53,0.66 -0.55,0.63 -0.58,0.6 -0.6,0.57 -0.63,0.54 -0.65,0.51 -0.67,0.47 -0.7,0.44 -0.71,0.39 -0.74,0.37 -0.75,0.32 -0.76,0.29 -0.79,0.24 -0.8,0.2 -0.81,0.16 -0.82,0.11 -0.84,0.07 -0.84,0.03 0,-1.1 c 5.03,0 11.75,-4.53 11.75,-17.13 0,-12.71 -7.02,-16.84 -11.7,-16.84 l 0,0 c -4.93,0 -11.76,4.28 -11.76,16.84 0,12.8 6.93,17.13 11.71,17.13 l 0,1.1 c -8.92,0 -16.54,-7.97 -16.54,-18.23 0,-10.21 7.67,-17.99 16.54,-17.99 9.06,0 16.58,7.92 16.58,17.99 z"
                id="path6224" /><polygon
                style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-opacity:1"
-               points="484.24,426.62 483,426.62 483,424.93 467.71,424.93 467.71,426.62 466.46,426.62 466.46,419.45 467.71,419.45 467.71,421.14 483,421.14 483,419.45 484.24,419.45 "
+               points="483,424.93 467.71,424.93 467.71,426.62 466.46,426.62 466.46,419.45 467.71,419.45 467.71,421.14 483,421.14 483,419.45 484.24,419.45 484.24,426.62 483,426.62 "
                id="polygon6226" /></g>        </g>
         <g
            style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1"
@@ -1185,18 +1184,6 @@
              y="380.875"
              style="text-align:center;text-anchor:middle" /></flowRegion><flowPara
            id="flowPara5044">$S_R$</flowPara></flowRoot>      <flowRoot
-         xml:space="preserve"
-         id="flowRoot5054"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         transform="matrix(0.42165512,0,0,2.0051892,577.63968,-375.84754)"><flowRegion
-           id="flowRegion5056"><rect
-             id="rect5058"
-             width="69.5"
-             height="19.125"
-             x="1002.5"
-             y="372.875"
-             style="text-align:center;text-anchor:middle" /></flowRegion><flowPara
-           id="flowPara5060">$\Theta$</flowPara></flowRoot>      <flowRoot
          transform="matrix(1.1969256,0,0,2.0051875,-137.35544,-503.27908)"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          id="flowRoot5654"
@@ -1208,7 +1195,20 @@
              height="14.961223"
              width="25.064217"
              id="rect5658" /></flowRegion><flowPara
-           id="flowPara5660">$r$</flowPara></flowRoot>    </g>
+           id="flowPara5660">$r$</flowPara></flowRoot>      <flowRoot
+         transform="matrix(0.97032001,0,0,5.0704146,17.536857,-1518.7934)"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="flowRoot8448-7"
+         xml:space="preserve"><flowRegion
+           id="flowRegion8450-0"><rect
+             style="text-align:center;text-anchor:middle"
+             y="372.875"
+             x="1002.5"
+             height="19.125"
+             width="69.5"
+             id="rect8452-2" /></flowRegion><flowPara
+           id="flowPara8454-7"
+           style="font-size:5.43767977px">$\Delta\Theta$</flowPara></flowRoot>    </g>
   </g>
   <g
      style="display:none"

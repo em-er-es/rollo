@@ -56,7 +56,7 @@
     \put(0.12857343,0.23455016){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.03077997\unitlength}\centering $P_i$\end{minipage}}}%
     \put(0.3413334,0.23455015){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02736415\unitlength}\centering $S_L$\end{minipage}}}%
     \put(0.04500528,0.30269259){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.03134516\unitlength}\centering $S_R$\end{minipage}}}%
-    \put(0.84085841,0.24220919){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02773494\unitlength}\centering $\Theta$\end{minipage}}}%
     \put(0.57647984,0.10610322){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02839267\unitlength}\centering $r$\end{minipage}}}%
+    \put(0.83133146,0.24220913){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.06382413\unitlength}\centering $\Delta\Theta$\end{minipage}}}%
   \end{picture}%
 \endgroup%

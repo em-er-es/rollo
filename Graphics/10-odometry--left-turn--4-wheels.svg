@@ -39,13 +39,13 @@
      inkscape:bbox-paths="true"
      inkscape:snap-bbox="true"
      inkscape:snap-page="true"
-     inkscape:current-layer="svg2"
+     inkscape:current-layer="g8398"
      inkscape:window-maximized="1"
      inkscape:window-y="38"
      inkscape:window-x="0"
-     inkscape:cy="514.31839"
-     inkscape:cx="764.99187"
-     inkscape:zoom="0.70710678"
+     inkscape:cy="566.72161"
+     inkscape:cx="253.87949"
+     inkscape:zoom="8"
      fit-margin-bottom="0"
      fit-margin-right="0"
      fit-margin-left="0"
@@ -54,7 +54,7 @@
      width="0px"
      showgrid="true"
      id="namedview6"
-     inkscape:window-height="672"
+     inkscape:window-height="692"
      inkscape:window-width="1366"
      inkscape:pageshadow="2"
      inkscape:pageopacity="1"
@@ -490,7 +490,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <dc:creator>
           <cc:Agent>
             <dc:title>Ernest Skrzypczyk</dc:title>
@@ -1214,8 +1214,7 @@
      style="display:inline"
      inkscape:label="CCW"
      id="g8204"
-     inkscape:groupmode="layer"
-     sodipodi:insensitive="true">
+     inkscape:groupmode="layer">
     <g
        style="display:none;opacity:0.8"
        inkscape:label="Wheels-1L"
@@ -1549,7 +1548,7 @@
                inkscape:connector-curvature="0"
                style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-opacity:1" /><polygon
                id="polygon8310"
-               points="484.24,419.45 484.24,426.62 483,426.62 483,424.93 467.71,424.93 467.71,426.62 466.46,426.62 466.46,419.45 467.71,419.45 467.71,421.14 483,421.14 483,419.45 "
+               points="483,421.14 483,419.45 484.24,419.45 484.24,426.62 483,426.62 483,424.93 467.71,424.93 467.71,426.62 466.46,426.62 466.46,419.45 467.71,419.45 467.71,421.14 "
                style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-opacity:1" /></g>        </g>
         <g
            id="g8312"
@@ -1892,7 +1891,7 @@
              width="53.5"
              id="rect8444" /></flowRegion><flowPara
            id="flowPara8446">$S_R$</flowPara></flowRoot>      <flowRoot
-         transform="matrix(0.42165512,0,0,2.0051892,-171.97161,-375.84754)"
+         transform="matrix(0.97032001,0,0,5.0704146,-745.76875,-1518.7935)"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          id="flowRoot8448"
          xml:space="preserve"><flowRegion
@@ -1903,7 +1902,8 @@
              height="19.125"
              width="69.5"
              id="rect8452" /></flowRegion><flowPara
-           id="flowPara8454">$\Theta$</flowPara></flowRoot>      <flowRoot
+           id="flowPara8454"
+           style="font-size:5.43767977px">$\Delta\Theta$</flowPara></flowRoot>      <flowRoot
          xml:space="preserve"
          id="flowRoot8456"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
