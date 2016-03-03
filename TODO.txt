@@ -1,7 +1,7 @@
 [C] - Add analysis node with psuedo real time plotting
 [D] - Fix doxygen documentation
-[P] - Redraw odometry model figures
-[P] - Finish local documentation
+[D] - Redraw odometry model figures
+[D] - Finish local documentation
 [D] - Document scripts in the LaTeX file, provide description
 [C] - Add dynamic reconfigure dependency
 [D] - Add media descriptions in documentation and locally
