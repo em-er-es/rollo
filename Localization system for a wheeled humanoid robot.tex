@@ -373,16 +373,13 @@ A differential drive robot runs straight when the linear speed of both the left 
 	\item Straight line
 \end{enumerate}
 
-%TODO FIG START reenable this part after images are drawn
-%The basic premise for the odometry model of the Rollo humanoid robot is presented in figures \fref{10-odometry-rt-2w} and \fref{10-odometry-lt-4w}.
+The basic premise for the odometry model of the Rollo humanoid robot is presented in figures \fref{10-odometry-rt-2w} and \fref{10-odometry-lt-4w}.
 
-%D%\includesvg[0.75]{Graphics/10-odometry--left-turn}{Odometry model with the simplified 2 wheel configuration for the right turn.\label{f:10-odometry-lt-2w}}
+%\includesvg[0.75]{Graphics/10-odometry--left-turn}{Odometry model with the simplified 2 wheel configuration for the right turn.\label{f:10-odometry-lt-2w}}
 \includesvg[0.75]{Graphics/10-odometry--right-turn}{Odometry model with the simplified 2 wheel configuration for the right turn.\label{f:10-odometry-rt-2w}}
 
-%D%\includesvg[0.75]{Graphics/10-odometry--right-turn--4-wheels}{Odometry model with the simplified 4 wheel configuration for the right turn.\label{f:10-odometry-rt-4w}}
+%\includesvg[0.75]{Graphics/10-odometry--right-turn--4-wheels}{Odometry model with the simplified 4 wheel configuration for the right turn.\label{f:10-odometry-rt-4w}}
 \includesvg[0.75]{Graphics/10-odometry--left-turn--4-wheels}{Odometry model with the simplified 4 wheel configuration for the left turn.\label{f:10-odometry-lt-4w}}
-
-%TODO FIG END
 
 \subsection{Clockwise direction}\label{s:10-odometry--cw}
 \indent\indent
@@ -402,7 +399,6 @@ With encoder feedback from left and right wheel, $S_L$ and $S_R$ can simply be c
 
 where $n_L$ and $n_R$ are the revolutions per minute ($[rpm]$) of left and right wheel, $r_L$ and $r_R$ are the radii of the two wheels and $t$ is time step in seconds. %TODO Legend table might be better, but leave it as it
 
-
 $S_L$ and $S_R$ can be related to $r$ and $\Delta \Theta$ using formulas \eref{e:SL=rtheta} and \eref{e:SR=rtheta}
 
 \begin{equation}\label{e:SL=rtheta}
@@ -415,7 +411,6 @@ $S_L$ and $S_R$ can be related to $r$ and $\Delta \Theta$ using formulas \eref{e
 
 The equations \eref{e:SL=rtheta} and \eref{e:SR=rtheta} \vpageref[above]{e:SL=rtheta} can be solved simultaneously to compute $\Delta \Theta$ defined in \eref{e:thetaCW}.
 
-
 %\begin{equation}\label{e:r}
 %	r  = \frac{l}{2} \cdot \frac{S_L + S_R}{S_L - S_R} % Travel distance
 %\end{equation}
@@ -424,15 +419,15 @@ The equations \eref{e:SL=rtheta} and \eref{e:SR=rtheta} \vpageref[above]{e:SL=rt
 	\Delta \Theta = \frac{S_L - S_R}{l} % Travel angle
 \end{equation}
 
-The length between initial position $P_i$ and final position $P_f$ can be approximated by taking average of $S_L$ and $S_R$ . %\eref{e:delS}.
+The length between initial position $P_i$ and final position $P_f$ can be approximated by taking average of $S_L$ and $S_R$. %\eref{e:delS}.
 
 \begin{equation}\label{e:delS}
 	\Delta S = \frac{S_L + S_R}{2} % del S 
 \end{equation}
 
-Final position of the robot and its orientation can then be derived using basic trigonometry and geometry relations as displayed in equation \eref{e:P_fCW}. In general this length %TODO [FIG] reference for "this length"
- is approximated to $\Delta S$ for a very small step of time. %%FIG
+Final position of the robot $P_f$ and its orientation $\Theta_f$ can then be derived using basic trigonometry and geometry relations as shown in figure \fref{10-odometry--movement} and portrayed in equation \eref{e:P_fCW}. In general case the length of arc $S$ connecting $P_i$ and $P_f$ can be approximated as $\Delta S$. This is because $\Delta S$ is very convenient to compute from encoders feedback and the two lengths are almost equal for a very small movements and step of time. This is basically the same technique used to compute $\pi$ or similar analogue to digital conversion problems. Should the time step increase however, then the error between $S$ and $\Delta S$, represented as red area, will grow, making the approximation very inaccurate.
 
+\includesvg[0.75]{Graphics/10-odometry--movement}{Odometry model derivation using trigonometry for computation of position and orientation during movement.\label{f:10-odometry--movement}}
 
 \begin{IEEEeqnarray}{CCC}\label{e:P_fCW}
 	P_f  & = & 
@@ -513,6 +508,8 @@ The equations selected for this model are as follows.
 \mathrm{\Theta_f = \Theta_i - \Delta \Theta}\nonumber
 \end{equation}
 
+The standalone Python script \verb|rollo_compute_position.py| can provide further details on the odometry model.
+
 %TODO CHECKED
 \subsection{Adaptation of odometry model for Rollo}\label{s:10-odometry--rollo}
 \indent\indent
@@ -567,7 +564,7 @@ Table \tref{command-velocities-estimates} shows the predetermined angular veloci
 %TODO Choose one of the tables, I would suggest the latter for formatting benefits that come with page changes for example, but it's up to you. Comment the other one out
 
 %\makebox[\textwidth][c]{ %TODO Choose which ever you prefer, format can be fixed. Need a few more minutes on this
-	\begin{table}
+	\begin{table}[h]
 		\centering
 		\caption{Predetermined wheels angular velocity based on test logs for given forward command.}
 		\label{t:command-velocities-estimates}
@@ -1499,7 +1496,7 @@ This setup introduced additional errors in the movement and furthermore also loc
 
 \clearpage
 
-\scalefigcrop{Graphics/45-mechanical-and-electrical-improvements--electrical-improvements-03.png}{0.4}{Voltage regulator with new power cables. The cabletie is used to secure the damaged power connector case, which were of very poor quality.\label{f:45-mechanical-and-electrical-improvements--electrical-improvements-03}}{0}{0}{0}{0}
+\scalefigcrop{Graphics/45-mechanical-and-electrical-improvements--electrical-improvements-03.png}{0.4}{Voltage regulator with new power cables. The cable tie was used to secure the damaged power connector case, which was of very poor quality.\label{f:45-mechanical-and-electrical-improvements--electrical-improvements-03}}{0}{0}{0}{0}
 
 \scalefigcrop{Graphics/45-mechanical-and-electrical-improvements--electrical-improvements-04.png}{0.4}{Control cable for the motor controller with a connector table for easy access.\label{f:45-mechanical-and-electrical-improvements--electrical-improvements-04}}{0}{0}{0}{0}
 
@@ -1512,7 +1509,7 @@ This setup introduced additional errors in the movement and furthermore also loc
 
 \clearpage
 
-At one point during the work with Rollo one of the power connectors caused a short circuit, which damaged the \link[DROK voltage regulator]{http://www.droking.com/drok-great-handy-volt-buck-converter-with-voltmeter-creates-easy-convenient-voltage-regulation/}'s \link[semiconductor integrated circuit LM2596]{http://www.ti.com/lit/ds/symlink/lm2596.pdf} seen in figure \fref{45-mechanical-and-electrical-improvements--electrical-improvements-03}. After this incident the decision was made to replace all power connections with new power cables with higher and only one diameter. Also all control signal cables have been replaced and secured with cleaned-up cableties as seen through figures \fref{45-mechanical-and-electrical-improvements--electrical-improvements-01} $\div$ \fref{45-mechanical-and-electrical-improvements--electrical-improvements-07}. Only the VGA socket cable connecting both microcontroller boards has not been replaced, however it's connections have also been improved.
+At one point during the work with Rollo one of the power connectors caused a short circuit, which damaged the \link[DROK voltage regulator]{http://www.droking.com/drok-great-handy-volt-buck-converter-with-voltmeter-creates-easy-convenient-voltage-regulation/}'s \link[semiconductor integrated circuit LM2596]{http://www.ti.com/lit/ds/symlink/lm2596.pdf} seen in figure \fref{45-mechanical-and-electrical-improvements--electrical-improvements-03}. After this incident the decision was made to replace all power connections with new power cables with higher and only one diameter. Also all control signal cables have been replaced and secured with cleaned up cable ties as seen through figures \fref{45-mechanical-and-electrical-improvements--electrical-improvements-01} $\div$ \fref{45-mechanical-and-electrical-improvements--electrical-improvements-07}. Only the VGA socket cable connecting both microcontroller boards has not been replaced, however it's connections have also been improved.
 
 \scalefigcrop{Graphics/45-mechanical-and-electrical-improvements--electrical-improvements-07.png}{0.5}{Encoder and motor controller connections to the microcontroller board using IDE40 cables.\label{f:45-mechanical-and-electrical-improvements--electrical-improvements-07}}{0}{0}{0}{0}
 
