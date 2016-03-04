@@ -36,7 +36,7 @@
   }%
   \providecommand\rotatebox[2]{#2}%
   \ifx\svgwidth\undefined%
-    \setlength{\unitlength}{1651.78694458bp}%
+    \setlength{\unitlength}{938.08889795bp}%
     \ifx\svgscale\undefined%
       \relax%
     \else%
@@ -48,15 +48,25 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.9307442)%
+  \begin{picture}(1,0.86282496)%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{10-odometry--movement.pdf}}%
-    \put(0.87668616,0.41701924){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.01452972\unitlength}\centering $l$\end{minipage}}}%
-    \put(0.52729981,0.50157183){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.00169513\unitlength}\raggedright \end{minipage}}}%
-    \put(0.63983119,0.51817308){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.01198641\unitlength}\raggedright \end{minipage}}}%
-    \put(0.89544902,0.5138384){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.0157514\unitlength}\centering $P_i$\end{minipage}}}%
-    \put(0.78831861,0.51383839){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.01400338\unitlength}\centering $S_L$\end{minipage}}}%
-    \put(0.93792474,0.54870973){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.01604063\unitlength}\centering $S_R$\end{minipage}}}%
-    \put(0.53250031,0.51775785){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.01419313\unitlength}\centering $\Theta$\end{minipage}}}%
-    \put(0.66745958,0.44810674){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.01452972\unitlength}\centering $r$\end{minipage}}}%
+    \put(0.10925285,0.18974828){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.00298479\unitlength}\raggedright \end{minipage}}}%
+    \put(0.3073981,0.21897976){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02110567\unitlength}\raggedright \end{minipage}}}%
+    \put(0.09414356,0.17886876){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.05751032\unitlength}\centering $\Delta\Theta$\end{minipage}}}%
+    \put(0.73142801,0.51161096){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.09284233\unitlength}\centering $S$\end{minipage}}}%
+    \put(0.72445235,0.04086808){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02558393\unitlength}\centering $l$\end{minipage}}}%
+    \put(0.76995576,0.23863674){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.04307247\unitlength}\centering $\Theta_i$\end{minipage}}}%
+    \put(0.53441128,0.23863677){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02465715\unitlength}\centering $S_L$\end{minipage}}}%
+    \put(0.83877204,0.51153203){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02824434\unitlength}\centering $S_R$\end{minipage}}}%
+    \put(0.35604617,0.09560695){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02558392\unitlength}\centering $r$\end{minipage}}}%
+    \put(0.26275791,0.38187896){\color[rgb]{0,0,0}\rotatebox{37.46098516}{\makebox(0,0)[lt]{\begin{minipage}{0.0358684\unitlength}\centering $r$\end{minipage}}}}%
+    \put(0.86631651,0.04078773){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.02773506\unitlength}\centering $P_i$\end{minipage}}}%
+    \put(0.52633901,0.31376195){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.04080011\unitlength}\centering $\Delta S$\end{minipage}}}%
+    \put(0.96811435,0.21134727){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.04245338\unitlength}\centering $\Theta_f$\end{minipage}}}%
+    \put(0.47187285,0.64797965){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.0269316\unitlength}\centering $P_f$\end{minipage}}}%
+    \put(0.43680266,0.42347688){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.14319607\unitlength}\centering $90\degree - \frac{\Delta\Theta}{2}$\end{minipage}}}%
+    \put(0.59376832,0.75095117){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.13626811\unitlength}\centering $\Theta_i + \frac{\Delta\Theta}{2}$\end{minipage}}}%
+    \put(0.43964443,0.77766838){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.06793408\unitlength}\centering $\frac{\Delta \Theta}{2}$\end{minipage}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{10-odometry--movement.pdf}}%
   \end{picture}%
 \endgroup%
