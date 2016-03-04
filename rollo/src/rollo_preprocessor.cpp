@@ -53,7 +53,7 @@ double x, y, theta;
 //! Absolute coordinates in various units
 double x_mm, y_mm, theta_deg;
 
-//! Topics
+// Topics
 //! Topic for motion capture data
 char TopicMotionCapture[64] = TOPIC_PREP_MC;
 //! Topic for position and orientation, stamped
