@@ -295,7 +295,7 @@
 	\enterProblemHeader{\ProblemName\ [\SectionName]}}
 
 {\enterProblemHeader{\ProblemName} \changetext{}{+\SectionLabelLength}{}{}{}}
-
+%FIX Determine total character length, substract from it the authors string and limit problemname string accordingly, in worst case skip it
 \newcommand{\sectionAnswer}[1]
 {
 	\noindent\fbox{\begin{minipage}[c]{\columnwidth}#1\end{minipage}}
@@ -338,7 +338,9 @@
 %\setcounter{page}{1}
 
 % % % Text
-\begin{Problem}[Rollo - Humanoid robot]
+%\begin{Problem}[Rollo - Humanoid robot]
+%\begin{Problem}[Localization system for a wheeled humanoid robot]
+\begin{Problem}[Localization problem]
 \section{Odometry}\label{s:10-odometry}
 \indent\indent
 Odometry is one of the most widely used technique for determining the position of a mobile robot
@@ -1466,7 +1468,8 @@ The square test algorithm has been implemented directly into the communication n
 
 Since the encoder feedback from Rollo was unavailable, the communication node did not include necessary code for receiving that data and processing it. Great effort has been undertaken to prepare Rollo from the hardware side for encoder feedback, but in the end the low-level software was missing. This bidirectional communication between Rollo and communication node has been portrayed in diagram \fref{40-ros--nodes-diagram}, since it is a crucial feature for proper implementation of any localization solver.
 
-Further details on the setup and nodes are described in next section \nameref{s:50-simulation-and-testing}. More in depth documentation of the actual code and algorithms has been done using Doxygen in two formats: \link[HTML version]{http://htmlpreview.github.io/?http://github.com/em-er-es/rollo/blob/master/Documentation/html/index.html} and \link[local LaTeX document form]{https://github.com/em-er-es/rollo/raw/master/Documentation/latex/refman.pdf}.
+%Further details on the setup and nodes are described in next section \nameref{s:50-simulation-and-testing}. More in depth documentation of the actual code and algorithms has been done using Doxygen in two formats: \link[HTML version]{http://htmlpreview.github.io/?http://github.com/em-er-es/rollo/blob/master/Documentation/html/index.html} and \link[local LaTeX document form]{https://github.com/em-er-es/rollo/raw/master/Documentation/latex/refman.pdf}.
+Further details on the software are described in section \nameref{s:50-simulation-and-testing}. More in depth documentation has been done using Doxygen in \link[HTML]{http://htmlpreview.github.io/?http://github.com/em-er-es/rollo/blob/master/Documentation/html/index.html} and \link[LaTeX]{https://github.com/em-er-es/rollo/raw/master/Documentation/latex/refman.pdf} formats.
 
 %TODO CHECKED
 
@@ -1515,7 +1518,7 @@ At one point during the work with Rollo one of the power connectors caused a sho
 
 \clearpage
 
-\scalefigcrop{Graphics/45-mechanical-and-electrical-improvements--final-state.png}{0.5}{Final state of Rollo after improvements. Additional hardware in form of Kinect andd RaspberryPi have been added for another project. \label{f:45-mechanical-and-electrical-improvements--final-state}}{0}{0}{0}{0}
+\scalefigcrop{Graphics/45-mechanical-and-electrical-improvements--final-state.png}{0.5}{Final state of Rollo after improvements. Additional hardware in form of Kinect and RaspberryPi have been added for another project. \label{f:45-mechanical-and-electrical-improvements--final-state}}{0}{0}{0}{0}
 
 The final state after mechanical and electrical improvements can be seen in image in figure \fref{45-mechanical-and-electrical-improvements--final-state}. The introduced improvements provided a safe and disturbance-free operation not only for this project. Also the capability of reading the encoders has been enabled through a complete rewiring and clean-up of signal cables.
 
